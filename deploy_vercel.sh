@@ -1,0 +1,21 @@
+#!/bin/bash
+
+echo "🚀 部署到Vercel"
+
+echo "📋 请按以下步骤部署到Vercel:"
+echo ""
+echo "1️⃣ 安装Vercel CLI:"
+echo "   npm i -g vercel"
+echo ""
+echo "2️⃣ 登录Vercel:"
+echo "   vercel login"
+echo ""
+echo "3️⃣ 部署项目:"
+echo "   vercel --prod"
+echo ""
+echo "4️⃣ 或者通过Web界面:"
+echo "   - 访问: https://vercel.com/new"
+echo "   - 导入GitHub仓库"
+echo "   - 自动部署"
+echo ""
+echo "✅ Vercel优势: 全球CDN加速，访问速度快"
