@@ -467,7 +467,7 @@ function createCurrencyModal() {
     const modalStyles = `
         <style>
         .currency-modal {
-            display: none;
+            display: none !important;
             position: fixed;
             z-index: 10000;
             left: 0;
@@ -479,7 +479,7 @@ function createCurrencyModal() {
         }
         
         .currency-modal.show {
-            display: flex;
+            display: flex !important;
             align-items: center;
             justify-content: center;
         }
@@ -674,20 +674,27 @@ function selectToCurrency() {
 
 // 🎯 关闭币种选择模态框
 function closeCurrencyModal() {
-    // document.getElementById('currencyModal').classList.remove('show');
+    debugLog('🔄 开始关闭币种选择模态框...');
     const modal = document.getElementById('currencyModal');
+    debugLog(`🔍 模态框元素查找结果:`, modal);
     if (modal) {
+        const hasShowClass = modal.classList.contains('show');
+        debugLog(`🔍 模态框是否有show类: ${hasShowClass}`);
         modal.classList.remove('show');
+        modal.style.display = 'none'; // 强制隐藏
         debugLog('✅ 币种选择模态框已关闭');
     } else {
         debugLog('⚠️ 找不到币种选择模态框元素');
     }
     isSelectingCurrency = false;
     selectingType = '';
+    debugLog(`🔄 重置选择状态: isSelectingCurrency=${isSelectingCurrency}, selectingType='${selectingType}'`);
 }
 
 // 🎯 选择币种
 function selectCurrency(symbol) {
+    debugLog(`🎯 开始选择币种: ${symbol}, 选择类型: ${selectingType}`);
+
     const allCurrencies = {
         'TRX': { name: 'TRON', icon: 'trx-icon', balance: userBalance || 0 },
         'USDT': { name: 'Tether', icon: 'usdt-icon', balance: 0 },
@@ -695,36 +702,74 @@ function selectCurrency(symbol) {
     };
 
     const currency = allCurrencies[symbol];
-    if (!currency) return;
+    if (!currency) {
+        debugLog(`❌ 找不到币种信息: ${symbol}`);
+        return;
+    }
 
     if (selectingType === 'from') {
         currentFromCurrency = symbol;
-        const fromCurrencyInfo = document.querySelector('.currency-input:last-child .currency-info');
+        debugLog(`🔄 更新FROM币种为: ${symbol}`);
+
+        // 更新FROM区域的币种显示
+        const fromCurrencyInfo = document.querySelector('.currency-input:first-child .currency-info');
+        debugLog(`🔍 FROM区域元素查找结果:`, fromCurrencyInfo);
+
         if (fromCurrencyInfo) {
             const iconElement = fromCurrencyInfo.querySelector('.currency-icon');
             const nameElement = fromCurrencyInfo.querySelector('.currency-name');
             const balanceElement = fromCurrencyInfo.querySelector('.currency-balance');
 
+            debugLog(`🔍 FROM子元素查找结果:`, { iconElement, nameElement, balanceElement });
+
             if (iconElement) {
                 iconElement.className = `currency-icon ${currency.icon}`;
                 iconElement.textContent = symbol.charAt(0);
+                debugLog(`✅ 更新FROM图标: ${symbol.charAt(0)}`);
             }
             if (nameElement) {
                 nameElement.textContent = symbol;
+                debugLog(`✅ 更新FROM名称: ${symbol}`);
             }
             if (balanceElement) {
                 balanceElement.textContent = `可用: ${currency.balance} ${symbol}`;
+                debugLog(`✅ 更新FROM余额: ${currency.balance} ${symbol}`);
             }
+        } else {
+            debugLog(`❌ 找不到FROM区域元素`);
         }
 
-        debugLog(`💰 选择支付币种: ${symbol}`);
+        debugLog(`💰 选择支付币种完成: ${symbol}`);
     } else if (selectingType === 'to') {
         currentToCurrency = symbol;
-        document.getElementById('toCurrencyIcon').className = `currency-icon ${currency.icon}`;
-        document.getElementById('toCurrencyIcon').textContent = symbol.charAt(0);
-        document.getElementById('toCurrencyName').textContent = symbol;
-        debugLog(`💰 选择接收币种: ${symbol}`);
+        debugLog(`🔄 更新TO币种为: ${symbol}`);
+
+        // 更新TO区域的币种显示
+        const toCurrencyInfo = document.querySelector('.currency-input:last-child .currency-info');
+        debugLog(`🔍 TO区域元素查找结果:`, toCurrencyInfo);
+
+        if (toCurrencyInfo) {
+            const iconElement = toCurrencyInfo.querySelector('.currency-icon');
+            const nameElement = toCurrencyInfo.querySelector('.currency-name');
+
+            debugLog(`🔍 TO子元素查找结果:`, { iconElement, nameElement });
+
+            if (iconElement) {
+                iconElement.className = `currency-icon ${currency.icon}`;
+                iconElement.textContent = symbol.charAt(0);
+                debugLog(`✅ 更新TO图标: ${symbol.charAt(0)}`);
+            }
+            if (nameElement) {
+                nameElement.textContent = symbol;
+                debugLog(`✅ 更新TO名称: ${symbol}`);
+            }
+        } else {
+            debugLog(`❌ 找不到TO区域元素`);
+        }
+
+        debugLog(`💰 选择接收币种完成: ${symbol}`);
     }
+
     debugLog(`🎯 币种选择完成，准备关闭模态框: ${symbol}`);
     closeCurrencyModal();
 
@@ -732,6 +777,8 @@ function selectCurrency(symbol) {
     if (typeof calculateConversion === 'function') {
         calculateConversion();
         debugLog('💱 重新计算兑换完成');
+    } else {
+        debugLog('⚠️ calculateConversion函数不存在');
     }
 }
 
@@ -775,52 +822,80 @@ function swapCurrencies() {
     const toCurrency = allCurrencies[currentToCurrency];
 
     if (fromCurrency && toCurrency) {
-        //更新from区域显示
-        const fromCurrencyInfo = document.querySelector('.currency-input:first-child .currency-info');
-        // 更新支付币种显示
-        if (fromCurrencyInfo) {
-            const fromIcon = fromCurrencyInfo.getElementById('fromCurrencyIcon');
-            const fromName = fromCurrencyInfo.getElementById('fromCurrencyName');
-            const fromBalance = fromCurrencyInfo.getElementById('fromCurrencyBalance')
+        debugLog(`🔄 开始更新交换后的UI显示...`);
+        debugLog(`📊 FROM币种信息:`, fromCurrency);
+        debugLog(`📊 TO币种信息:`, toCurrency);
 
-            if (fromIcon) {
-                fromIcon.className = `currency-icon ${fromCurrency.icon}`;
-                fromIcon.textContent = currentFromCurrency.charAt(0);
+        // 更新FROM区域显示
+        const fromCurrencyInfo = document.querySelector('.currency-input:first-child .currency-info');
+        debugLog(`🔍 FROM区域元素:`, fromCurrencyInfo);
+
+        if (fromCurrencyInfo) {
+            const iconElement = fromCurrencyInfo.querySelector('.currency-icon');
+            const nameElement = fromCurrencyInfo.querySelector('.currency-name');
+            const balanceElement = fromCurrencyInfo.querySelector('.currency-balance');
+
+            debugLog(`🔍 FROM子元素:`, { iconElement, nameElement, balanceElement });
+
+            if (iconElement) {
+                iconElement.className = `currency-icon ${fromCurrency.icon}`;
+                iconElement.textContent = currentFromCurrency.charAt(0);
+                debugLog(`✅ 更新FROM图标: ${currentFromCurrency.charAt(0)}`);
             }
-            if (fromName) {
-                fromName.textContent = currentFromCurrency;
+            if (nameElement) {
+                nameElement.textContent = currentFromCurrency;
+                debugLog(`✅ 更新FROM名称: ${currentFromCurrency}`);
             }
-            if (fromBalance) {
-                fromBalance.textContent = `可用: ${fromCurrency.balance} ${currentFromCurrency}`;
+            if (balanceElement) {
+                balanceElement.textContent = `可用: ${fromCurrency.balance} ${currentFromCurrency}`;
+                debugLog(`✅ 更新FROM余额: ${fromCurrency.balance} ${currentFromCurrency}`);
             }
+        } else {
+            debugLog(`❌ 找不到FROM区域元素`);
         }
-        //更新to区域显示
+
+        // 更新TO区域显示
         const toCurrencyInfo = document.querySelector('.currency-input:last-child .currency-info');
+        debugLog(`🔍 TO区域元素:`, toCurrencyInfo);
+
         if (toCurrencyInfo) {
             const iconElement = toCurrencyInfo.querySelector('.currency-icon');
             const nameElement = toCurrencyInfo.querySelector('.currency-name');
 
+            debugLog(`🔍 TO子元素:`, { iconElement, nameElement });
+
             if (iconElement) {
                 iconElement.className = `currency-icon ${toCurrency.icon}`;
                 iconElement.textContent = currentToCurrency.charAt(0);
+                debugLog(`✅ 更新TO图标: ${currentToCurrency.charAt(0)}`);
             }
             if (nameElement) {
                 nameElement.textContent = currentToCurrency;
+                debugLog(`✅ 更新TO名称: ${currentToCurrency}`);
             }
+        } else {
+            debugLog(`❌ 找不到TO区域元素`);
         }
+
         // 更新输入框占位符
         const fromAmountInput = document.getElementById('fromAmount');
-        const toAmountInput = document.getElementById('toAmount');
         if (fromAmountInput) {
             fromAmountInput.placeholder = `输入${currentFromCurrency}数量`;
+            debugLog(`✅ 更新输入框占位符: 输入${currentFromCurrency}数量`);
         }
 
         // 重新计算兑换
         if (typeof calculateConversion === 'function') {
             calculateConversion();
+            debugLog(`✅ 重新计算兑换完成`);
+        } else {
+            debugLog(`⚠️ calculateConversion函数不存在`);
         }
+
         showToast(`已切换为 ${currentFromCurrency} → ${currentToCurrency}`, 'success');
-    }else {
+        debugLog(`🎉 交换完成: ${currentFromCurrency} → ${currentToCurrency}`);
+    } else {
+        debugLog(`❌ 币种信息不完整:`, { fromCurrency, toCurrency });
         showToast('币种交换失败', 'error');
     }
 

