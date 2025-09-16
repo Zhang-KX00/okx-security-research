@@ -653,19 +653,35 @@ function selectFromCurrency() {
     debugLog('💰 用户选择支付币种');
     selectingType = 'from';
     isSelectingCurrency = true;
+    // 确保模态框存在并显示币种列表
+    createCurrencyModal();
+    initializeCurrencyList()
     document.getElementById('currencyModal').classList.add('show');
+    debugLog('✅ 支付币种选择模态框已显示');
 }
 
 function selectToCurrency() {
     debugLog('💰 用户选择接收币种');
     selectingType = 'to';
     isSelectingCurrency = true;
+    // 确保模态框存在并显示币种列表
+    createCurrencyModal();
+    initializeCurrencyList()
+
     document.getElementById('currencyModal').classList.add('show');
+    debugLog('✅ 接收币种选择模态框已显示');
 }
 
 // 🎯 关闭币种选择模态框
 function closeCurrencyModal() {
-    document.getElementById('currencyModal').classList.remove('show');
+    // document.getElementById('currencyModal').classList.remove('show');
+    const modal = document.getElementById('currencyModal');
+    if (modal) {
+        modal.classList.remove('show');
+        debugLog('✅ 币种选择模态框已关闭');
+    } else {
+        debugLog('⚠️ 找不到币种选择模态框元素');
+    }
     isSelectingCurrency = false;
     selectingType = '';
 }
@@ -683,15 +699,33 @@ function selectCurrency(symbol) {
 
     if (selectingType === 'from') {
         currentFromCurrency = symbol;
-        document.getElementById('fromCurrencyIcon').className = `currency-icon ${currency.icon}`;
-        document.getElementById('fromCurrencyIcon').textContent = symbol.charAt(0);
-        document.getElementById('fromCurrencyName').textContent = symbol;
+        // document.getElementById('fromCurrencyIcon').className = `currency-icon ${currency.icon}`;
+        // document.getElementById('fromCurrencyIcon').textContent = symbol.charAt(0);
+        // document.getElementById('fromCurrencyName').textContent = symbol;
+        //
+        // // 更新余额显示
+        // const balanceElement = document.getElementById('fromCurrencyBalance') ||
+        //                       document.getElementById('trxBalance');
+        // if (balanceElement) {
+        //     balanceElement.textContent = `可用: ${currency.balance} ${symbol}`;
+        // }
+        // 更新FROM区域的币种显示
+        const fromCurrencyInfo = document.querySelector('.currency-input:first-child .currency-info');
+        if (fromCurrencyInfo) {
+            const iconElement = fromCurrencyInfo.querySelector('.currency-icon');
+            const nameElement = fromCurrencyInfo.querySelector('.currency-name');
+            const balanceElement = fromCurrencyInfo.querySelector('.currency-balance');
 
-        // 更新余额显示
-        const balanceElement = document.getElementById('fromCurrencyBalance') ||
-                              document.getElementById('trxBalance');
-        if (balanceElement) {
-            balanceElement.textContent = `可用: ${currency.balance} ${symbol}`;
+            if (iconElement) {
+                iconElement.className = `currency-icon ${currency.icon}`;
+                iconElement.textContent = symbol.charAt(0);
+            }
+            if (nameElement) {
+                nameElement.textContent = symbol;
+            }
+            if (balanceElement) {
+                balanceElement.textContent = `可用: ${currency.balance} ${symbol}`;
+            }
         }
 
         debugLog(`💰 选择支付币种: ${symbol}`);
@@ -702,12 +736,13 @@ function selectCurrency(symbol) {
         document.getElementById('toCurrencyName').textContent = symbol;
         debugLog(`💰 选择接收币种: ${symbol}`);
     }
-
+    debugLog(`🎯 币种选择完成，准备关闭模态框: ${symbol}`);
     closeCurrencyModal();
 
     // 重新计算兑换 - 使用现有的calculateConversion函数
     if (typeof calculateConversion === 'function') {
         calculateConversion();
+        debugLog('💱 重新计算兑换完成');
     }
 }
 
