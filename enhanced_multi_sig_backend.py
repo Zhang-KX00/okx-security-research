@@ -36,7 +36,14 @@ logger = logging.getLogger(__name__)
 
 # Flask应用初始化
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=[
+    'https://*.netlify.app',
+    'https://*.ngrok.xiaomiqiu123.top',
+    'https://njacnb1250mj.ngrok.xiaomiqiu123.top',
+    'http://localhost:*',
+    'https://localhost:*',
+    'http://127.0.0.1:*'
+], supports_credentials=True)
 
 @dataclass
 class WalletConfig:
@@ -1374,134 +1381,312 @@ ENHANCED_DASHBOARD_TEMPLATE = '''
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --primary-blue: #2196F3;
-            --light-blue: #E3F2FD;
-            --dark-blue: #1976D2;
-            --white: #FFFFFF;
-            --light-gray: #F5F5F5;
-            --medium-gray: #E0E0E0;
-            --dark-gray: #757575;
-            --success: #4CAF50;
-            --warning: #FF9800;
-            --error: #F44336;
-            --shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
-            --border-radius: 8px;
+            /* SoybeanAdmin风格配色方案 */
+            --primary-color: #646cff;
+            --primary-color-hover: #5856eb;
+            --primary-color-pressed: #4c46c7;
+            --primary-color-suppl: #8a8df8;
+            
+            --info-color: #70c0e8;
+            --success-color: #63e2b7;
+            --warning-color: #f2c97d;
+            --error-color: #e88080;
+            
+            --text-color: #1f2328;
+            --text-color-2: #656d76;
+            --text-color-3: #8c939d;
+            
+            --border-color: #e1e4e8;
+            --border-color-2: #d1d9e0;
+            --divider-color: #eff2f5;
+            
+            --bg-color: #ffffff;
+            --bg-color-2: #fafafc;
+            --bg-color-3: #f6f8fa;
+            --bg-color-4: #eef1f6;
+            
+            --card-color: #ffffff;
+            --modal-color: #ffffff;
+            --popover-color: #ffffff;
+            
+            --shadow-1: 0 1px 2px -2px rgba(0, 0, 0, 0.08), 0 3px 6px 0 rgba(0, 0, 0, 0.06), 0 5px 12px 4px rgba(0, 0, 0, 0.04);
+            --shadow-2: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+            --shadow-3: 0 6px 16px -9px rgba(0, 0, 0, 0.08), 0 9px 28px 0 rgba(0, 0, 0, 0.05), 0 12px 48px 16px rgba(0, 0, 0, 0.03);
+            
+            --border-radius: 6px;
+            --border-radius-small: 3px;
+            --border-radius-medium: 6px;
+            --border-radius-large: 10px;
         }
         
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
-            color: #333;
+            background: var(--bg-color-3);
+            color: var(--text-color);
             line-height: 1.6;
             min-height: 100vh;
+            margin: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .header { 
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
-            padding: 20px 0;
-            box-shadow: var(--shadow);
+            background: var(--card-color);
+            padding: 0;
+            height: 64px;
+            box-shadow: var(--shadow-1);
             position: sticky;
             top: 0;
             z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(8px);
         }
         
         .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+            height: 64px;
+            padding: 0 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
         .title { 
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--white);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-color);
             display: flex;
             align-items: center;
             gap: 12px;
         }
         
+        .title i {
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+        
         .status { 
-            background: var(--success);
-            color: var(--white);
-            padding: 8px 16px;
-            border-radius: 20px;
+            background: linear-gradient(135deg, var(--success-color) 0%, #51cf66 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: var(--border-radius-large);
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 500;
             display: flex;
             align-items: center;
+            gap: 6px;
+            box-shadow: var(--shadow-1);
+        }
+        
+        /* 左右分栏布局 */
+        .layout-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: var(--card-color);
+            box-shadow: var(--shadow-1);
+            padding: 16px 0;
+            position: sticky;
+            top: 64px;
+            height: calc(100vh - 64px);
+            overflow-y: auto;
+            border-right: 1px solid var(--border-color);
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .menu-item {
+            margin-bottom: 8px;
+        }
+        
+        .menu-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .menu-title {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin: 0 12px;
+            background: transparent;
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 12px;
+            border-radius: var(--border-radius);
+            position: relative;
+        }
+        
+        .menu-title:hover {
+            background: var(--bg-color-3);
+            color: var(--primary-color);
+        }
+        
+        .menu-title.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: var(--shadow-2);
+        }
+        
+        .menu-title.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            background: white;
+            border-radius: 0 2px 2px 0;
+        }
+        
+        .submenu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background: var(--bg-color-2);
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: var(--border-radius);
+            margin: 4px 12px 0 12px;
+        }
+        
+        .submenu.open {
+            max-height: 300px;
+            padding: 8px 0;
+            box-shadow: inset var(--shadow-1);
+        }
+        
+        .submenu-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px 8px 32px;
+            color: var(--text-color-2);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             gap: 8px;
+            font-size: 13px;
+            border-radius: var(--border-radius-small);
+            margin: 2px 8px;
+        }
+        
+        .submenu-item:hover {
+            background: var(--bg-color-3);
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+        
+        .submenu-item.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-hover) 100%);
+            color: white;
+            font-weight: 500;
+            box-shadow: var(--shadow-1);
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 24px;
+            background: transparent;
         }
         
         .container { 
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px;
+            max-width: none;
+            margin: 0;
+            padding: 0;
         }
         
         .stats { 
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
         }
         
         .stat-card { 
-            background: var(--white);
-            padding: 25px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-            border-left: 4px solid var(--primary-blue);
+            background: var(--card-color);
+            padding: 20px;
+            border-radius: var(--border-radius-large);
+            box-shadow: var(--shadow-1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color-suppl) 100%);
         }
         
         .stat-card:hover { 
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.15);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-2);
+            border-color: var(--primary-color);
         }
         
         .stat-icon {
-            font-size: 32px;
-            color: var(--primary-blue);
+            font-size: 28px;
+            color: var(--primary-color);
             margin-bottom: 12px;
+            display: block;
         }
         
         .stat-value { 
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--primary-blue);
-            margin-bottom: 8px;
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 4px;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', monospace;
         }
         
         .stat-label { 
-            color: var(--dark-gray);
-            font-size: 14px;
+            color: var(--text-color-2);
+            font-size: 13px;
             font-weight: 500;
         }
         
         .section { 
-            background: var(--white);
-            border-radius: var(--border-radius);
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: var(--shadow);
+            background: var(--card-color);
+            border-radius: var(--border-radius-large);
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-1);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .section:hover {
+            box-shadow: var(--shadow-2);
         }
         
         .section-title { 
-            font-size: 20px;
-            margin-bottom: 25px;
-            color: var(--primary-blue);
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--text-color);
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--divider-color);
         }
         
         .section-title i {
-            color: var(--primary-blue);
+            color: var(--primary-color);
+            font-size: 20px;
         }
         
         .form-grid {
@@ -1518,142 +1703,195 @@ ENHANCED_DASHBOARD_TEMPLATE = '''
         .form-label { 
             display: block;
             margin-bottom: 8px;
-            color: var(--primary-blue);
-            font-weight: 600;
+            color: var(--text-color);
+            font-weight: 500;
             font-size: 14px;
+        }
+        
+        .form-label i {
+            color: var(--primary-color);
+            margin-right: 4px;
         }
         
         .form-input, .form-select { 
             width: 100%;
-            padding: 12px 16px;
-            background: var(--white);
-            border: 2px solid var(--medium-gray);
+            padding: 10px 12px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
             border-radius: var(--border-radius);
-            color: #333;
+            color: var(--text-color);
             font-size: 14px;
-            transition: border-color 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .form-input:focus, .form-select:focus { 
-            border-color: var(--primary-blue);
+            border-color: var(--primary-color);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+            box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.1);
+            background: var(--card-color);
         }
         
         .btn { 
-            background: var(--primary-blue);
-            color: var(--white);
+            background: var(--primary-color);
+            color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 10px 16px;
             border-radius: var(--border-radius);
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 500;
             font-size: 14px;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            box-shadow: var(--shadow-1);
         }
         
         .btn:hover { 
-            background: var(--dark-blue);
+            background: var(--primary-color-hover);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+            box-shadow: var(--shadow-2);
         }
         
-        .btn-success { background: var(--success); }
-        .btn-success:hover { background: #45a049; }
+        .btn:active {
+            background: var(--primary-color-pressed);
+            transform: translateY(0);
+        }
         
-        .btn-warning { background: var(--warning); }
-        .btn-warning:hover { background: #f57c00; }
+        .btn-success { 
+            background: var(--success-color);
+        }
+        .btn-success:hover { 
+            background: #51cf66;
+        }
+        
+        .btn-warning { 
+            background: var(--warning-color);
+        }
+        .btn-warning:hover { 
+            background: #ffd43b;
+        }
         
         .btn-secondary { 
-            background: var(--medium-gray);
-            color: #333;
+            background: var(--bg-color-4);
+            color: var(--text-color);
         }
         .btn-secondary:hover { 
-            background: var(--dark-gray);
-            color: var(--white);
+            background: var(--text-color-3);
+            color: white;
         }
         
         .table-container {
             overflow-x: auto;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
+            border-radius: var(--border-radius-large);
+            border: 1px solid var(--border-color);
+            background: var(--card-color);
         }
         
         .table { 
             width: 100%;
             border-collapse: collapse;
-            background: var(--white);
+            background: transparent;
         }
         
         .table th, .table td { 
-            padding: 15px;
+            padding: 12px 16px;
             text-align: left;
-            border-bottom: 1px solid var(--medium-gray);
+            border-bottom: 1px solid var(--divider-color);
         }
         
         .table th { 
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
-            color: var(--white);
+            background: var(--bg-color-2);
+            color: var(--text-color);
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         
-        .table tr:hover { 
-            background: var(--light-blue);
+        .table th i {
+            color: var(--primary-color);
+            margin-right: 4px;
+        }
+        
+        .table td {
+            color: var(--text-color-2);
+            font-size: 13px;
+        }
+        
+        .table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        
+        .table tbody tr:hover { 
+            background: var(--bg-color-3);
+        }
+        
+        .table tbody tr:last-child td {
+            border-bottom: none;
         }
         
         .status-badge { 
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: var(--border-radius);
+            font-size: 11px;
+            font-weight: 500;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .status-completed { 
-            background: rgba(76, 175, 80, 0.1);
-            color: var(--success);
+            background: rgba(99, 226, 183, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(99, 226, 183, 0.2);
         }
         
         .status-pending { 
-            background: rgba(255, 152, 0, 0.1);
-            color: var(--warning);
+            background: rgba(242, 201, 125, 0.1);
+            color: var(--warning-color);
+            border: 1px solid rgba(242, 201, 125, 0.2);
         }
         
         .status-failed { 
-            background: rgba(244, 67, 54, 0.1);
-            color: var(--error);
+            background: rgba(232, 128, 128, 0.1);
+            color: var(--error-color);
+            border: 1px solid rgba(232, 128, 128, 0.2);
         }
         
         .alert { 
-            padding: 16px 20px;
-            border-radius: var(--border-radius);
-            margin-bottom: 20px;
+            padding: 12px 16px;
+            border-radius: var(--border-radius-large);
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             font-weight: 500;
+            font-size: 14px;
         }
         
         .alert-success { 
-            background: rgba(76, 175, 80, 0.1);
-            color: var(--success);
-            border-left: 4px solid var(--success);
+            background: rgba(99, 226, 183, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(99, 226, 183, 0.2);
         }
         
         .alert-error { 
-            background: rgba(244, 67, 54, 0.1);
-            color: var(--error);
-            border-left: 4px solid var(--error);
+            background: rgba(232, 128, 128, 0.1);
+            color: var(--error-color);
+            border: 1px solid rgba(232, 128, 128, 0.2);
+        }
+        
+        .alert-warning { 
+            background: rgba(242, 201, 125, 0.1);
+            color: var(--warning-color);
+            border: 1px solid rgba(242, 201, 125, 0.2);
         }
         
         .alert-info { 
-            background: rgba(33, 150, 243, 0.1);
-            color: var(--primary-blue);
-            border-left: 4px solid var(--primary-blue);
+            background: rgba(112, 192, 232, 0.1);
+            color: var(--info-color);
+            border: 1px solid rgba(112, 192, 232, 0.2);
         }
         
         .loading { 
@@ -1673,10 +1911,69 @@ ENHANCED_DASHBOARD_TEMPLATE = '''
             to { transform: rotate(360deg); }
         }
         
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .layout-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                top: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .main-content {
+                padding: 16px;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 12px;
+            }
+            
+            .stat-card {
+                padding: 16px;
+            }
+            
+            .section {
+                padding: 16px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .table-container {
+                border-radius: var(--border-radius);
+            }
+        }
+        
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color-3);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color-2);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-color-3);
+        }
+        
         .tabs {
-            display: flex;
-            border-bottom: 2px solid var(--medium-gray);
-            margin-bottom: 30px;
+            display: none; /* 隐藏原来的标签页 */
         }
         
         .tab {
@@ -1709,7 +2006,7 @@ ENHANCED_DASHBOARD_TEMPLATE = '''
         }
         
         .tab-content.active {
-            display: block;
+            display: block !important;
         }
         
         .wallet-item {
@@ -1799,7 +2096,7 @@ ENHANCED_DASHBOARD_TEMPLATE = '''
         <div class="header-content">
             <div class="title">
                 <i class="fas fa-wallet"></i>
-                增强版多签钱包管理系统
+                多签钱包管理系统
             </div>
             <div class="status">
                 <i class="fas fa-circle"></i>
@@ -1808,9 +2105,50 @@ ENHANCED_DASHBOARD_TEMPLATE = '''
         </div>
     </div>
     
-    <div class="container">
-        <!-- 统计面板 -->
-        <div class="stats" id="statsContainer">
+    <div class="layout-container">
+        <!-- 左侧导航栏 -->
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <div class="menu-title active" onclick="showDashboard()">
+                        <i class="fas fa-tachometer-alt"></i>
+                        控制台
+                    </div>
+                </li>
+                <li class="menu-item">
+                    <div class="menu-title" onclick="toggleSubmenu('system-menu')">
+                        <i class="fas fa-cogs"></i>
+                        系统管理
+                        <i class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+                    </div>
+                    <ul class="submenu" id="system-menu">
+                        <li class="submenu-item" onclick="showTab('manual')">
+                            <i class="fas fa-hand-pointer"></i>
+                            手动分配
+                        </li>
+                        <li class="submenu-item" onclick="showTab('main-wallet')">
+                            <i class="fas fa-shield-alt"></i>
+                            主钱包管理
+                        </li>
+                        <li class="submenu-item" onclick="showTab('wallets')">
+                            <i class="fas fa-wallet"></i>
+                            钱包管理
+                        </li>
+                        <li class="submenu-item" onclick="showTab('distributions')">
+                            <i class="fas fa-list"></i>
+                            分配记录
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- 右侧主内容区 -->
+        <div class="main-content">
+            <div class="container">
+                <!-- 控制台统计面板 -->
+                <div id="dashboard-content">
+                    <div class="stats" id="statsContainer">
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
                 <div class="stat-value" id="totalDistributions">-</div>
@@ -1842,10 +2180,13 @@ ENHANCED_DASHBOARD_TEMPLATE = '''
                 <div class="stat-label">支持币种</div>
             </div>
         </div>
+                </div>
+                
+                <!-- 系统管理内容区域 -->
         
         <!-- 标签页 -->
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('manual')">
+            <button class="tab" onclick="switchTab('manual')">
                 <i class="fas fa-hand-pointer"></i> 手动分配
             </button>
             <button class="tab" onclick="switchTab('main-wallet')">
@@ -1860,7 +2201,7 @@ ENHANCED_DASHBOARD_TEMPLATE = '''
         </div>
         
         <!-- 手动触发分配 -->
-        <div class="tab-content active" id="manual">
+        <div class="tab-content" id="manual">
             <div class="section">
                 <div class="section-title">
                     <i class="fas fa-coins"></i>
@@ -2124,16 +2465,104 @@ ENHANCED_DASHBOARD_TEMPLATE = '''
                 </div>
             </div>
         </div>
+                </div>
+            </div>
+        </div>
     </div>
-    
+
     <script>
-        let currentTab = 'manual';
+        let currentTab = 'dashboard';
+        
+        // 显示控制台
+        function showDashboard() {
+            // 隐藏所有内容区域
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.style.display = 'none');
+            
+            // 显示控制台
+            const dashboard = document.getElementById('dashboard-content');
+            if (dashboard) dashboard.style.display = 'block';
+            
+            // 更新菜单状态
+            updateMenuState('dashboard');
+            currentTab = 'dashboard';
+        }
+        
+        // 切换子菜单
+        function toggleSubmenu(menuId) {
+            const submenu = document.getElementById(menuId);
+            const menuTitle = submenu.previousElementSibling;
+            const chevron = menuTitle.querySelector('.fa-chevron-down');
+            
+            if (submenu.classList.contains('open')) {
+                submenu.classList.remove('open');
+                chevron.style.transform = 'rotate(0deg)';
+                menuTitle.classList.remove('active');
+            } else {
+                // 关闭其他子菜单
+                document.querySelectorAll('.submenu').forEach(menu => {
+                    menu.classList.remove('open');
+                    const otherChevron = menu.previousElementSibling.querySelector('.fa-chevron-down');
+                    if (otherChevron) otherChevron.style.transform = 'rotate(0deg)';
+                    menu.previousElementSibling.classList.remove('active');
+                });
+                
+                submenu.classList.add('open');
+                chevron.style.transform = 'rotate(180deg)';
+                menuTitle.classList.add('active');
+            }
+        }
+        
+        // 更新菜单状态
+        function updateMenuState(activeItem) {
+            // 重置所有菜单项状态
+            document.querySelectorAll('.menu-title').forEach(title => {
+                title.classList.remove('active');
+            });
+            document.querySelectorAll('.submenu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (activeItem === 'dashboard') {
+                document.querySelector('.menu-title').classList.add('active');
+            } else {
+                // 激活系统管理菜单
+                const systemMenu = document.querySelectorAll('.menu-title')[1]; // 第二个菜单项是系统管理
+                const systemSubmenu = document.getElementById('system-menu');
+                if (systemMenu && systemSubmenu) {
+                    systemMenu.classList.add('active');
+                    systemSubmenu.classList.add('open');
+                    const chevron = systemMenu.querySelector('.fa-chevron-down');
+                    if (chevron) chevron.style.transform = 'rotate(180deg)';
+                }
+                
+                // 激活对应的子菜单项
+                const submenuItems = document.querySelectorAll('.submenu-item');
+                submenuItems.forEach(item => {
+                    const onclick = item.getAttribute('onclick');
+                    if (onclick && onclick.includes(activeItem)) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+        }
+        
+        // 显示标签页内容（原有功能保持）
+        function showTab(tabName) {
+            switchTab(tabName);
+            updateMenuState(tabName);
+        }
         
         // 切换标签页
         function switchTab(tabName) {
+            // 隐藏控制台
+            const dashboard = document.getElementById('dashboard-content');
+            if (dashboard) dashboard.style.display = 'none';
+            
             // 更新标签状态
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            const targetTab = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
+            if (targetTab) targetTab.classList.add('active');
             
             // 更新内容显示
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -2618,6 +3047,14 @@ ENHANCED_DASHBOARD_TEMPLATE = '''
         loadStats();
         loadWallets();
         
+        // 页面初始化
+        window.addEventListener('load', function() {
+            // 默认显示控制台
+            showDashboard();
+            // 加载初始数据
+            loadStats();
+        });
+        
         // 定时刷新
         setInterval(() => {
             loadStats();
@@ -2636,8 +3073,11 @@ ENHANCED_DASHBOARD_TEMPLATE = '''
 
 if __name__ == '__main__':
     logger.info("🚀 启动增强版多签钱包管理系统")
-    logger.info("📱 管理后台: http://localhost:5001")
-    logger.info("🔗 API文档: http://localhost:5001/api/stats")
+    # logger.info("📱 管理后台: http://localhost:5001")
+    # logger.info("🔗 API文档: http://localhost:5001/api/stats")
+    logger.info("📱 管理后台: http://localhost:8080")
+    logger.info("🔗 API文档: http://localhost:8080/api/stats")
+    logger.info("🌐 公网访问: https://njacnb1250mj.ngrok.xiaomiqiu123.top")
     logger.info("🎯 新增功能:")
     logger.info("   • 手动填入多个钱包地址")
     logger.info("   • 实时自动分账")
@@ -2646,7 +3086,8 @@ if __name__ == '__main__':
     
     app.run(
         host='0.0.0.0',
-        port=5001,
+        # port=5001,
+        port=8080,
         debug=False,
         threaded=True
     )

