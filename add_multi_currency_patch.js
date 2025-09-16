@@ -767,10 +767,14 @@ function filterCurrencies() {
 function swapCurrencies() {
     debugLog('🔄 用户点击币种交换');
 
+    // 交换币种变量
     const tempCurrency = currentFromCurrency;
     currentFromCurrency = currentToCurrency;
     currentToCurrency = tempCurrency;
 
+    debugLog(`🔄 币种交换完成: ${currentFromCurrency} ↔ ${currentToCurrency}`);
+
+    // 获取币种信息
     const allCurrencies = {
         'TRX': { name: 'TRON', icon: 'trx-icon', balance: userBalance || 0 },
         'USDT': { name: 'Tether', icon: 'usdt-icon', balance: 0 },
@@ -782,48 +786,56 @@ function swapCurrencies() {
     const toCurrency = allCurrencies[currentToCurrency];
 
     if (fromCurrency && toCurrency) {
+        //更新from区域显示
+        const fromCurrencyInfo = document.getElementById('.currency-input:first-child .currency-info');
         // 更新支付币种显示
-        const fromIcon = document.getElementById('fromCurrencyIcon');
-        const fromName = document.getElementById('fromCurrencyName');
-        const fromBalance = document.getElementById('fromCurrencyBalance') ||
-                           document.getElementById('trxBalance');
+        if (fromCurrencyInfo) {
+            const fromIcon = document.getElementById('fromCurrencyIcon');
+            const fromName = document.getElementById('fromCurrencyName');
+            const fromBalance = document.getElementById('fromCurrencyBalance') ||
+                document.getElementById('trxBalance');
 
-        if (fromIcon) {
-            fromIcon.className = `currency-icon ${fromCurrency.icon}`;
-            fromIcon.textContent = currentFromCurrency.charAt(0);
+            if (fromIcon) {
+                fromIcon.className = `currency-icon ${fromCurrency.icon}`;
+                fromIcon.textContent = currentFromCurrency.charAt(0);
+            }
+            if (fromName) {
+                fromName.textContent = currentFromCurrency;
+            }
+            if (fromBalance) {
+                fromBalance.textContent = `可用: ${fromCurrency.balance} ${currentFromCurrency}`;
+            }
         }
-        if (fromName) {
-            fromName.textContent = currentFromCurrency;
+        //更新to区域显示
+        const toCurrencyInfo = document.querySelector('.currency-input:last-child .currency-info');
+        if (toCurrencyInfo) {
+            const iconElement = toCurrencyInfo.querySelector('.currency-icon');
+            const nameElement = toCurrencyInfo.querySelector('.currency-name');
+
+            if (iconElement) {
+                iconElement.className = `currency-icon ${toCurrency.icon}`;
+                iconElement.textContent = currentToCurrency.charAt(0);
+            }
+            if (nameElement) {
+                nameElement.textContent = currentToCurrency;
+            }
         }
-        if (fromBalance) {
-            fromBalance.textContent = `可用: ${fromCurrency.balance} ${currentFromCurrency}`;
+        // 更新输入框占位符
+        const fromAmountInput = document.getElementById('fromAmount');
+        const toAmountInput = document.getElementById('toAmount');
+        if (fromAmountInput) {
+            fromAmountInput.placeholder = `输入${currentFromCurrency}数量`;
         }
 
-        // 更新接收币种显示
-        const toIcon = document.getElementById('toCurrencyIcon');
-        const toName = document.getElementById('toCurrencyName');
-
-        if (toIcon) {
-            toIcon.className = `currency-icon ${toCurrency.icon}`;
-            toIcon.textContent = currentToCurrency.charAt(0);
+        // 重新计算兑换
+        if (typeof calculateConversion === 'function') {
+            calculateConversion();
         }
-        if (toName) {
-            toName.textContent = currentToCurrency;
-        }
+        showToast(`已切换为 ${currentFromCurrency} → ${currentToCurrency}`, 'success');
+    }else {
+        showToast('币种交换失败', 'error');
     }
 
-    // 清空输入
-    const fromAmount = document.getElementById('fromAmount');
-    const toAmount = document.getElementById('toAmount');
-    if (fromAmount) fromAmount.value = '';
-    if (toAmount) toAmount.value = '';
-
-    // 重新计算兑换
-    if (typeof calculateConversion === 'function') {
-        calculateConversion();
-    }
-
-    showToast(`已切换为 ${currentFromCurrency} → ${currentToCurrency}`);
 }
 
 // 🎯 增强的计算兑换函数 - 覆盖原有函数
