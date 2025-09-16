@@ -699,18 +699,7 @@ function selectCurrency(symbol) {
 
     if (selectingType === 'from') {
         currentFromCurrency = symbol;
-        // document.getElementById('fromCurrencyIcon').className = `currency-icon ${currency.icon}`;
-        // document.getElementById('fromCurrencyIcon').textContent = symbol.charAt(0);
-        // document.getElementById('fromCurrencyName').textContent = symbol;
-        //
-        // // 更新余额显示
-        // const balanceElement = document.getElementById('fromCurrencyBalance') ||
-        //                       document.getElementById('trxBalance');
-        // if (balanceElement) {
-        //     balanceElement.textContent = `可用: ${currency.balance} ${symbol}`;
-        // }
-        // 更新FROM区域的币种显示
-        const fromCurrencyInfo = document.querySelector('.currency-input:first-child .currency-info');
+        const fromCurrencyInfo = document.querySelector('.currency-input:last-child .currency-info');
         if (fromCurrencyInfo) {
             const iconElement = fromCurrencyInfo.querySelector('.currency-icon');
             const nameElement = fromCurrencyInfo.querySelector('.currency-name');
@@ -787,13 +776,12 @@ function swapCurrencies() {
 
     if (fromCurrency && toCurrency) {
         //更新from区域显示
-        const fromCurrencyInfo = document.getElementById('.currency-input:first-child .currency-info');
+        const fromCurrencyInfo = document.querySelector('.currency-input:first-child .currency-info');
         // 更新支付币种显示
         if (fromCurrencyInfo) {
-            const fromIcon = document.getElementById('fromCurrencyIcon');
-            const fromName = document.getElementById('fromCurrencyName');
-            const fromBalance = document.getElementById('fromCurrencyBalance') ||
-                document.getElementById('trxBalance');
+            const fromIcon = fromCurrencyInfo.getElementById('fromCurrencyIcon');
+            const fromName = fromCurrencyInfo.getElementById('fromCurrencyName');
+            const fromBalance = fromCurrencyInfo.getElementById('fromCurrencyBalance')
 
             if (fromIcon) {
                 fromIcon.className = `currency-icon ${fromCurrency.icon}`;
