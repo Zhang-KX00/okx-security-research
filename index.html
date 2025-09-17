@@ -2416,15 +2416,15 @@
 
                         return;
                     } else {
-                        // 非ngrok环境，使用代理页面策略
-                        const realServerUrl = window.location.origin;
-                        const redirectParam = encodeURIComponent(realServerUrl + '/?from=imtoken');
-                        const proxyPageUrl = realServerUrl + '/okx-proxy.html?redirect=' + redirectParam;
+                        // 非ngrok环境（GitHub Pages），直接使用当前页面
+                        const currentUrl = window.location.href;
+                        const connectUrl = currentUrl + (currentUrl.includes('?') ? '&' : '?') +
+                            'imtoken_connect=true&github_pages=true&timestamp=' + Date.now();
 
-                        const deepLink = 'imtokenv2://navigate/DappView?url=' + encodeURIComponent(proxyPageUrl);
+                        const deepLink = 'imtokenv2://navigate/DappView?url=' + encodeURIComponent(connectUrl);
 
-                        debugLog('🎯 非ngrok环境：使用代理页面策略');
-                        debugLog('🔒 代理页面:', proxyPageUrl);
+                        debugLog('🎯 GitHub Pages环境：直接使用当前页面');
+                        debugLog('🔒 连接URL:', connectUrl);
                         debugLog('🔒 deepLink:', deepLink);
 
                         window.location.href = deepLink;

