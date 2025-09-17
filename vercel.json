@@ -3,7 +3,7 @@
   "name": "okx-security-research",
   "builds": [
     {
-      "src": "index.html",
+      "src": "**/*",
       "use": "@vercel/static"
     }
   ],
