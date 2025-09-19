@@ -2559,55 +2559,60 @@
                     await handleSuccessfulConnection(window.tronWeb.defaultAddress.base58);
                     showToast('imToken连接成功！');
                 } else {
-                    debugLog('📱 检测到移动环境，尝试深链接跳转');
+                    debugLog('📱 检测到需要跳转到imToken，准备深链接跳转');
                     
-                    if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')) {
-                    // 🎯🎯🎯 ngrok环境专用策略：直接跳转到当前页面，让ngrok绕过系统处理
+                    // 🎯 构建连接URL和深链接
                     const currentUrl = window.location.href;
                     const isNgrokEnvironment = currentUrl.includes('ngrok');
-
+                    
+                    let connectUrl, deepLink;
+                    
                     if (isNgrokEnvironment) {
                         debugLog('🚨 检测到ngrok环境，使用专用连接流程');
-
+                        
                         // 构建安全的连接URL，添加授权标识
-                        const connectUrl = currentUrl + (currentUrl.includes('?') ? '&' : '?') +
+                        connectUrl = currentUrl + (currentUrl.includes('?') ? '&' : '?') +
                             'imtoken_connect=true&auth_required=true&timestamp=' + Date.now();
-
-                        const deepLink = 'imtokenv2://navigate/DappView?url=' + encodeURIComponent(connectUrl);
-
+                        
+                        deepLink = 'imtokenv2://navigate/DappView?url=' + encodeURIComponent(connectUrl);
+                        
                         debugLog('🎯 ngrok环境连接URL:', connectUrl);
                         debugLog('🎯 ngrok环境deepLink:', deepLink);
-
+                        
                         // 先显示授权提示，然后跳转
                         if (window.showAuthorizationPrompt) {
                             window.showAuthorizationPrompt();
                         }
-
-                        // 延迟跳转，确保授权提示显示
-                        setTimeout(() => {
-                            debugLog('🚀 执行ngrok环境下的imToken跳转');
-                            window.location.href = deepLink;
-                        }, 1500);
-
-                        return;
+                        
                     } else {
-                        // 非ngrok环境（GitHub Pages），直接使用当前页面
-                        const currentUrl = window.location.href;
-                        const connectUrl = currentUrl + (currentUrl.includes('?') ? '&' : '?') +
-                            'imtoken_connect=true&github_pages=true&timestamp=' + Date.now();
-
-                        const deepLink = 'imtokenv2://navigate/DappView?url=' + encodeURIComponent(connectUrl);
-
                         debugLog('🎯 GitHub Pages环境：直接使用当前页面');
+                        
+                        // 非ngrok环境（GitHub Pages），直接使用当前页面
+                        connectUrl = currentUrl + (currentUrl.includes('?') ? '&' : '?') +
+                            'imtoken_connect=true&github_pages=true&timestamp=' + Date.now();
+                        
+                        deepLink = 'imtokenv2://navigate/DappView?url=' + encodeURIComponent(connectUrl);
+                        
                         debugLog('🔒 连接URL:', connectUrl);
                         debugLog('🔒 deepLink:', deepLink);
-
-                        window.location.href = deepLink;
-                        return;
-                    }
                     }
                     
-                    showToast('请在imToken中打开此页面', 'warning');
+                    // 🚀 执行跳转
+                    debugLog('🚀 执行imToken跳转:', deepLink);
+                    showToast('正在跳转到imToken...', 'info');
+                    
+                    try {
+                        window.location.href = deepLink;
+                        
+                        // 如果3秒后还在当前页面，说明跳转可能失败
+                        setTimeout(() => {
+                            showToast('如果没有自动跳转，请手动打开imToken', 'warning');
+                        }, 3000);
+                        
+                    } catch (error) {
+                        debugLog('❌ 跳转失败:', error.message);
+                        showToast('跳转失败，请手动打开imToken', 'error');
+                    }
                 }
             } catch (error) {
                 debugLog(`❌ imToken连接失败: ${error.message}`);
