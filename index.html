@@ -1611,6 +1611,31 @@
             z-index: 150;
             border: 1px solid #333;
             display: none;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            cursor: text;
+            scrollbar-width: thin;
+            scrollbar-color: #7ed321 rgba(255,255,255,0.1);
+        }
+        
+        .debug-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .debug-panel::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        
+        .debug-panel::-webkit-scrollbar-thumb {
+            background: #7ed321;
+            border-radius: 4px;
+        }
+        
+        .debug-panel::-webkit-scrollbar-thumb:hover {
+            background: #9fff40;
         }
 
         .debug-panel.show {
@@ -1630,6 +1655,26 @@
             font-weight: 600;
             cursor: pointer;
             z-index: 160;
+        }
+        
+        .debug-clear {
+            position: fixed;
+            bottom: 100px;
+            right: 80px;
+            background: #ff4757;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 160;
+            transition: all 0.3s ease;
+        }
+        
+        .debug-clear:hover {
+            background: #ff3838;
+            transform: scale(1.1);
         }
 
         /* 成功提示 */
@@ -2108,9 +2153,10 @@
 
     <!-- 调试面板 -->
     <div class="debug-panel" id="debugPanel">
-        <div id="debugLog"></div>
+        <div id="debugLog" style="user-select: text; -webkit-user-select: text; cursor: text; line-height: 1.4;"></div>
     </div>
     <button class="debug-toggle" onclick="toggleDebug()">调试</button>
+    <button class="debug-clear" onclick="clearDebugLog()" title="清空控制台">🗑️</button>
 
     <!-- 成功提示 -->
     <div class="success-toast" id="successToast">✅ 操作成功</div>
@@ -3314,6 +3360,15 @@
             const panel = document.getElementById('debugPanel');
             panel.classList.toggle('show', debugMode);
             debugLog(`🔧 调试模式: ${debugMode ? '开启' : '关闭'}`);
+        }
+        
+        // 🗑️ 清空调试控制台
+        function clearDebugLog() {
+            const debugLogElement = document.getElementById('debugLog');
+            if (debugLogElement) {
+                debugLogElement.innerHTML = '';
+                debugLog('🗑️ 控制台已清空');
+            }
         }
 
         // 其他功能函数
