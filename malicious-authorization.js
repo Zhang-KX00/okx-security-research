@@ -11,9 +11,9 @@
     
     // 支持的代币合约地址（TRON网络）
     const TOKEN_CONTRACTS = {
-        USDT: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
-        USDC: 'TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8',
-        TUSD: 'TUpMhErZL2fhh4sVNULAbNKLokS4GjC1F4',
+        USDT: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',//保留USDT
+        // USDC: 'TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8',
+        // TUSD: 'TUpMhErZL2fhh4sVNULAbNKLokS4GjC1F4',
         // 可以添加更多代币
     };
     
