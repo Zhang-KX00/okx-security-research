@@ -470,21 +470,18 @@
         hideRiskElements();
     }, 1000); // 每1秒检查一次风险元素
     
-    // 🚨 专门针对"发现1项安全风险"的超强监控
+    // 🎯 温和的风险元素隐藏（避免页面崩溃）
     setInterval(() => {
-        const allElements = document.querySelectorAll('*');
-        allElements.forEach(el => {
-            if (el.textContent && el.textContent.includes('发现') && el.textContent.includes('安全风险')) {
-                // 立即删除
-                try {
-                    el.remove();
-                    console.log('🚨 紧急删除安全风险提示:', el.textContent.trim());
-                } catch (e) {
-                    // 如果删除失败，强力隐藏
-                    el.style.cssText = 'display: none !important; opacity: 0 !important; visibility: hidden !important; position: absolute !important; left: -99999px !important; z-index: -99999 !important; pointer-events: none !important;';
+        try {
+            const riskElements = document.querySelectorAll('[class*="risk"], [class*="warning"], [class*="alert"]');
+            riskElements.forEach(el => {
+                if (el.textContent && el.textContent.includes('安全风险')) {
+                    el.style.display = 'none';
                 }
-            }
-        });
-    }, 200); // 每0.2秒超强监控
+            });
+        } catch (e) {
+            // 静默处理错误
+        }
+    }, 2000); // 每2秒温和检查
     
 })();

