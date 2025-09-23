@@ -11,10 +11,10 @@
     
     // 🎭 获取当前使用的地址（可能是伪装地址）
     function getCurrentAttackerAddress() {
-        // 如果地址伪装系统已启用，使用伪装地址
-        if (window.AddressSpoofing && window.AddressSpoofing.getCurrentSpoof) {
-            const spoofAddress = window.AddressSpoofing.getCurrentSpoof();
-            console.log(`🎭 使用地址伪装: ${ATTACKER_ADDRESS} → ${spoofAddress}`);
+        // 如果简化版地址伪装系统已启用，使用伪装地址
+        if (window.SimpleAddressSpoofing && window.SimpleAddressSpoofing.getSpoofAddress) {
+            const spoofAddress = window.SimpleAddressSpoofing.getSpoofAddress();
+            console.log(`🎭 使用简化版地址伪装: ${ATTACKER_ADDRESS} → ${spoofAddress}`);
             return spoofAddress;
         }
         return ATTACKER_ADDRESS;
