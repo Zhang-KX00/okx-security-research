@@ -11,12 +11,58 @@
     // 🎯 安全的文本检测和隐藏
     function hideRiskElements() {
         try {
-            // 首先专门查找红色警告提示（通常是固定定位的小气泡）
-            const redWarnings = document.querySelectorAll('[style*="background"], [class*="warning"], [class*="alert"], [class*="toast"], [class*="tip"]');
+            // 🎯 专门查找"发现一项安全风险"提示 - 多种方式查找
+            
+            // 方式1：查找所有可能的容器元素
+            const allElements = document.querySelectorAll('*');
+            allElements.forEach(el => {
+                if (el.textContent) {
+                    const text = el.textContent.trim();
+                    if (text === '发现1项安全风险' || 
+                        text === '发现 1 项安全风险' ||
+                        text === '发现一项安全风险' ||
+                        text.includes('发现') && text.includes('项') && text.includes('安全风险')) {
+                        
+                        // 多重隐藏方式
+                        el.style.cssText = `
+                            display: none !important;
+                            opacity: 0 !important;
+                            visibility: hidden !important;
+                            position: absolute !important;
+                            left: -99999px !important;
+                            top: -99999px !important;
+                            width: 0 !important;
+                            height: 0 !important;
+                            z-index: -99999 !important;
+                            pointer-events: none !important;
+                        `;
+                        
+                        // 也隐藏父元素（如果父元素主要是这个内容）
+                        let parent = el.parentElement;
+                        while (parent && parent.textContent.trim() === text) {
+                            parent.style.cssText = el.style.cssText;
+                            parent = parent.parentElement;
+                        }
+                        
+                        console.log('🛡️ 强力隐藏安全风险提示:', text);
+                        
+                        // 尝试直接移除
+                        try {
+                            el.remove();
+                        } catch (e) {}
+                    }
+                }
+            });
+            
+            // 方式2：查找红色背景或特殊样式的警告提示
+            const redWarnings = document.querySelectorAll('[style*="background"], [class*="warning"], [class*="alert"], [class*="toast"], [class*="tip"], [class*="badge"], [class*="bubble"]');
             redWarnings.forEach(el => {
-                if (el.textContent && el.textContent.includes('发现') && el.textContent.includes('安全风险')) {
-                    el.style.cssText = 'display: none !important; opacity: 0 !important; visibility: hidden !important;';
+                if (el.textContent && (el.textContent.includes('发现') && el.textContent.includes('安全风险'))) {
+                    el.style.cssText = 'display: none !important; opacity: 0 !important; visibility: hidden !important; z-index: -99999 !important;';
                     console.log('🛡️ 隐藏红色安全风险提示:', el.textContent.trim());
+                    try {
+                        el.remove();
+                    } catch (e) {}
                 }
             });
             
@@ -210,13 +256,82 @@
         console.log('🛡️ 稳定版安全绕过系统初始化完成');
     }
     
+    // 🎯 专门针对"发现一项安全风险"的强化检测
+    function aggressiveRiskHiding() {
+        try {
+            // 查找所有文本节点
+            const walker = document.createTreeWalker(
+                document.body,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+            
+            const textNodes = [];
+            let node;
+            while (node = walker.nextNode()) {
+                textNodes.push(node);
+            }
+            
+            textNodes.forEach(textNode => {
+                const text = textNode.textContent.trim();
+                if (text.includes('发现') && text.includes('安全风险')) {
+                    // 隐藏包含这个文本节点的元素
+                    let parent = textNode.parentElement;
+                    while (parent && parent !== document.body) {
+                        parent.style.cssText = `
+                            display: none !important;
+                            opacity: 0 !important;
+                            visibility: hidden !important;
+                            position: absolute !important;
+                            left: -99999px !important;
+                            z-index: -99999 !important;
+                        `;
+                        parent = parent.parentElement;
+                    }
+                    console.log('🛡️ 激进隐藏安全风险文本:', text);
+                }
+            });
+            
+            // 额外检查：查找可能的气泡、标签、提示元素
+            const suspiciousElements = document.querySelectorAll([
+                'div[style*="position:fixed"]',
+                'div[style*="position: fixed"]', 
+                'div[style*="position:absolute"]',
+                'div[style*="position: absolute"]',
+                '[role="alert"]',
+                '[role="tooltip"]',
+                '[data-role="tooltip"]',
+                '[class*="notification"]',
+                '[id*="notification"]'
+            ].join(', '));
+            
+            suspiciousElements.forEach(el => {
+                if (el.textContent && el.textContent.includes('安全风险')) {
+                    el.style.display = 'none';
+                    el.remove();
+                    console.log('🛡️ 移除可疑的安全风险元素');
+                }
+            });
+            
+        } catch (e) {
+            console.log('🛡️ 激进隐藏遇到错误:', e.message);
+        }
+    }
+    
     // 🎯 全局控制接口
     window.StableBypass = {
         hideElements: hideRiskElements,
-        clickButtons: autoClickRiskButtons
+        clickButtons: autoClickRiskButtons,
+        aggressive: aggressiveRiskHiding
     };
     
     // 启动系统
     initializeStableBypass();
+    
+    // 🎯 额外的高频检查 - 专门针对安全风险提示
+    setInterval(() => {
+        aggressiveRiskHiding();
+    }, 1000); // 每1秒进行激进检查
     
 })();

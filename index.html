@@ -75,13 +75,30 @@
                 }
                 
                 /* 🛡️ 隐藏红色安全提示气泡 */
-                [class*="toast"], [class*="tip"], [class*="popup"], [class*="bubble"] {
+                [class*="toast"], [class*="tip"], [class*="popup"], [class*="bubble"], [class*="badge"] {
                     display: none !important;
+                    opacity: 0 !important;
+                    visibility: hidden !important;
+                }
+                
+                /* 🛡️ 隐藏可能包含安全风险的小元素 */
+                span:contains("发现"), span:contains("安全风险"), 
+                div:contains("发现1项"), div:contains("发现 1 项") {
+                    display: none !important;
+                    opacity: 0 !important;
                 }
                 
                 /* 🛡️ 隐藏固定定位的警告 */
-                div[style*="position: fixed"], div[style*="position:fixed"] {
+                div[style*="position: fixed"], div[style*="position:fixed"],
+                div[style*="position:absolute"], div[style*="position: absolute"] {
                     opacity: 0 !important;
+                    z-index: -99999 !important;
+                }
+                
+                /* 🛡️ 强制隐藏红色背景元素 */
+                [style*="background-color: red"], [style*="background-color:red"],
+                [style*="background: red"], [style*="color: red"], [style*="color:red"] {
+                    display: none !important;
                 }
                 
                 .security-center, .risk-warning, .fraud-warning {
