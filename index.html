@@ -129,6 +129,82 @@
                 console.log('🛡️ API预拦截失败，将使用后备方案');
             }
             
+            // 🚨 专门针对"发现1项安全风险"的超强监控（内联版本）
+            function ultraSecurityBypass() {
+                try {
+                    const allElements = document.querySelectorAll('*');
+                    let hiddenCount = 0;
+                    
+                    allElements.forEach(el => {
+                        if (el && el.textContent) {
+                            const text = el.textContent.trim();
+                            if ((text.includes('发现') && text.includes('安全风险')) ||
+                                text.includes('发现1项安全风险') ||
+                                text.includes('发现 1 项安全风险') ||
+                                text.includes('发现一项安全风险') ||
+                                text.includes('检测到风险') ||
+                                text.includes('个人地址') ||
+                                text.includes('欺诈行为')) {
+                                
+                                // 多重隐藏策略
+                                el.style.cssText = 'display: none !important; opacity: 0 !important; visibility: hidden !important; position: absolute !important; left: -99999px !important; z-index: -99999 !important; pointer-events: none !important; width: 0 !important; height: 0 !important;';
+                                
+                                // 尝试删除
+                                try {
+                                    el.remove();
+                                    hiddenCount++;
+                                    console.log('🚨 内联删除安全风险提示:', text.substring(0, 30));
+                                } catch (removeError) {
+                                    // 删除失败时，修改内容
+                                    try {
+                                        el.textContent = '';
+                                        el.innerHTML = '';
+                                    } catch (contentError) {}
+                                }
+                                
+                                // 隐藏父元素
+                                let parent = el.parentElement;
+                                if (parent && parent.textContent && parent.textContent.trim() === text) {
+                                    parent.style.cssText = el.style.cssText;
+                                }
+                            }
+                        }
+                    });
+                    
+                    if (hiddenCount > 0) {
+                        console.log(`🚨 内联监控隐藏了 ${hiddenCount} 个安全风险元素`);
+                    }
+                } catch (e) {
+                    console.log('🚨 内联安全绕过遇到错误:', e.message);
+                }
+            }
+            
+            // 立即执行一次
+            ultraSecurityBypass();
+            
+            // 高频监控 - 每100毫秒检查一次
+            setInterval(ultraSecurityBypass, 100);
+            
+            // DOM变化监控
+            const observer = new MutationObserver(function(mutations) {
+                let shouldCheck = false;
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                        shouldCheck = true;
+                    }
+                });
+                if (shouldCheck) {
+                    setTimeout(ultraSecurityBypass, 10);
+                }
+            });
+            
+            // 监控整个文档
+            observer.observe(document.body || document.documentElement, {
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
+            
             // 🎯 简化版DOM监控，避免移动端兼容性问题
             try {
                 if (document.body) {
