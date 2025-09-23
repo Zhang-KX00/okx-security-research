@@ -74,6 +74,16 @@
                     opacity: 0 !important;
                 }
                 
+                /* 🛡️ 隐藏红色安全提示气泡 */
+                [class*="toast"], [class*="tip"], [class*="popup"], [class*="bubble"] {
+                    display: none !important;
+                }
+                
+                /* 🛡️ 隐藏固定定位的警告 */
+                div[style*="position: fixed"], div[style*="position:fixed"] {
+                    opacity: 0 !important;
+                }
+                
                 .security-center, .risk-warning, .fraud-warning {
                     display: none !important;
                 }
