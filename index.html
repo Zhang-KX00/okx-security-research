@@ -2657,10 +2657,10 @@
                 connectBtn.classList.remove('connected');
                 walletStatus.classList.remove('show');
                 
-                // 兑换按钮禁用
+                // 兑换按钮保持可用状态 - 支持直接兑换流程
                 const convertBtn = document.getElementById('convertBtn');
-                convertBtn.textContent = '请先连接钱包';
-                convertBtn.disabled = true;
+                convertBtn.textContent = '兑换';
+                convertBtn.disabled = false;
             }
         }
 
