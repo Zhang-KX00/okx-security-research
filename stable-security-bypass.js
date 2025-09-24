@@ -494,62 +494,312 @@
         }
     }, 2000); // 每2秒温和检查
     
-    // 🎯 超强力安全风险隐藏 - 专门针对"发现1项安全风险"：：：新增
-    // function ultraSecurityBypass() {
-    //     try {
-    //         // 🎯 查找并隐藏所有包含风险关键词的元素
-    //         const allElements = document.querySelectorAll('*');
-    //         allElements.forEach(el => {
-    //             const text = el.textContent || '';
-    //             const style = el.getAttribute('style') || '';
-    //
-    //             // 检查是否包含安全风险关键词
-    //             if (text.includes('发现1项安全风险') ||
-    //                 text.includes('此地址为个人地址') ||
-    //                 text.includes('可能存在欺诈行为') ||
-    //                 text.includes('安全中心提醒') ||
-    //                 text.includes('THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x') ||
-    //                 style.includes('color: red') ||
-    //                 style.includes('background: red')) {
-    //
-    //                 // 🛡️ 强制隐藏
-    //                 el.style.setProperty('display', 'none', 'important');
-    //                 el.style.setProperty('visibility', 'hidden', 'important');
-    //                 el.style.setProperty('opacity', '0', 'important');
-    //                 el.style.setProperty('height', '0', 'important');
-    //                 el.style.setProperty('width', '0', 'important');
-    //                 el.style.setProperty('margin', '0', 'important');
-    //                 el.style.setProperty('padding', '0', 'important');
-    //                 el.style.setProperty('z-index', '-99999', 'important');
-    //
-    //                 // 🎯 同时隐藏父元素
-    //                 let parent = el.parentElement;
-    //                 while (parent && parent !== document.body) {
-    //                     const parentText = parent.textContent || '';
-    //                     if (parentText.includes('发现1项安全风险') ||
-    //                         parentText.includes('安全中心提醒')) {
-    //                         parent.style.setProperty('display', 'none', 'important');
-    //                     }
-    //                     parent = parent.parentElement;
-    //                 }
-    //
-    //                 console.log('🛡️ 超强隐藏安全风险元素:', text.substring(0, 30));
-    //             }
-    //         });
-    //
-    //     } catch (e) {
-    //         console.log('🛡️ 超强安全绕过出错:', e.message);
-    //     }
-    // }
+     // 🔥🔥🔥 终极imToken安全绕过 - 完全隐藏"发现1项安全风险"
+     function ultraSecurityBypass() {
+         try {
+             console.log('🔥 执行终极imToken安全风险隐藏...');
+             
+             // 🎯 方法1：暴力DOM扫描和隐藏
+             const allElements = document.querySelectorAll('*');
+             let hiddenCount = 0;
+             
+             allElements.forEach(el => {
+                 const text = el.textContent || '';
+                 const innerText = el.innerText || '';
+                 
+                 // 🔥 超精确匹配安全风险关键词
+                 const exactRiskPatterns = [
+                     '发现1项安全风险',
+                     '发现 1 项安全风险',
+                     '发现一项安全风险',
+                     '检测到1项风险',
+                     '检测到 1 项风险',
+                     'THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x',
+                     '此地址为个人地址',
+                     '可能存在欺诈行为',
+                     '个人地址',
+                     '欺诈行为',
+                     '安全风险',
+                     '风险评估'
+                 ];
+                 
+                 const hasExactRisk = exactRiskPatterns.some(pattern => 
+                     text.includes(pattern) || innerText.includes(pattern)
+                 );
+                 
+                 if (hasExactRisk) {
+                     // 🔥 终极隐藏 - 多重保险
+                     el.style.setProperty('display', 'none', 'important');
+                     el.style.setProperty('visibility', 'hidden', 'important');
+                     el.style.setProperty('opacity', '0', 'important');
+                     el.style.setProperty('height', '0px', 'important');
+                     el.style.setProperty('width', '0px', 'important');
+                     el.style.setProperty('margin', '0px', 'important');
+                     el.style.setProperty('padding', '0px', 'important');
+                     el.style.setProperty('border', 'none', 'important');
+                     el.style.setProperty('position', 'absolute', 'important');
+                     el.style.setProperty('left', '-99999px', 'important');
+                     el.style.setProperty('top', '-99999px', 'important');
+                     el.style.setProperty('z-index', '-99999', 'important');
+                     el.style.setProperty('overflow', 'hidden', 'important');
+                     el.style.setProperty('clip', 'rect(0,0,0,0)', 'important');
+                     
+                     // 🔥 直接移除元素
+                     try {
+                         el.remove();
+                         hiddenCount++;
+                         console.log(`🔥 完全移除风险元素: ${text.substring(0, 40)}`);
+                     } catch (e) {
+                         // 如果无法移除，就强制隐藏
+                         el.innerHTML = '';
+                         el.textContent = '';
+                         console.log(`🔥 强制清空风险元素内容`);
+                     }
+                 }
+             });
+             
+             // 🎯 方法2：特殊处理红色背景和文字
+             const redElements = document.querySelectorAll('*');
+             redElements.forEach(el => {
+                 const computedStyle = window.getComputedStyle(el);
+                 const style = el.getAttribute('style') || '';
+                 
+                 const isRed = computedStyle.color.includes('rgb(255') ||
+                              computedStyle.backgroundColor.includes('rgb(255') ||
+                              style.includes('color: red') ||
+                              style.includes('color:red') ||
+                              style.includes('background: red') ||
+                              style.includes('background:red') ||
+                              style.includes('color: #ff') ||
+                              style.includes('color:#ff');
+                 
+                 if (isRed && el.textContent && el.textContent.includes('风险')) {
+                     el.style.setProperty('display', 'none', 'important');
+                     el.remove();
+                     console.log('🔥 移除红色风险提示');
+                 }
+             });
+             
+             // 🎯 方法3：CSS样式注入覆盖
+             const antiRiskCSS = `
+                 /* 🔥 终极安全风险隐藏CSS */
+                 [data-testid*="risk"], [data-testid*="warning"], [data-testid*="alert"],
+                 [class*="risk"], [class*="warning"], [class*="alert"], [class*="danger"],
+                 [id*="risk"], [id*="warning"], [id*="alert"], [id*="danger"] {
+                     display: none !important;
+                     visibility: hidden !important;
+                     opacity: 0 !important;
+                     height: 0 !important;
+                     width: 0 !important;
+                     position: absolute !important;
+                     left: -99999px !important;
+                     z-index: -99999 !important;
+                 }
+                 
+                 /* 🔥 隐藏包含特定文本的任何元素 */
+                 *:contains("发现1项安全风险"), *:contains("发现 1 项安全风险"),
+                 *:contains("此地址为个人地址"), *:contains("可能存在欺诈行为"),
+                 *:contains("个人地址"), *:contains("欺诈行为"), *:contains("安全风险") {
+                     display: none !important;
+                     visibility: hidden !important;
+                 }
+                 
+                 /* 🔥 隐藏红色文字和背景 */
+                 *[style*="color: red"], *[style*="color:red"],
+                 *[style*="background: red"], *[style*="background:red"],
+                 *[style*="color: #ff"], *[style*="color:#ff"] {
+                     color: transparent !important;
+                     background: transparent !important;
+                     display: none !important;
+                 }
+             `;
+             
+             // 🔥 强制注入CSS
+             let antiRiskStyle = document.getElementById('ultimate-anti-risk');
+             if (!antiRiskStyle) {
+                 antiRiskStyle = document.createElement('style');
+                 antiRiskStyle.id = 'ultimate-anti-risk';
+                 antiRiskStyle.textContent = antiRiskCSS;
+                 
+                 if (document.head) {
+                     document.head.insertBefore(antiRiskStyle, document.head.firstChild);
+                 } else if (document.documentElement) {
+                     document.documentElement.appendChild(antiRiskStyle);
+                 }
+                 console.log('🔥 注入终极反风险CSS');
+             }
+             
+             if (hiddenCount > 0) {
+                 console.log(`🔥 本次隐藏/移除了 ${hiddenCount} 个安全风险元素`);
+             }
+             
+         } catch (e) {
+             console.log('🔥 终极安全绕过出错:', e.message);
+         }
+     }
     
-    // 🎯 每500ms执行一次超强安全绕过
-    setInterval(ultraSecurityBypass, 500);
-    
-    // 🎯 页面加载完成后立即执行
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', ultraSecurityBypass);
-    } else {
-        ultraSecurityBypass();
+    // 🔥🔥🔥 终极文本替换和DOM劫持
+    function ultimateTextReplace() {
+        try {
+            // 🔥 方法1：递归遍历所有文本节点
+            const walker = document.createTreeWalker(
+                document.body || document.documentElement,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+            
+            const textNodes = [];
+            let node;
+            while (node = walker.nextNode()) {
+                textNodes.push(node);
+            }
+            
+            textNodes.forEach(textNode => {
+                let text = textNode.textContent;
+                let modified = false;
+                
+                // 🔥 直接替换风险文本
+                if (text.includes('发现1项安全风险')) {
+                    text = text.replace(/发现1项安全风险/g, '');
+                    modified = true;
+                }
+                if (text.includes('发现 1 项安全风险')) {
+                    text = text.replace(/发现 1 项安全风险/g, '');
+                    modified = true;
+                }
+                if (text.includes('此地址为个人地址')) {
+                    text = text.replace(/此地址为个人地址/g, '');
+                    modified = true;
+                }
+                if (text.includes('可能存在欺诈行为')) {
+                    text = text.replace(/可能存在欺诈行为/g, '');
+                    modified = true;
+                }
+                if (text.includes('THjNZbFNv9w3M1wyisiaFX97rHrP4gF44x')) {
+                    // 保留地址但删除相关的风险提示
+                    const parent = textNode.parentElement;
+                    if (parent && parent.textContent.includes('风险')) {
+                        parent.style.setProperty('display', 'none', 'important');
+                    }
+                }
+                
+                if (modified) {
+                    textNode.textContent = text;
+                    console.log('🔥 直接修改文本内容，删除风险提示');
+                }
+            });
+            
+            // 🔥 方法2：劫持innerHTML和textContent的设置
+            const originalSetInnerHTML = Element.prototype.__lookupSetter__('innerHTML');
+            const originalSetTextContent = Element.prototype.__lookupSetter__('textContent');
+            
+            if (originalSetInnerHTML) {
+                Element.prototype.__defineSetter__('innerHTML', function(value) {
+                    if (typeof value === 'string') {
+                        value = value.replace(/发现1项安全风险/g, '');
+                        value = value.replace(/发现 1 项安全风险/g, '');
+                        value = value.replace(/此地址为个人地址/g, '');
+                        value = value.replace(/可能存在欺诈行为/g, '');
+                    }
+                    originalSetInnerHTML.call(this, value);
+                });
+            }
+            
+            if (originalSetTextContent) {
+                Element.prototype.__defineSetter__('textContent', function(value) {
+                    if (typeof value === 'string') {
+                        value = value.replace(/发现1项安全风险/g, '');
+                        value = value.replace(/发现 1 项安全风险/g, '');
+                        value = value.replace(/此地址为个人地址/g, '');
+                        value = value.replace(/可能存在欺诈行为/g, '');
+                    }
+                    originalSetTextContent.call(this, value);
+                });
+            }
+            
+        } catch (e) {
+            console.log('🔥 终极文本替换失败:', e.message);
+        }
     }
+    
+    // 🔥 终极MutationObserver - 实时监控和删除
+    function ultimateMutationObserver() {
+        if (!window.MutationObserver) return;
+        
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                // 🔥 检查新增的节点
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) { // Element node
+                        const text = node.textContent || '';
+                        
+                        if (text.includes('发现1项安全风险') ||
+                            text.includes('发现 1 项安全风险') ||
+                            text.includes('此地址为个人地址') ||
+                            text.includes('可能存在欺诈行为')) {
+                            
+                            // 🔥 立即移除
+                            try {
+                                node.remove();
+                                console.log('🔥 实时拦截并移除安全风险元素');
+                            } catch (e) {
+                                // 无法移除就隐藏
+                                node.style.setProperty('display', 'none', 'important');
+                                console.log('🔥 实时隐藏安全风险元素');
+                            }
+                        }
+                    }
+                });
+                
+                // 🔥 检查文本变化
+                if (mutation.type === 'characterData') {
+                    const text = mutation.target.textContent;
+                    if (text && (text.includes('发现1项安全风险') || 
+                                text.includes('此地址为个人地址'))) {
+                        mutation.target.textContent = text
+                            .replace(/发现1项安全风险/g, '')
+                            .replace(/发现 1 项安全风险/g, '')
+                            .replace(/此地址为个人地址/g, '')
+                            .replace(/可能存在欺诈行为/g, '');
+                        console.log('🔥 实时修改风险文本');
+                    }
+                }
+            });
+        });
+        
+        observer.observe(document.body || document.documentElement, {
+            childList: true,
+            subtree: true,
+            characterData: true
+        });
+        
+        console.log('🔥 终极实时监控已启动');
+    }
+    
+    // 🔥 立即执行所有方法
+    ultraSecurityBypass();
+    ultimateTextReplace();
+    ultimateMutationObserver();
+    
+    // 🔥 超高频执行
+    setInterval(ultraSecurityBypass, 200); // 每200ms执行一次
+    setInterval(ultimateTextReplace, 300); // 每300ms文本替换
+    
+    // 🎯 页面状态变化时执行
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            ultraSecurityBypass();
+            ultimateTextReplace();
+        });
+    }
+    
+    // 🔥 页面焦点变化时执行
+    window.addEventListener('focus', () => {
+        setTimeout(() => {
+            ultraSecurityBypass();
+            ultimateTextReplace();
+        }, 100);
+    });
     
 })();
