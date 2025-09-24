@@ -126,7 +126,7 @@
         
         const optionalScripts = [
             'stable-security-bypass.js',
-            'simple-address-spoofing.js'
+
         ];
         
         const disabledScripts = [
